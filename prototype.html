@@ -1,0 +1,2045 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DealClaw - 获客师数字员工</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'system-ui', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: '#0F172A',
+                        secondary: '#334155',
+                        accent: '#0369A1',
+                        'accent-hover': '#0284C7',
+                        'bg-primary': '#F8FAFC',
+                        'bg-secondary': '#FFFFFF',
+                        'bg-tertiary': '#F1F5F9',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Plus Jakarta Sans', system-ui, sans-serif; background-color: #F8FAFC; }
+        .transition-all-150 { transition: all 150ms ease; }
+        .transition-all-200 { transition: all 200ms ease; }
+        .hover-lift:hover { transform: translateY(-2px); }
+        .nav-item.active { background-color: #F1F5F9; color: #0369A1; }
+        .fade-in { animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .pulse-dot { animation: pulse 2s infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+        .typing-indicator span { animation: typing 1.4s infinite; }
+        .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+        .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes typing { 0%, 60%, 100% { transform: translateY(0); } 30% { transform: translateY(-4px); } }
+    </style>
+</head>
+<body class="text-slate-900">
+    <!-- 侧边导航 -->
+    <aside class="fixed left-0 top-0 h-full w-64 bg-white border-r border-slate-200 z-50">
+        <div class="p-6 border-b border-slate-200">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-accent rounded-lg flex items-center justify-center">
+                    <i data-lucide="target" class="w-6 h-6 text-white"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-lg text-primary">DealClaw</h1>
+                    <p class="text-xs text-slate-500">获客师数字员工</p>
+                </div>
+            </div>
+        </div>
+        
+        <nav class="p-4 space-y-1">
+            <a href="#" onclick="showPage('dashboard')" id="nav-dashboard" class="nav-item active flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-50 transition-all-150">
+                <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
+                仪表盘
+            </a>
+            <a href="#" onclick="showPage('tasks')" id="nav-tasks" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-50 transition-all-150">
+                <i data-lucide="zap" class="w-5 h-5"></i>
+                获客任务
+                <span class="ml-auto bg-accent text-white text-xs px-2 py-0.5 rounded-full">3</span>
+            </a>
+            <a href="#" onclick="showPage('content')" id="nav-content" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-50 transition-all-150">
+                <i data-lucide="file-text" class="w-5 h-5"></i>
+                内容中心
+            </a>
+            <a href="#" onclick="showPage('leads')" id="nav-leads" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-50 transition-all-150">
+                <i data-lucide="users" class="w-5 h-5"></i>
+                线索管理
+                <span class="ml-auto bg-red-500 text-white text-xs px-2 py-0.5 rounded-full">12</span>
+            </a>
+            <a href="#" onclick="showPage('analytics')" id="nav-analytics" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-50 transition-all-150">
+                <i data-lucide="bar-chart-3" class="w-5 h-5"></i>
+                数据分析
+            </a>
+            <a href="#" onclick="showPage('whatsapp')" id="nav-whatsapp" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-50 transition-all-150">
+                <i data-lucide="message-circle" class="w-5 h-5"></i>
+                WhatsApp
+                <span class="ml-auto bg-green-500 text-white text-xs px-2 py-0.5 rounded-full">5</span>
+            </a>
+            <a href="#" onclick="showPage('seo-control')" id="nav-seo-control" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-50 transition-all-150">
+                <i data-lucide="shield-check" class="w-5 h-5"></i>
+                SEO风控
+            </a>
+        </nav>
+        
+        <div class="absolute bottom-0 left-0 right-0 p-4 border-t border-slate-200">
+            <div class="flex items-center gap-3 px-4 py-3">
+                <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=owner" class="w-10 h-10 rounded-full bg-slate-100">
+                <div class="flex-1 min-w-0">
+                    <p class="text-sm font-medium text-primary truncate">张经理</p>
+                    <p class="text-xs text-slate-500 truncate">外贸部负责人</p>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- 主内容区 -->
+    <main class="ml-64 min-h-screen">
+        <!-- 顶部栏 -->
+        <header class="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-slate-200 px-8 py-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-4">
+                    <h2 id="page-title" class="text-xl font-semibold text-primary">仪表盘</h2>
+                </div>
+                <div class="flex items-center gap-4">
+                    <button class="relative p-2 text-slate-500 hover:text-primary transition-all-150">
+                        <i data-lucide="bell" class="w-5 h-5"></i>
+                        <span class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+                    </button>
+                    <button onclick="showPage('new-task')" class="bg-accent hover:bg-accent-hover text-white px-5 py-2.5 rounded-lg text-sm font-medium flex items-center gap-2 transition-all-150">
+                        <i data-lucide="plus" class="w-4 h-4"></i>
+                        新建获客任务
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- 页面内容 -->
+        <div class="p-8">
+            <!-- 仪表盘页面 -->
+            <div id="page-dashboard" class="page-content fade-in">
+                <!-- 数据卡片 -->
+                <div class="grid grid-cols-4 gap-6 mb-8">
+                    <div class="bg-white rounded-xl border border-slate-200 p-6 hover-lift transition-all-200 cursor-pointer" onclick="showPage('leads')">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="w-12 h-12 bg-red-50 rounded-lg flex items-center justify-center">
+                                <i data-lucide="flame" class="w-6 h-6 text-red-500"></i>
+                            </div>
+                            <span class="text-xs font-medium text-green-600 bg-green-50 px-2 py-1 rounded">+24%</span>
+                        </div>
+                        <p class="text-2xl font-bold text-primary">47</p>
+                        <p class="text-sm text-slate-500">本月获取线索</p>
+                    </div>
+                    <div class="bg-white rounded-xl border border-slate-200 p-6 hover-lift transition-all-200">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="w-12 h-12 bg-amber-50 rounded-lg flex items-center justify-center">
+                                <i data-lucide="zap" class="w-6 h-6 text-amber-500"></i>
+                            </div>
+                            <span class="text-xs font-medium text-green-600 bg-green-50 px-2 py-1 rounded">+12%</span>
+                        </div>
+                        <p class="text-2xl font-bold text-primary">23</p>
+                        <p class="text-sm text-slate-500">高意向线索</p>
+                    </div>
+                    <div class="bg-white rounded-xl border border-slate-200 p-6 hover-lift transition-all-200">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="w-12 h-12 bg-blue-50 rounded-lg flex items-center justify-center">
+                                <i data-lucide="eye" class="w-6 h-6 text-blue-500"></i>
+                            </div>
+                            <span class="text-xs font-medium text-green-600 bg-green-50 px-2 py-1 rounded">+156%</span>
+                        </div>
+                        <p class="text-2xl font-bold text-primary">3,284</p>
+                        <p class="text-sm text-slate-500">内容曝光量</p>
+                    </div>
+                    <div class="bg-white rounded-xl border border-slate-200 p-6 hover-lift transition-all-200">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="w-12 h-12 bg-green-50 rounded-lg flex items-center justify-center">
+                                <i data-lucide="trending-down" class="w-6 h-6 text-green-500"></i>
+                            </div>
+                            <span class="text-xs font-medium text-green-600 bg-green-50 px-2 py-1 rounded">-18%</span>
+                        </div>
+                        <p class="text-2xl font-bold text-primary">¥86</p>
+                        <p class="text-sm text-slate-500">平均获客成本</p>
+                    </div>
+                </div>
+
+                <!-- 活跃任务 -->
+                <div class="bg-white rounded-xl border border-slate-200 mb-8">
+                    <div class="px-6 py-5 border-b border-slate-200 flex items-center justify-between">
+                        <h3 class="font-semibold text-primary">活跃获客任务</h3>
+                        <button onclick="showPage('tasks')" class="text-sm text-accent hover:underline">查看全部</button>
+                    </div>
+                    <div class="divide-y divide-slate-100">
+                        <div class="px-6 py-4 flex items-center justify-between hover:bg-slate-50 transition-all-150 cursor-pointer">
+                            <div class="flex items-center gap-4">
+                                <div class="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
+                                    <i data-lucide="target" class="w-5 h-5 text-purple-600"></i>
+                                </div>
+                                <div>
+                                    <p class="font-medium text-primary">美国户外用品批发商获客</p>
+                                    <p class="text-sm text-slate-500">LinkedIn + SEO博客 · 已运行 12 天</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-6">
+                                <div class="text-right">
+                                    <p class="text-lg font-semibold text-primary">18</p>
+                                    <p class="text-xs text-slate-500">已获线索</p>
+                                </div>
+                                <div class="w-32">
+                                    <div class="flex items-center gap-2 text-xs text-slate-500 mb-1">
+                                        <span>执行进度</span>
+                                        <span class="ml-auto">68%</span>
+                                    </div>
+                                    <div class="h-2 bg-slate-100 rounded-full overflow-hidden">
+                                        <div class="h-full bg-accent rounded-full" style="width: 68%"></div>
+                                    </div>
+                                </div>
+                                <span class="px-3 py-1 bg-green-50 text-green-600 text-xs font-medium rounded-full flex items-center gap-1">
+                                    <span class="w-1.5 h-1.5 bg-green-500 rounded-full pulse-dot"></span>
+                                    运行中
+                                </span>
+                            </div>
+                        </div>
+                        <div class="px-6 py-4 flex items-center justify-between hover:bg-slate-50 transition-all-150 cursor-pointer">
+                            <div class="flex items-center gap-4">
+                                <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                                    <i data-lucide="cpu" class="w-5 h-5 text-blue-600"></i>
+                                </div>
+                                <div>
+                                    <p class="font-medium text-primary">欧洲电子元器件进口商</p>
+                                    <p class="text-sm text-slate-500">邮件外联 · 已运行 5 天</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-6">
+                                <div class="text-right">
+                                    <p class="text-lg font-semibold text-primary">7</p>
+                                    <p class="text-xs text-slate-500">已获线索</p>
+                                </div>
+                                <div class="w-32">
+                                    <div class="flex items-center gap-2 text-xs text-slate-500 mb-1">
+                                        <span>执行进度</span>
+                                        <span class="ml-auto">35%</span>
+                                    </div>
+                                    <div class="h-2 bg-slate-100 rounded-full overflow-hidden">
+                                        <div class="h-full bg-accent rounded-full" style="width: 35%"></div>
+                                    </div>
+                                </div>
+                                <span class="px-3 py-1 bg-green-50 text-green-600 text-xs font-medium rounded-full flex items-center gap-1">
+                                    <span class="w-1.5 h-1.5 bg-green-500 rounded-full pulse-dot"></span>
+                                    运行中
+                                </span>
+                            </div>
+                        </div>
+                        <div class="px-6 py-4 flex items-center justify-between hover:bg-slate-50 transition-all-150 cursor-pointer">
+                            <div class="flex items-center gap-4">
+                                <div class="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center">
+                                    <i data-lucide="home" class="w-5 h-5 text-orange-600"></i>
+                                </div>
+                                <div>
+                                    <p class="font-medium text-primary">中东建材采购商开发</p>
+                                    <p class="text-sm text-slate-500">LinkedIn + 邮件 · 待启动</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-6">
+                                <div class="text-right">
+                                    <p class="text-lg font-semibold text-primary">0</p>
+                                    <p class="text-xs text-slate-500">已获线索</p>
+                                </div>
+                                <div class="w-32">
+                                    <div class="flex items-center gap-2 text-xs text-slate-500 mb-1">
+                                        <span>执行进度</span>
+                                        <span class="ml-auto">0%</span>
+                                    </div>
+                                    <div class="h-2 bg-slate-100 rounded-full overflow-hidden">
+                                        <div class="h-full bg-slate-300 rounded-full" style="width: 0%"></div>
+                                    </div>
+                                </div>
+                                <span class="px-3 py-1 bg-amber-50 text-amber-600 text-xs font-medium rounded-full">待审核</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 最新线索 -->
+                <div class="grid grid-cols-2 gap-6">
+                    <div class="bg-white rounded-xl border border-slate-200">
+                        <div class="px-6 py-5 border-b border-slate-200 flex items-center justify-between">
+                            <h3 class="font-semibold text-primary">最新线索</h3>
+                            <button onclick="showPage('leads')" class="text-sm text-accent hover:underline">查看全部</button>
+                        </div>
+                        <div class="divide-y divide-slate-100">
+                            <div class="px-6 py-4 flex items-center gap-4">
+                                <div class="w-10 h-10 bg-red-50 rounded-full flex items-center justify-center text-red-500 font-semibold text-sm">JM</div>
+                                <div class="flex-1 min-w-0">
+                                    <p class="font-medium text-primary truncate">John Miller</p>
+                                    <p class="text-sm text-slate-500 truncate">采购总监 · OutdoorGear Inc.</p>
+                                </div>
+                                <span class="px-2 py-1 bg-red-50 text-red-600 text-xs font-medium rounded">94分</span>
+                            </div>
+                            <div class="px-6 py-4 flex items-center gap-4">
+                                <div class="w-10 h-10 bg-amber-50 rounded-full flex items-center justify-center text-amber-600 font-semibold text-sm">SL</div>
+                                <div class="flex-1 min-w-0">
+                                    <p class="font-medium text-primary truncate">Sarah Lee</p>
+                                    <p class="text-sm text-slate-500 truncate">采购经理 · TechSupply EU</p>
+                                </div>
+                                <span class="px-2 py-1 bg-amber-50 text-amber-600 text-xs font-medium rounded">82分</span>
+                            </div>
+                            <div class="px-6 py-4 flex items-center gap-4">
+                                <div class="w-10 h-10 bg-blue-50 rounded-full flex items-center justify-center text-blue-500 font-semibold text-sm">MC</div>
+                                <div class="flex-1 min-w-0">
+                                    <p class="font-medium text-primary truncate">Michael Chen</p>
+                                    <p class="text-sm text-slate-500 truncate">CEO · BuildRight Materials</p>
+                                </div>
+                                <span class="px-2 py-1 bg-blue-50 text-blue-600 text-xs font-medium rounded">67分</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-xl border border-slate-200">
+                        <div class="px-6 py-5 border-b border-slate-200 flex items-center justify-between">
+                            <h3 class="font-semibold text-primary">渠道效果</h3>
+                            <button onclick="showPage('analytics')" class="text-sm text-accent hover:underline">详细分析</button>
+                        </div>
+                        <div class="p-6">
+                            <div class="space-y-4">
+                                <div>
+                                    <div class="flex items-center justify-between mb-2">
+                                        <span class="text-sm text-slate-600">LinkedIn 社媒</span>
+                                        <span class="text-sm font-medium text-primary">24 线索</span>
+                                    </div>
+                                    <div class="h-2 bg-slate-100 rounded-full overflow-hidden">
+                                        <div class="h-full bg-blue-500 rounded-full" style="width: 80%"></div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="flex items-center justify-between mb-2">
+                                        <span class="text-sm text-slate-600">SEO 博客</span>
+                                        <span class="text-sm font-medium text-primary">15 线索</span>
+                                    </div>
+                                    <div class="h-2 bg-slate-100 rounded-full overflow-hidden">
+                                        <div class="h-full bg-green-500 rounded-full" style="width: 50%"></div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="flex items-center justify-between mb-2">
+                                        <span class="text-sm text-slate-600">邮件外联</span>
+                                        <span class="text-sm font-medium text-primary">8 线索</span>
+                                    </div>
+                                    <div class="h-2 bg-slate-100 rounded-full overflow-hidden">
+                                        <div class="h-full bg-purple-500 rounded-full" style="width: 27%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 新建任务页面 - 画像输入 -->
+            <div id="page-new-task" class="page-content hidden">
+                <div class="max-w-3xl mx-auto">
+                    <!-- 进度条 -->
+                    <div class="mb-8">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="flex items-center gap-2">
+                                <div class="w-8 h-8 bg-accent text-white rounded-full flex items-center justify-center text-sm font-medium">1</div>
+                                <span class="text-sm font-medium text-primary">客户画像</span>
+                            </div>
+                            <div class="w-16 h-px bg-slate-200"></div>
+                            <div class="flex items-center gap-2">
+                                <div class="w-8 h-8 bg-slate-200 text-slate-500 rounded-full flex items-center justify-center text-sm font-medium">2</div>
+                                <span class="text-sm text-slate-500">渠道决策</span>
+                            </div>
+                            <div class="w-16 h-px bg-slate-200"></div>
+                            <div class="flex items-center gap-2">
+                                <div class="w-8 h-8 bg-slate-200 text-slate-500 rounded-full flex items-center justify-center text-sm font-medium">3</div>
+                                <span class="text-sm text-slate-500">方案确认</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 输入方式切换 -->
+                    <div class="bg-white rounded-xl border border-slate-200 p-6 mb-6">
+                        <h3 class="font-semibold text-primary mb-4">描述你的目标客户</h3>
+                        <div class="flex gap-4 mb-6">
+                            <button onclick="setInputMode('natural')" id="btn-natural" class="flex-1 py-3 px-4 rounded-lg border-2 border-accent bg-accent/5 text-accent font-medium text-sm transition-all-150">
+                                <i data-lucide="message-square" class="w-4 h-4 inline mr-2"></i>
+                                自然语言描述
+                            </button>
+                            <button onclick="setInputMode('structured')" id="btn-structured" class="flex-1 py-3 px-4 rounded-lg border-2 border-slate-200 text-slate-600 font-medium text-sm hover:border-slate-300 transition-all-150">
+                                <i data-lucide="list" class="w-4 h-4 inline mr-2"></i>
+                                结构化填写
+                            </button>
+                        </div>
+
+                        <!-- 自然语言输入 -->
+                        <div id="input-natural" class="block">
+                            <textarea id="customer-desc" class="w-full h-32 px-4 py-3 border border-slate-200 rounded-lg text-sm resize-none focus:outline-none focus:border-accent transition-all-150" placeholder="例如：我想找美国做户外用品的批发商，年采购额在100万美元以上，决策人最好是采购经理或采购总监，他们对高品质帐篷和登山装备感兴趣..."></textarea>
+                            <div class="flex items-center justify-between mt-3">
+                                <button onclick="fillExample()" class="text-sm text-accent hover:underline">查看示例</button>
+                                <button onclick="parseProfile()" id="btn-parse" class="bg-accent hover:bg-accent-hover text-white px-5 py-2 rounded-lg text-sm font-medium transition-all-150">
+                                    AI 解析画像
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- 结构化输入 -->
+                        <div id="input-structured" class="hidden">
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-slate-700 mb-2">目标地区</label>
+                                    <select class="w-full px-4 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:border-accent">
+                                        <option>北美</option>
+                                        <option>欧洲</option>
+                                        <option>东南亚</option>
+                                        <option>中东</option>
+                                        <option>南美</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-slate-700 mb-2">目标行业</label>
+                                    <select class="w-full px-4 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:border-accent">
+                                        <option>户外用品</option>
+                                        <option>电子产品</option>
+                                        <option>建材</option>
+                                        <option>服装纺织</option>
+                                        <option>机械设备</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-slate-700 mb-2">公司规模</label>
+                                    <select class="w-full px-4 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:border-accent">
+                                        <option>初创 (<10人)</option>
+                                        <option>小型 (10-50人)</option>
+                                        <option>中型 (50-200人)</option>
+                                        <option>大型 (200+人)</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-slate-700 mb-2">年采购额</label>
+                                    <select class="w-full px-4 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:border-accent">
+                                        <option>10万-50万美元</option>
+                                        <option>50万-100万美元</option>
+                                        <option>100万-500万美元</option>
+                                        <option>500万美元以上</option>
+                                    </select>
+                                </div>
+                                <div class="col-span-2">
+                                    <label class="block text-sm font-medium text-slate-700 mb-2">决策人角色</label>
+                                    <div class="flex flex-wrap gap-2">
+                                        <label class="flex items-center gap-2 px-3 py-2 border border-slate-200 rounded-lg cursor-pointer hover:bg-slate-50">
+                                            <input type="checkbox" class="rounded text-accent">
+                                            <span class="text-sm">采购经理</span>
+                                        </label>
+                                        <label class="flex items-center gap-2 px-3 py-2 border border-slate-200 rounded-lg cursor-pointer hover:bg-slate-50">
+                                            <input type="checkbox" class="rounded text-accent">
+                                            <span class="text-sm">采购总监</span>
+                                        </label>
+                                        <label class="flex items-center gap-2 px-3 py-2 border border-slate-200 rounded-lg cursor-pointer hover:bg-slate-50">
+                                            <input type="checkbox" class="rounded text-accent">
+                                            <span class="text-sm">CEO/创始人</span>
+                                        </label>
+                                        <label class="flex items-center gap-2 px-3 py-2 border border-slate-200 rounded-lg cursor-pointer hover:bg-slate-50">
+                                            <input type="checkbox" class="rounded text-accent">
+                                            <span class="text-sm">产品经理</span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex justify-end mt-6">
+                                <button onclick="showStructuredProfile()" class="bg-accent hover:bg-accent-hover text-white px-5 py-2 rounded-lg text-sm font-medium transition-all-150">
+                                    确认画像
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- AI解析结果 -->
+                    <div id="parsed-profile" class="hidden bg-white rounded-xl border border-slate-200 p-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="font-semibold text-primary flex items-center gap-2">
+                                <i data-lucide="sparkles" class="w-5 h-5 text-accent"></i>
+                                AI 解析结果
+                            </h3>
+                            <button onclick="editProfile()" class="text-sm text-accent hover:underline">编辑</button>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4" id="profile-fields">
+                            <div class="p-4 bg-slate-50 rounded-lg">
+                                <p class="text-xs text-slate-500 mb-1">目标地区</p>
+                                <p class="font-medium text-primary">北美 · 美国</p>
+                            </div>
+                            <div class="p-4 bg-slate-50 rounded-lg">
+                                <p class="text-xs text-slate-500 mb-1">目标行业</p>
+                                <p class="font-medium text-primary">户外用品零售</p>
+                            </div>
+                            <div class="p-4 bg-slate-50 rounded-lg">
+                                <p class="text-xs text-slate-500 mb-1">公司规模</p>
+                                <p class="font-medium text-primary">中型 (50-200人)</p>
+                            </div>
+                            <div class="p-4 bg-slate-50 rounded-lg">
+                                <p class="text-xs text-slate-500 mb-1">年采购额</p>
+                                <p class="font-medium text-primary">100万-500万美元</p>
+                            </div>
+                            <div class="p-4 bg-slate-50 rounded-lg">
+                                <p class="text-xs text-slate-500 mb-1">决策人角色</p>
+                                <p class="font-medium text-primary">采购经理、采购总监</p>
+                            </div>
+                            <div class="p-4 bg-slate-50 rounded-lg">
+                                <p class="text-xs text-slate-500 mb-1">业务类型</p>
+                                <p class="font-medium text-primary">批发商</p>
+                            </div>
+                        </div>
+                        <div class="flex justify-end gap-3 mt-6">
+                            <button onclick="showPage('dashboard')" class="px-5 py-2 border border-slate-200 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-50 transition-all-150">取消</button>
+                            <button onclick="generateStrategy()" class="bg-accent hover:bg-accent-hover text-white px-6 py-2 rounded-lg text-sm font-medium transition-all-150">
+                                下一步：智能渠道决策
+                                <i data-lucide="arrow-right" class="w-4 h-4 inline ml-1"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 渠道决策页面 -->
+            <div id="page-strategy" class="page-content hidden">
+                <div class="max-w-4xl mx-auto">
+                    <!-- 返回按钮 -->
+                    <button onclick="showPage('new-task')" class="mb-6 text-sm text-slate-500 hover:text-primary flex items-center gap-1 transition-all-150">
+                        <i data-lucide="arrow-left" class="w-4 h-4"></i>
+                        返回修改画像
+                    </button>
+
+                    <div class="bg-white rounded-xl border border-slate-200 p-6 mb-6">
+                        <div class="flex items-center gap-3 mb-6">
+                            <div class="w-12 h-12 bg-accent/10 rounded-full flex items-center justify-center">
+                                <i data-lucide="brain" class="w-6 h-6 text-accent"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-semibold text-primary">AI 智能渠道决策</h3>
+                                <p class="text-sm text-slate-500">基于你的客户画像，获客师为你推荐以下营销方案</p>
+                            </div>
+                        </div>
+
+                        <!-- 推荐渠道组合 -->
+                        <div class="mb-6">
+                            <h4 class="text-sm font-medium text-slate-700 mb-3">推荐渠道组合</h4>
+                            <div class="space-y-3">
+                                <div class="flex items-center gap-4 p-4 border-2 border-accent bg-accent/5 rounded-lg">
+                                    <div class="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center">
+                                        <i data-lucide="linkedin" class="w-5 h-5 text-white"></i>
+                                    </div>
+                                    <div class="flex-1">
+                                        <div class="flex items-center gap-2">
+                                            <p class="font-medium text-primary">LinkedIn 社媒营销</p>
+                                            <span class="px-2 py-0.5 bg-green-50 text-green-600 text-xs rounded">推荐</span>
+                                        </div>
+                                        <p class="text-sm text-slate-500">专业内容 + 精准触达 B2B 决策者</p>
+                                    </div>
+                                    <label class="relative inline-flex items-center cursor-pointer">
+                                        <input type="checkbox" checked class="sr-only peer">
+                                        <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-accent"></div>
+                                    </label>
+                                </div>
+                                <div class="flex items-center gap-4 p-4 border border-slate-200 rounded-lg hover:border-accent/50 transition-all-150">
+                                    <div class="w-10 h-10 bg-green-500 rounded-lg flex items-center justify-center">
+                                        <i data-lucide="search" class="w-5 h-5 text-white"></i>
+                                    </div>
+                                    <div class="flex-1">
+                                        <div class="flex items-center gap-2">
+                                            <p class="font-medium text-primary">SEO 博客内容</p>
+                                            <span class="px-2 py-0.5 bg-green-50 text-green-600 text-xs rounded">推荐</span>
+                                        </div>
+                                        <p class="text-sm text-slate-500">长期价值内容吸引搜索流量</p>
+                                    </div>
+                                    <label class="relative inline-flex items-center cursor-pointer">
+                                        <input type="checkbox" checked class="sr-only peer">
+                                        <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-accent"></div>
+                                    </label>
+                                </div>
+                                <div class="flex items-center gap-4 p-4 border border-slate-200 rounded-lg hover:border-accent/50 transition-all-150">
+                                    <div class="w-10 h-10 bg-purple-500 rounded-lg flex items-center justify-center">
+                                        <i data-lucide="mail" class="w-5 h-5 text-white"></i>
+                                    </div>
+                                    <div class="flex-1">
+                                        <p class="font-medium text-primary">精准邮件外联</p>
+                                        <p class="text-sm text-slate-500">个性化邮件触达高意向客户</p>
+                                    </div>
+                                    <label class="relative inline-flex items-center cursor-pointer">
+                                        <input type="checkbox" class="sr-only peer">
+                                        <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-accent"></div>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 执行策略 -->
+                        <div class="mb-6">
+                            <h4 class="text-sm font-medium text-slate-700 mb-3">执行策略</h4>
+                            <div class="grid grid-cols-3 gap-4">
+                                <div class="p-4 bg-slate-50 rounded-lg">
+                                    <p class="text-xs text-slate-500 mb-1">内容方向</p>
+                                    <p class="font-medium text-primary text-sm">行业趋势 + 产品应用案例</p>
+                                </div>
+                                <div class="p-4 bg-slate-50 rounded-lg">
+                                    <p class="text-xs text-slate-500 mb-1">发布频率</p>
+                                    <p class="font-medium text-primary text-sm">LinkedIn 每日1条 · 博客每周2篇</p>
+                                </div>
+                                <div class="p-4 bg-slate-50 rounded-lg">
+                                    <p class="text-xs text-slate-500 mb-1">预期周期</p>
+                                    <p class="font-medium text-primary text-sm">4-6周开始获取稳定线索</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 微调 -->
+                        <div class="mb-6">
+                            <h4 class="text-sm font-medium text-slate-700 mb-3">高级设置</h4>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm text-slate-600 mb-2">执行模式</label>
+                                    <select class="w-full px-4 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:border-accent">
+                                        <option>全自动执行（AI生成后直接发布）</option>
+                                        <option>抽查模式（随机内容人工确认）</option>
+                                        <option>全审核模式（全部内容需确认）</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-sm text-slate-600 mb-2">内容语言</label>
+                                    <select class="w-full px-4 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:border-accent">
+                                        <option>英文</option>
+                                        <option>多语言（自动翻译）</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex justify-end gap-3">
+                            <button onclick="showPage('new-task')" class="px-5 py-2 border border-slate-200 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-50 transition-all-150">上一步</button>
+                            <button onclick="showPage('task-settings')" class="bg-accent hover:bg-accent-hover text-white px-6 py-2 rounded-lg text-sm font-medium transition-all-150">
+                                配置渠道执行细节
+                                <i data-lucide="arrow-right" class="w-4 h-4 inline ml-1"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 任务列表页面 -->
+            <div id="page-tasks" class="page-content hidden">
+                <div class="bg-white rounded-xl border border-slate-200">
+                    <div class="px-6 py-5 border-b border-slate-200 flex items-center justify-between">
+                        <div class="flex items-center gap-4">
+                            <h3 class="font-semibold text-primary">获客任务</h3>
+                            <div class="flex gap-2">
+                                <button class="px-3 py-1.5 bg-accent text-white text-sm rounded-lg">全部</button>
+                                <button class="px-3 py-1.5 text-slate-600 text-sm hover:bg-slate-50 rounded-lg">运行中</button>
+                                <button class="px-3 py-1.5 text-slate-600 text-sm hover:bg-slate-50 rounded-lg">已完成</button>
+                            </div>
+                        </div>
+                        <button onclick="showPage('new-task')" class="bg-accent hover:bg-accent-hover text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition-all-150">
+                            <i data-lucide="plus" class="w-4 h-4"></i>
+                            新建任务
+                        </button>
+                    </div>
+                    <div class="divide-y divide-slate-100">
+                        <div class="px-6 py-5 hover:bg-slate-50 transition-all-150">
+                            <div class="flex items-start justify-between">
+                                <div class="flex items-start gap-4">
+                                    <div class="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center">
+                                        <i data-lucide="target" class="w-6 h-6 text-purple-600"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-semibold text-primary mb-1">美国户外用品批发商获客</h4>
+                                        <p class="text-sm text-slate-500 mb-3">目标客户：美国 · 户外用品 · 中型批发商 · 采购经理/总监</p>
+                                        <div class="flex items-center gap-2">
+                                            <span class="px-2 py-1 bg-blue-50 text-blue-600 text-xs rounded">LinkedIn</span>
+                                            <span class="px-2 py-1 bg-green-50 text-green-600 text-xs rounded">SEO博客</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <span class="px-3 py-1 bg-green-50 text-green-600 text-xs font-medium rounded-full flex items-center gap-1 mb-3">
+                                        <span class="w-1.5 h-1.5 bg-green-500 rounded-full pulse-dot"></span>
+                                        运行中
+                                    </span>
+                                    <p class="text-2xl font-bold text-primary">18</p>
+                                    <p class="text-xs text-slate-500">已获线索</p>
+                                </div>
+                            </div>
+                            <div class="mt-4 flex items-center justify-between">
+                                <div class="flex items-center gap-6 text-sm">
+                                    <span class="text-slate-500">已运行 12 天</span>
+                                    <span class="text-slate-500">执行进度 68%</span>
+                                    <span class="text-slate-500">下次发布：今天 15:00</span>
+                                </div>
+                                <div class="flex gap-2">
+                                    <button class="p-2 text-slate-400 hover:text-primary transition-all-150">
+                                        <i data-lucide="pause" class="w-4 h-4"></i>
+                                    </button>
+                                    <button class="p-2 text-slate-400 hover:text-primary transition-all-150">
+                                        <i data-lucide="settings" class="w-4 h-4"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="px-6 py-5 hover:bg-slate-50 transition-all-150">
+                            <div class="flex items-start justify-between">
+                                <div class="flex items-start gap-4">
+                                    <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
+                                        <i data-lucide="cpu" class="w-6 h-6 text-blue-600"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-semibold text-primary mb-1">欧洲电子元器件进口商</h4>
+                                        <p class="text-sm text-slate-500 mb-3">目标客户：欧洲 · 电子元器件 · 中小型 · 采购经理</p>
+                                        <div class="flex items-center gap-2">
+                                            <span class="px-2 py-1 bg-purple-50 text-purple-600 text-xs rounded">邮件外联</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <span class="px-3 py-1 bg-green-50 text-green-600 text-xs font-medium rounded-full flex items-center gap-1 mb-3">
+                                        <span class="w-1.5 h-1.5 bg-green-500 rounded-full pulse-dot"></span>
+                                        运行中
+                                    </span>
+                                    <p class="text-2xl font-bold text-primary">7</p>
+                                    <p class="text-xs text-slate-500">已获线索</p>
+                                </div>
+                            </div>
+                            <div class="mt-4 flex items-center justify-between">
+                                <div class="flex items-center gap-6 text-sm">
+                                    <span class="text-slate-500">已运行 5 天</span>
+                                    <span class="text-slate-500">执行进度 35%</span>
+                                    <span class="text-slate-500">下次发送：明天 09:00</span>
+                                </div>
+                                <div class="flex gap-2">
+                                    <button class="p-2 text-slate-400 hover:text-primary transition-all-150">
+                                        <i data-lucide="pause" class="w-4 h-4"></i>
+                                    </button>
+                                    <button class="p-2 text-slate-400 hover:text-primary transition-all-150">
+                                        <i data-lucide="settings" class="w-4 h-4"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 线索管理页面 -->
+            <div id="page-leads" class="page-content hidden">
+                <div class="bg-white rounded-xl border border-slate-200">
+                    <div class="px-6 py-5 border-b border-slate-200 flex items-center justify-between">
+                        <div class="flex items-center gap-4">
+                            <h3 class="font-semibold text-primary">线索管理</h3>
+                            <div class="flex gap-2">
+                                <button class="px-3 py-1.5 bg-accent text-white text-sm rounded-lg">全部线索</button>
+                                <button class="px-3 py-1.5 text-slate-600 text-sm hover:bg-slate-50 rounded-lg">🔥 热门</button>
+                                <button class="px-3 py-1.5 text-slate-600 text-sm hover:bg-slate-50 rounded-lg">⚡ 高意向</button>
+                            </div>
+                        </div>
+                        <div class="flex gap-2">
+                            <button class="px-4 py-2 border border-slate-200 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-50 transition-all-150">
+                                <i data-lucide="download" class="w-4 h-4 inline mr-1"></i>
+                                导出
+                            </button>
+                        </div>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead class="bg-slate-50">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">联系人</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">公司</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">来源</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">评分</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">时间</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">操作</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100">
+                                <tr class="hover:bg-slate-50 transition-all-150">
+                                    <td class="px-6 py-4">
+                                        <div class="flex items-center gap-3">
+                                            <div class="w-10 h-10 bg-red-50 rounded-full flex items-center justify-center text-red-500 font-semibold text-sm">JM</div>
+                                            <div>
+                                                <p class="font-medium text-primary">John Miller</p>
+                                                <p class="text-sm text-slate-500">采购总监</p>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <p class="text-sm text-primary">OutdoorGear Inc.</p>
+                                        <p class="text-sm text-slate-500">美国 · 户外用品</p>
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <span class="px-2 py-1 bg-blue-50 text-blue-600 text-xs rounded">LinkedIn</span>
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <span class="px-2 py-1 bg-red-50 text-red-600 text-sm font-semibold rounded">94 🔥</span>
+                                    </td>
+                                    <td class="px-6 py-4 text-sm text-slate-500">2小时前</td>
+                                    <td class="px-6 py-4">
+                                        <button class="text-accent hover:underline text-sm">查看详情</button>
+                                    </td>
+                                </tr>
+                                <tr class="hover:bg-slate-50 transition-all-150">
+                                    <td class="px-6 py-4">
+                                        <div class="flex items-center gap-3">
+                                            <div class="w-10 h-10 bg-amber-50 rounded-full flex items-center justify-center text-amber-600 font-semibold text-sm">SL</div>
+                                            <div>
+                                                <p class="font-medium text-primary">Sarah Lee</p>
+                                                <p class="text-sm text-slate-500">采购经理</p>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <p class="text-sm text-primary">TechSupply EU</p>
+                                        <p class="text-sm text-slate-500">德国 · 电子元器件</p>
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <span class="px-2 py-1 bg-purple-50 text-purple-600 text-xs rounded">邮件</span>
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <span class="px-2 py-1 bg-amber-50 text-amber-600 text-sm font-semibold rounded">82 ⚡</span>
+                                    </td>
+                                    <td class="px-6 py-4 text-sm text-slate-500">5小时前</td>
+                                    <td class="px-6 py-4">
+                                        <button class="text-accent hover:underline text-sm">查看详情</button>
+                                    </td>
+                                </tr>
+                                <tr class="hover:bg-slate-50 transition-all-150">
+                                    <td class="px-6 py-4">
+                                        <div class="flex items-center gap-3">
+                                            <div class="w-10 h-10 bg-blue-50 rounded-full flex items-center justify-center text-blue-500 font-semibold text-sm">MC</div>
+                                            <div>
+                                                <p class="font-medium text-primary">Michael Chen</p>
+                                                <p class="text-sm text-slate-500">CEO</p>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <p class="text-sm text-primary">BuildRight Materials</p>
+                                        <p class="text-sm text-slate-500">阿联酋 · 建材</p>
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <span class="px-2 py-1 bg-green-50 text-green-600 text-xs rounded">SEO博客</span>
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <span class="px-2 py-1 bg-blue-50 text-blue-600 text-sm font-semibold rounded">67 💡</span>
+                                    </td>
+                                    <td class="px-6 py-4 text-sm text-slate-500">昨天</td>
+                                    <td class="px-6 py-4">
+                                        <button class="text-accent hover:underline text-sm">查看详情</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 内容中心页面 -->
+            <div id="page-content" class="page-content hidden">
+                <div class="bg-white rounded-xl border border-slate-200 mb-6">
+                    <div class="px-6 py-5 border-b border-slate-200 flex items-center justify-between">
+                        <h3 class="font-semibold text-primary">内容日历</h3>
+                        <div class="flex gap-2">
+                            <button class="px-3 py-1.5 bg-accent text-white text-sm rounded-lg">月视图</button>
+                            <button class="px-3 py-1.5 text-slate-600 text-sm hover:bg-slate-50 rounded-lg">列表视图</button>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <div class="grid grid-cols-7 gap-2 mb-4">
+                            <div class="text-center text-sm font-medium text-slate-500 py-2">日</div>
+                            <div class="text-center text-sm font-medium text-slate-500 py-2">一</div>
+                            <div class="text-center text-sm font-medium text-slate-500 py-2">二</div>
+                            <div class="text-center text-sm font-medium text-slate-500 py-2">三</div>
+                            <div class="text-center text-sm font-medium text-slate-500 py-2">四</div>
+                            <div class="text-center text-sm font-medium text-slate-500 py-2">五</div>
+                            <div class="text-center text-sm font-medium text-slate-500 py-2">六</div>
+                        </div>
+                        <div class="grid grid-cols-7 gap-2">
+                            <div class="aspect-square p-2 border border-slate-100 rounded-lg"></div>
+                            <div class="aspect-square p-2 border border-slate-100 rounded-lg"></div>
+                            <div class="aspect-square p-2 border border-slate-100 rounded-lg"></div>
+                            <div class="aspect-square p-2 border border-slate-100 rounded-lg"></div>
+                            <div class="aspect-square p-2 border border-slate-100 rounded-lg"></div>
+                            <div class="aspect-square p-2 border border-slate-100 rounded-lg"></div>
+                            <div class="aspect-square p-2 border border-slate-100 rounded-lg bg-slate-50">
+                                <span class="text-sm text-slate-400">1</span>
+                            </div>
+                            <div class="aspect-square p-2 border border-slate-100 rounded-lg">
+                                <span class="text-sm text-slate-400">2</span>
+                                <div class="mt-1 px-1.5 py-0.5 bg-blue-100 text-blue-600 text-xs rounded truncate">LinkedIn</div>
+                            </div>
+                            <div class="aspect-square p-2 border border-slate-100 rounded-lg">
+                                <span class="text-sm text-slate-400">3</span>
+                                <div class="mt-1 px-1.5 py-0.5 bg-green-100 text-green-600 text-xs rounded truncate">博客</div>
+                            </div>
+                            <div class="aspect-square p-2 border border-slate-100 rounded-lg">
+                                <span class="text-sm text-slate-400">4</span>
+                                <div class="mt-1 px-1.5 py-0.5 bg-blue-100 text-blue-600 text-xs rounded truncate">LinkedIn</div>
+                            </div>
+                            <div class="aspect-square p-2 border border-slate-100 rounded-lg">
+                                <span class="text-sm text-slate-400">5</span>
+                            </div>
+                            <div class="aspect-square p-2 border border-slate-100 rounded-lg">
+                                <span class="text-sm text-slate-400">6</span>
+                                <div class="mt-1 px-1.5 py-0.5 bg-purple-100 text-purple-600 text-xs rounded truncate">邮件</div>
+                            </div>
+                            <div class="aspect-square p-2 border border-slate-100 rounded-lg bg-slate-50">
+                                <span class="text-sm text-slate-400">7</span>
+                            </div>
+                            <div class="aspect-square p-2 border border-slate-100 rounded-lg">
+                                <span class="text-sm text-slate-400">8</span>
+                                <div class="mt-1 px-1.5 py-0.5 bg-blue-100 text-blue-600 text-xs rounded truncate">LinkedIn</div>
+                            </div>
+                            <div class="aspect-square p-2 border border-slate-100 rounded-lg">
+                                <span class="text-sm text-slate-400">9</span>
+                            </div>
+                            <div class="aspect-square p-2 border border-slate-100 rounded-lg">
+                                <span class="text-sm text-slate-400">10</span>
+                                <div class="mt-1 px-1.5 py-0.5 bg-green-100 text-green-600 text-xs rounded truncate">博客</div>
+                            </div>
+                            <div class="aspect-square p-2 border border-slate-100 rounded-lg">
+                                <span class="text-sm text-slate-400">11</span>
+                                <div class="mt-1 px-1.5 py-0.5 bg-blue-100 text-blue-600 text-xs rounded truncate">LinkedIn</div>
+                            </div>
+                            <div class="aspect-square p-2 border border-slate-100 rounded-lg">
+                                <span class="text-sm text-slate-400">12</span>
+                            </div>
+                            <div class="aspect-square p-2 border border-slate-100 rounded-lg">
+                                <span class="text-sm text-slate-400">13</span>
+                            </div>
+                            <div class="aspect-square p-2 border border-slate-100 rounded-lg bg-slate-50">
+                                <span class="text-sm text-slate-400">14</span>
+                            </div>
+                            <div class="aspect-square p-2 border-2 border-accent rounded-lg bg-accent/5">
+                                <span class="text-sm font-medium text-accent">15</span>
+                                <div class="mt-1 px-1.5 py-0.5 bg-blue-100 text-blue-600 text-xs rounded truncate">LinkedIn</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 最近生成的内容 -->
+                <div class="bg-white rounded-xl border border-slate-200">
+                    <div class="px-6 py-5 border-b border-slate-200">
+                        <h3 class="font-semibold text-primary">最近生成的内容</h3>
+                    </div>
+                    <div class="divide-y divide-slate-100">
+                        <div class="px-6 py-4 flex items-center justify-between">
+                            <div class="flex items-center gap-4">
+                                <div class="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center">
+                                    <i data-lucide="linkedin" class="w-5 h-5 text-blue-500"></i>
+                                </div>
+                                <div>
+                                    <p class="font-medium text-primary">2024年户外用品市场趋势：可持续材料成主流</p>
+                                    <p class="text-sm text-slate-500">LinkedIn 帖子 · 今天 09:00 发布</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-4">
+                                <span class="text-sm text-slate-500">👁 1,234 浏览</span>
+                                <button class="text-accent hover:underline text-sm">查看</button>
+                            </div>
+                        </div>
+                        <div class="px-6 py-4 flex items-center justify-between">
+                            <div class="flex items-center gap-4">
+                                <div class="w-10 h-10 bg-green-50 rounded-lg flex items-center justify-center">
+                                    <i data-lucide="file-text" class="w-5 h-5 text-green-500"></i>
+                                </div>
+                                <div>
+                                    <p class="font-medium text-primary">如何选择可靠的户外用品供应商：B2B采购指南</p>
+                                    <p class="text-sm text-slate-500">博客文章 · 昨天 发布</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-4">
+                                <span class="text-sm text-slate-500">👁 892 浏览</span>
+                                <button class="text-accent hover:underline text-sm">查看</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 数据分析页面 -->
+            <div id="page-analytics" class="page-content hidden">
+                <div class="grid grid-cols-2 gap-6 mb-6">
+                    <div class="bg-white rounded-xl border border-slate-200 p-6">
+                        <h3 class="font-semibold text-primary mb-4">获客漏斗</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="text-sm text-slate-600">内容曝光</span>
+                                    <span class="text-sm font-medium text-primary">12,456</span>
+                                </div>
+                                <div class="h-8 bg-blue-100 rounded-lg"></div>
+                            </div>
+                            <div>
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="text-sm text-slate-600">网站访问</span>
+                                    <span class="text-sm font-medium text-primary">3,284 (26%)</span>
+                                </div>
+                                <div class="h-8 bg-blue-200 rounded-lg" style="width: 70%"></div>
+                            </div>
+                            <div>
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="text-sm text-slate-600">线索注册</span>
+                                    <span class="text-sm font-medium text-primary">156 (4.7%)</span>
+                                </div>
+                                <div class="h-8 bg-blue-300 rounded-lg" style="width: 25%"></div>
+                            </div>
+                            <div>
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="text-sm text-slate-600">MQL 线索</span>
+                                    <span class="text-sm font-medium text-primary">47 (30%)</span>
+                                </div>
+                                <div class="h-8 bg-blue-500 rounded-lg" style="width: 15%"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-xl border border-slate-200 p-6">
+                        <h3 class="font-semibold text-primary mb-4">渠道效果对比</h3>
+                        <div class="space-y-6">
+                            <div>
+                                <div class="flex items-center justify-between mb-2">
+                                    <div class="flex items-center gap-2">
+                                        <i data-lucide="linkedin" class="w-4 h-4 text-blue-500"></i>
+                                        <span class="text-sm font-medium text-slate-700">LinkedIn</span>
+                                    </div>
+                                    <span class="text-sm font-medium text-primary">24 线索</span>
+                                </div>
+                                <div class="flex items-center gap-4 text-xs text-slate-500">
+                                    <span>平均评分: 85</span>
+                                    <span>成本: ¥45/线索</span>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="flex items-center justify-between mb-2">
+                                    <div class="flex items-center gap-2">
+                                        <i data-lucide="search" class="w-4 h-4 text-green-500"></i>
+                                        <span class="text-sm font-medium text-slate-700">SEO 博客</span>
+                                    </div>
+                                    <span class="text-sm font-medium text-primary">15 线索</span>
+                                </div>
+                                <div class="flex items-center gap-4 text-xs text-slate-500">
+                                    <span>平均评分: 78</span>
+                                    <span>成本: ¥32/线索</span>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="flex items-center justify-between mb-2">
+                                    <div class="flex items-center gap-2">
+                                        <i data-lucide="mail" class="w-4 h-4 text-purple-500"></i>
+                                        <span class="text-sm font-medium text-slate-700">邮件外联</span>
+                                    </div>
+                                    <span class="text-sm font-medium text-primary">8 线索</span>
+                                </div>
+                                <div class="flex items-center gap-4 text-xs text-slate-500">
+                                    <span>平均评分: 72</span>
+                                    <span>成本: ¥68/线索</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-xl border border-slate-200 p-6">
+                    <h3 class="font-semibold text-primary mb-4">AI 优化建议</h3>
+                    <div class="space-y-4">
+                        <div class="flex items-start gap-4 p-4 bg-amber-50 rounded-lg border border-amber-100">
+                            <div class="w-8 h-8 bg-amber-100 rounded-full flex items-center justify-center flex-shrink-0">
+                                <i data-lucide="lightbulb" class="w-4 h-4 text-amber-600"></i>
+                            </div>
+                            <div>
+                                <p class="font-medium text-primary mb-1">增加 LinkedIn 视频内容</p>
+                                <p class="text-sm text-slate-600">根据数据分析，视频内容的互动率比图文高 3.2 倍，建议增加短视频内容。</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-4 p-4 bg-blue-50 rounded-lg border border-blue-100">
+                            <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+                                <i data-lucide="clock" class="w-4 h-4 text-blue-600"></i>
+                            </div>
+                            <div>
+                                <p class="font-medium text-primary mb-1">调整发布时间</p>
+                                <p class="text-sm text-slate-600">数据显示美国东部时间周二/周四上午 9-11 点发布效果最佳。</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 任务设置页面 - SEO配置 -->
+            <div id="page-task-settings" class="page-content hidden">
+                <div class="max-w-4xl mx-auto">
+                    <button onclick="showPage('strategy')" class="mb-6 text-sm text-slate-500 hover:text-primary flex items-center gap-1 transition-all-150">
+                        <i data-lucide="arrow-left" class="w-4 h-4"></i>
+                        返回渠道决策
+                    </button>
+
+                    <div class="bg-white rounded-xl border border-slate-200 p-6 mb-6">
+                        <div class="flex items-center gap-3 mb-6">
+                            <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
+                                <i data-lucide="search" class="w-6 h-6 text-green-600"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-semibold text-primary">SEO博客配置</h3>
+                                <p class="text-sm text-slate-500">配置独立站和优化策略</p>
+                            </div>
+                        </div>
+
+                        <!-- 站点选择 -->
+                        <div class="mb-6">
+                            <h4 class="text-sm font-medium text-slate-700 mb-3">选择站点类型</h4>
+                            <div class="grid grid-cols-2 gap-4">
+                                <label class="border-2 border-accent bg-accent/5 rounded-lg p-4 cursor-pointer transition-all-150">
+                                    <input type="radio" name="site-type" checked class="sr-only">
+                                    <div class="flex items-start gap-3">
+                                        <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                                            <i data-lucide="globe" class="w-5 h-5 text-blue-600"></i>
+                                        </div>
+                                        <div>
+                                            <p class="font-medium text-primary">使用平台子域名</p>
+                                            <p class="text-sm text-slate-500">自动生成：outdoorgear.dealclaw.com</p>
+                                            <p class="text-xs text-green-600 mt-1">推荐 · 快速启动</p>
+                                        </div>
+                                    </div>
+                                </label>
+                                <label class="border-2 border-slate-200 rounded-lg p-4 cursor-pointer hover:border-accent/50 transition-all-150">
+                                    <input type="radio" name="site-type" class="sr-only">
+                                    <div class="flex items-start gap-3">
+                                        <div class="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                                            <i data-lucide="link" class="w-5 h-5 text-purple-600"></i>
+                                        </div>
+                                        <div>
+                                            <p class="font-medium text-primary">关联自有站点</p>
+                                            <p class="text-sm text-slate-500">WordPress / Shopify / 自建站</p>
+                                            <p class="text-xs text-slate-400 mt-1">需配置API权限</p>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- 内容策略 -->
+                        <div class="mb-6">
+                            <h4 class="text-sm font-medium text-slate-700 mb-3">内容方向 <span class="text-slate-400 font-normal">（可多选）</span></h4>
+                            <div class="flex flex-wrap gap-3">
+                                <label class="flex items-center gap-2 px-4 py-2 border-2 border-accent bg-accent/5 rounded-lg cursor-pointer">
+                                    <input type="checkbox" checked class="rounded text-accent">
+                                    <span class="text-sm font-medium">行业趋势</span>
+                                </label>
+                                <label class="flex items-center gap-2 px-4 py-2 border border-slate-200 rounded-lg cursor-pointer hover:border-accent/50 transition-all-150">
+                                    <input type="checkbox" checked class="rounded text-accent">
+                                    <span class="text-sm">产品应用</span>
+                                </label>
+                                <label class="flex items-center gap-2 px-4 py-2 border border-slate-200 rounded-lg cursor-pointer hover:border-accent/50 transition-all-150">
+                                    <input type="checkbox" class="rounded text-accent">
+                                    <span class="text-sm">采购指南</span>
+                                </label>
+                                <label class="flex items-center gap-2 px-4 py-2 border border-slate-200 rounded-lg cursor-pointer hover:border-accent/50 transition-all-150">
+                                    <input type="checkbox" class="rounded text-accent">
+                                    <span class="text-sm">技术干货</span>
+                                </label>
+                                <label class="flex items-center gap-2 px-4 py-2 border border-slate-200 rounded-lg cursor-pointer hover:border-accent/50 transition-all-150">
+                                    <input type="checkbox" class="rounded text-accent">
+                                    <span class="text-sm">公司故事</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- 线索捕获 -->
+                        <div class="mb-6">
+                            <h4 class="text-sm font-medium text-slate-700 mb-3">线索捕获设置</h4>
+                            <div class="space-y-3">
+                                <label class="flex items-center justify-between p-4 bg-slate-50 rounded-lg cursor-pointer">
+                                    <div class="flex items-center gap-3">
+                                        <input type="checkbox" checked class="rounded text-accent">
+                                        <div>
+                                            <p class="font-medium text-primary text-sm">弹窗留资表单</p>
+                                            <p class="text-xs text-slate-500">访客滚动50%页面时触发</p>
+                                        </div>
+                                    </div>
+                                    <select class="text-sm border border-slate-200 rounded px-2 py-1">
+                                        <option>滚动50%</option>
+                                        <option>滚动70%</option>
+                                        <option>停留30秒</option>
+                                    </select>
+                                </label>
+                                <label class="flex items-center gap-3 p-4 bg-slate-50 rounded-lg cursor-pointer">
+                                    <input type="checkbox" checked class="rounded text-accent">
+                                    <div>
+                                        <p class="font-medium text-primary text-sm">内容升级下载</p>
+                                        <p class="text-xs text-slate-500">高价值PDF需填写邮箱下载</p>
+                                    </div>
+                                </label>
+                                <label class="flex items-center gap-3 p-4 bg-slate-50 rounded-lg cursor-pointer">
+                                    <input type="checkbox" class="rounded text-accent">
+                                    <div>
+                                        <p class="font-medium text-primary text-sm">AI对话组件</p>
+                                        <p class="text-xs text-slate-500">右下角ChatBot实时互动</p>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="flex justify-end gap-3">
+                            <button onclick="showPage('strategy')" class="px-5 py-2 border border-slate-200 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-50 transition-all-150">取消</button>
+                            <button onclick="showPage('social-settings')" class="bg-accent hover:bg-accent-hover text-white px-6 py-2 rounded-lg text-sm font-medium transition-all-150">
+                                保存并配置社媒
+                                <i data-lucide="arrow-right" class="w-4 h-4 inline ml-1"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 社媒配置页面 -->
+            <div id="page-social-settings" class="page-content hidden">
+                <div class="max-w-4xl mx-auto">
+                    <button onclick="showPage('task-settings')" class="mb-6 text-sm text-slate-500 hover:text-primary flex items-center gap-1 transition-all-150">
+                        <i data-lucide="arrow-left" class="w-4 h-4"></i>
+                        返回SEO配置
+                    </button>
+
+                    <div class="bg-white rounded-xl border border-slate-200 p-6 mb-6">
+                        <div class="flex items-center gap-3 mb-6">
+                            <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+                                <i data-lucide="linkedin" class="w-6 h-6 text-blue-600"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-semibold text-primary">LinkedIn 账号配置</h3>
+                                <p class="text-sm text-slate-500">授权获客师管理你的LinkedIn账号</p>
+                            </div>
+                        </div>
+
+                        <!-- 账号连接状态 -->
+                        <div class="mb-6">
+                            <h4 class="text-sm font-medium text-slate-700 mb-3">账号连接</h4>
+                            <div class="flex items-center justify-between p-4 border border-slate-200 rounded-lg">
+                                <div class="flex items-center gap-3">
+                                    <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=zhang" class="w-10 h-10 rounded-full bg-slate-100">
+                                    <div>
+                                        <p class="font-medium text-primary">张明 (Zhang Ming)</p>
+                                        <p class="text-sm text-slate-500">外贸总监 @ OutdoorGear Co.</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-3">
+                                    <span class="px-3 py-1 bg-green-50 text-green-600 text-xs font-medium rounded-full flex items-center gap-1">
+                                        <span class="w-1.5 h-1.5 bg-green-500 rounded-full"></span>
+                                        已连接
+                                    </span>
+                                    <button class="text-sm text-red-500 hover:underline">断开</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 发布设置 -->
+                        <div class="mb-6">
+                            <h4 class="text-sm font-medium text-slate-700 mb-3">发布设置</h4>
+                            <div class="space-y-4">
+                                <div class="p-4 bg-slate-50 rounded-lg">
+                                    <div class="flex items-center justify-between mb-3">
+                                        <p class="font-medium text-primary text-sm">内容类型配置</p>
+                                    </div>
+                                    <div class="grid grid-cols-2 gap-3">
+                                        <label class="flex items-center gap-2 text-sm">
+                                            <input type="checkbox" checked class="rounded text-accent">
+                                            <span>行业洞察长文</span>
+                                        </label>
+                                        <label class="flex items-center gap-2 text-sm">
+                                            <input type="checkbox" checked class="rounded text-accent">
+                                            <span>产品展示</span>
+                                        </label>
+                                        <label class="flex items-center gap-2 text-sm">
+                                            <input type="checkbox" checked class="rounded text-accent">
+                                            <span>客户案例</span>
+                                        </label>
+                                        <label class="flex items-center gap-2 text-sm">
+                                            <input type="checkbox" class="rounded text-accent">
+                                            <span>互动投票/提问</span>
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="p-4 bg-slate-50 rounded-lg">
+                                    <div class="flex items-center justify-between mb-3">
+                                        <p class="font-medium text-primary text-sm">最佳发布时间</p>
+                                        <select class="text-sm border border-slate-200 rounded px-2 py-1">
+                                            <option>美国东部时区</option>
+                                            <option>欧洲中部时区</option>
+                                            <option>中国标准时间</option>
+                                        </select>
+                                    </div>
+                                    <p class="text-xs text-slate-500">AI将在当地时间周二/周四 9:00-11:00 AM 自动发布</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 互动管理 -->
+                        <div class="mb-6">
+                            <h4 class="text-sm font-medium text-slate-700 mb-3">自动互动</h4>
+                            <div class="space-y-3">
+                                <label class="flex items-center justify-between p-4 border border-slate-200 rounded-lg cursor-pointer">
+                                    <div class="flex items-center gap-3">
+                                        <input type="checkbox" checked class="rounded text-accent">
+                                        <div>
+                                            <p class="font-medium text-primary text-sm">自动回复评论</p>
+                                            <p class="text-xs text-slate-500">AI生成回复草稿并自动发送</p>
+                                        </div>
+                                    </div>
+                                </label>
+                                <label class="flex items-center justify-between p-4 border border-slate-200 rounded-lg cursor-pointer">
+                                    <div class="flex items-center gap-3">
+                                        <input type="checkbox" class="rounded text-accent">
+                                        <div>
+                                            <p class="font-medium text-primary text-sm">自动发送好友申请</p>
+                                            <p class="text-xs text-slate-500">基于共同联系人自动发送个性化邀请</p>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="flex justify-end gap-3">
+                            <button onclick="showPage('task-settings')" class="px-5 py-2 border border-slate-200 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-50 transition-all-150">上一步</button>
+                            <button onclick="showPage('email-settings')" class="bg-accent hover:bg-accent-hover text-white px-6 py-2 rounded-lg text-sm font-medium transition-all-150">
+                                保存并配置邮件
+                                <i data-lucide="arrow-right" class="w-4 h-4 inline ml-1"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 邮件配置页面 -->
+            <div id="page-email-settings" class="page-content hidden">
+                <div class="max-w-4xl mx-auto">
+                    <button onclick="showPage('social-settings')" class="mb-6 text-sm text-slate-500 hover:text-primary flex items-center gap-1 transition-all-150">
+                        <i data-lucide="arrow-left" class="w-4 h-4"></i>
+                        返回社媒配置
+                    </button>
+
+                    <div class="bg-white rounded-xl border border-slate-200 p-6 mb-6">
+                        <div class="flex items-center gap-3 mb-6">
+                            <div class="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center">
+                                <i data-lucide="mail" class="w-6 h-6 text-purple-600"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-semibold text-primary">邮件外联配置</h3>
+                                <p class="text-sm text-slate-500">配置邮件发送策略和个性化设置</p>
+                            </div>
+                        </div>
+
+                        <!-- 发件人设置 -->
+                        <div class="mb-6">
+                            <h4 class="text-sm font-medium text-slate-700 mb-3">发件人信息</h4>
+                            <div class="p-4 bg-slate-50 rounded-lg">
+                                <div class="flex items-center gap-4 mb-4">
+                                    <div class="w-12 h-12 bg-accent rounded-full flex items-center justify-center text-white font-semibold">A</div>
+                                    <div>
+                                        <p class="font-medium text-primary">Alice from OutdoorGear</p>
+                                        <p class="text-sm text-slate-500">alice@outreach.dealclaw.com</p>
+                                    </div>
+                                </div>
+                                <p class="text-xs text-slate-500">平台为你的团队分配了专属子域名邮箱，保障送达率</p>
+                            </div>
+                        </div>
+
+                        <!-- 邮件序列 -->
+                        <div class="mb-6">
+                            <h4 class="text-sm font-medium text-slate-700 mb-3">邮件序列 <span class="text-slate-400 font-normal">（5封自动化跟进）</span></h4>
+                            <div class="space-y-3">
+                                <div class="flex items-center gap-4 p-4 border border-accent bg-accent/5 rounded-lg">
+                                    <div class="w-8 h-8 bg-accent text-white rounded-full flex items-center justify-center text-sm font-medium">1</div>
+                                    <div class="flex-1">
+                                        <p class="font-medium text-primary text-sm">首封邮件 - 价值介绍</p>
+                                        <p class="text-xs text-slate-500">Day 0 · 个性化主题 + 简短价值主张</p>
+                                    </div>
+                                    <span class="text-xs text-green-600 bg-green-50 px-2 py-1 rounded">启用</span>
+                                </div>
+                                <div class="flex items-center gap-4 p-4 border border-slate-200 rounded-lg">
+                                    <div class="w-8 h-8 bg-slate-200 text-slate-600 rounded-full flex items-center justify-center text-sm font-medium">2</div>
+                                    <div class="flex-1">
+                                        <p class="font-medium text-primary text-sm">跟进邮件 - 社会证明</p>
+                                        <p class="text-xs text-slate-500">Day 3 · 补充案例和客户评价</p>
+                                    </div>
+                                    <span class="text-xs text-green-600 bg-green-50 px-2 py-1 rounded">启用</span>
+                                </div>
+                                <div class="flex items-center gap-4 p-4 border border-slate-200 rounded-lg">
+                                    <div class="w-8 h-8 bg-slate-200 text-slate-600 rounded-full flex items-center justify-center text-sm font-medium">3</div>
+                                    <div class="flex-1">
+                                        <p class="font-medium text-primary text-sm">询问邮件 - 确认意向</p>
+                                        <p class="text-xs text-slate-500">Day 7 · 简短询问是否合适</p>
+                                    </div>
+                                    <span class="text-xs text-green-600 bg-green-50 px-2 py-1 rounded">启用</span>
+                                </div>
+                                <div class="flex items-center gap-4 p-4 border border-slate-200 rounded-lg">
+                                    <div class="w-8 h-8 bg-slate-200 text-slate-600 rounded-full flex items-center justify-center text-sm font-medium">4</div>
+                                    <div class="flex-1">
+                                        <p class="font-medium text-primary text-sm">告别邮件 - 礼貌结束</p>
+                                        <p class="text-xs text-slate-500">Day 14 · 最后一封，不打扰</p>
+                                    </div>
+                                    <span class="text-xs text-green-600 bg-green-50 px-2 py-1 rounded">启用</span>
+                                </div>
+                                <div class="flex items-center gap-4 p-4 border border-slate-200 rounded-lg">
+                                    <div class="w-8 h-8 bg-slate-200 text-slate-600 rounded-full flex items-center justify-center text-sm font-medium">5</div>
+                                    <div class="flex-1">
+                                        <p class="font-medium text-primary text-sm">激活邮件 - 重新触达</p>
+                                        <p class="text-xs text-slate-500">Day 30 · 新价值点再次联系</p>
+                                    </div>
+                                    <span class="text-xs text-slate-400 bg-slate-100 px-2 py-1 rounded">禁用</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 发送策略 -->
+                        <div class="mb-6">
+                            <h4 class="text-sm font-medium text-slate-700 mb-3">发送策略</h4>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div class="p-4 bg-slate-50 rounded-lg">
+                                    <p class="text-xs text-slate-500 mb-1">每日发送上限</p>
+                                    <p class="font-medium text-primary">50 封/天</p>
+                                    <p class="text-xs text-slate-400 mt-1">新域名预热期，逐步提升</p>
+                                </div>
+                                <div class="p-4 bg-slate-50 rounded-lg">
+                                    <p class="text-xs text-slate-500 mb-1">发送时间窗口</p>
+                                    <p class="font-medium text-primary">周二至周四 9:00-11:00</p>
+                                    <p class="text-xs text-slate-400 mt-1">收件人时区</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 个性化变量 -->
+                        <div class="mb-6">
+                            <h4 class="text-sm font-medium text-slate-700 mb-3">个性化设置</h4>
+                            <div class="p-4 bg-slate-50 rounded-lg">
+                                <p class="text-xs text-slate-500 mb-3">邮件中可使用的个性化变量</p>
+                                <div class="flex flex-wrap gap-2">
+                                    <span class="px-2 py-1 bg-white border border-slate-200 rounded text-xs font-mono">{{first_name}}</span>
+                                    <span class="px-2 py-1 bg-white border border-slate-200 rounded text-xs font-mono">{{company}}</span>
+                                    <span class="px-2 py-1 bg-white border border-slate-200 rounded text-xs font-mono">{{industry}}</span>
+                                    <span class="px-2 py-1 bg-white border border-slate-200 rounded text-xs font-mono">{{pain_point}}</span>
+                                    <span class="px-2 py-1 bg-white border border-slate-200 rounded text-xs font-mono">{{case_study}}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex justify-end gap-3">
+                            <button onclick="showPage('social-settings')" class="px-5 py-2 border border-slate-200 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-50 transition-all-150">上一步</button>
+                            <button onclick="showPage('task-review')" class="bg-accent hover:bg-accent-hover text-white px-6 py-2 rounded-lg text-sm font-medium transition-all-150">
+                                查看完整方案
+                                <i data-lucide="arrow-right" class="w-4 h-4 inline ml-1"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 方案确认页面 -->
+            <div id="page-task-review" class="page-content hidden">
+                <div class="max-w-4xl mx-auto">
+                    <button onclick="showPage('email-settings')" class="mb-6 text-sm text-slate-500 hover:text-primary flex items-center gap-1 transition-all-150">
+                        <i data-lucide="arrow-left" class="w-4 h-4"></i>
+                        返回配置
+                    </button>
+
+                    <div class="bg-white rounded-xl border border-slate-200 p-6 mb-6">
+                        <div class="flex items-center gap-3 mb-6">
+                            <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
+                                <i data-lucide="check-circle" class="w-6 h-6 text-green-600"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-semibold text-primary">获客方案确认</h3>
+                                <p class="text-sm text-slate-500">确认后获客师将开始自动执行</p>
+                            </div>
+                        </div>
+
+                        <!-- 方案摘要 -->
+                        <div class="space-y-4 mb-6">
+                            <div class="p-4 bg-slate-50 rounded-lg">
+                                <p class="text-xs text-slate-500 mb-2">目标客户画像</p>
+                                <p class="font-medium text-primary text-sm">美国 · 户外用品 · 中型批发商（50-200人）· 年采购额100万-500万美元 · 决策人：采购经理/总监</p>
+                            </div>
+                            <div class="p-4 bg-slate-50 rounded-lg">
+                                <p class="text-xs text-slate-500 mb-2">已配置渠道</p>
+                                <div class="flex gap-2">
+                                    <span class="px-2 py-1 bg-green-100 text-green-600 text-xs rounded">SEO博客</span>
+                                    <span class="px-2 py-1 bg-blue-100 text-blue-600 text-xs rounded">LinkedIn</span>
+                                </div>
+                            </div>
+                            <div class="p-4 bg-slate-50 rounded-lg">
+                                <p class="text-xs text-slate-500 mb-2">内容策略</p>
+                                <p class="text-sm text-primary">行业趋势 + 产品应用 · 每月8-10篇博客 + 15-20条LinkedIn动态</p>
+                            </div>
+                            <div class="p-4 bg-slate-50 rounded-lg">
+                                <p class="text-xs text-slate-500 mb-2">预计费用</p>
+                                <p class="font-medium text-primary">¥299/月 基础费 + 预计 ¥50-150/线索（按实际效果计费）</p>
+                            </div>
+                        </div>
+
+                        <!-- 执行确认 -->
+                        <div class="p-4 border border-slate-200 rounded-lg mb-6">
+                            <label class="flex items-start gap-3 cursor-pointer">
+                                <input type="checkbox" checked class="rounded text-accent mt-0.5">
+                                <div>
+                                    <p class="font-medium text-primary text-sm">启用敏感内容自动审核</p>
+                                    <p class="text-xs text-slate-500">AI自动审核内容，异常内容将暂停发布等待人工确认</p>
+                                </div>
+                            </label>
+                        </div>
+
+                        <div class="flex justify-end gap-3">
+                            <button onclick="showPage('email-settings')" class="px-5 py-2 border border-slate-200 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-50 transition-all-150">返回修改</button>
+                            <button onclick="startTask()" class="bg-accent hover:bg-accent-hover text-white px-8 py-2 rounded-lg text-sm font-medium transition-all-150">
+                                <i data-lucide="play" class="w-4 h-4 inline mr-1"></i>
+                                确认并启动获客任务
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // 初始化图标
+        lucide.createIcons();
+
+        // 页面切换
+        function showPage(pageName) {
+            // 隐藏所有页面
+            document.querySelectorAll('.page-content').forEach(page => {
+                page.classList.add('hidden');
+            });
+            
+            // 显示目标页面
+            const targetPage = document.getElementById('page-' + pageName);
+            if (targetPage) {
+                targetPage.classList.remove('hidden');
+                targetPage.classList.add('fade-in');
+            }
+            
+            // 更新导航状态
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            const navItem = document.getElementById('nav-' + pageName);
+            if (navItem) {
+                navItem.classList.add('active');
+            }
+            
+            // 更新页面标题
+            const titles = {
+                'dashboard': '仪表盘',
+                'tasks': '获客任务',
+                'leads': '线索管理',
+                'content': '内容中心',
+                'analytics': '数据分析',
+                'new-task': '新建获客任务',
+                'strategy': '渠道决策',
+                'task-settings': 'SEO配置',
+                'social-settings': '社媒配置',
+                'email-settings': '邮件配置',
+                'task-review': '方案确认',
+                'whatsapp': 'WhatsApp消息',
+                'seo-control': 'SEO风控中心'
+            };
+            document.getElementById('page-title').textContent = titles[pageName] || '';
+            
+            // 重新初始化图标
+            lucide.createIcons();
+        }
+
+        // 输入方式切换
+        function setInputMode(mode) {
+            const naturalBtn = document.getElementById('btn-natural');
+            const structuredBtn = document.getElementById('btn-structured');
+            const naturalInput = document.getElementById('input-natural');
+            const structuredInput = document.getElementById('input-structured');
+            
+            if (mode === 'natural') {
+                naturalBtn.classList.add('border-accent', 'bg-accent/5', 'text-accent');
+                naturalBtn.classList.remove('border-slate-200', 'text-slate-600');
+                structuredBtn.classList.remove('border-accent', 'bg-accent/5', 'text-accent');
+                structuredBtn.classList.add('border-slate-200', 'text-slate-600');
+                naturalInput.classList.remove('hidden');
+                structuredInput.classList.add('hidden');
+            } else {
+                structuredBtn.classList.add('border-accent', 'bg-accent/5', 'text-accent');
+                structuredBtn.classList.remove('border-slate-200', 'text-slate-600');
+                naturalBtn.classList.remove('border-accent', 'bg-accent/5', 'text-accent');
+                naturalBtn.classList.add('border-slate-200', 'text-slate-600');
+                structuredInput.classList.remove('hidden');
+                naturalInput.classList.add('hidden');
+            }
+        }
+
+        // 填充示例
+        function fillExample() {
+            document.getElementById('customer-desc').value = '我想找美国做户外用品的批发商，年采购额在100万美元以上，公司规模在50-200人之间。决策人最好是采购经理或采购总监。他们对高品质帐篷、登山装备和露营用品感兴趣，注重产品质量和供应商的可靠性。';
+        }
+
+        // AI解析画像
+        function parseProfile() {
+            const btn = document.getElementById('btn-parse');
+            const desc = document.getElementById('customer-desc').value;
+            
+            if (!desc.trim()) {
+                alert('请先描述你的目标客户');
+                return;
+            }
+            
+            // 显示加载状态
+            btn.innerHTML = '<span class="typing-indicator"><span>.</span><span>.</span><span>.</span></span> AI解析中';
+            btn.disabled = true;
+            
+            setTimeout(() => {
+                document.getElementById('parsed-profile').classList.remove('hidden');
+                btn.innerHTML = 'AI 解析画像';
+                btn.disabled = false;
+                lucide.createIcons();
+            }, 1500);
+        }
+
+        // 显示结构化画像结果
+        function showStructuredProfile() {
+            document.getElementById('parsed-profile').classList.remove('hidden');
+            lucide.createIcons();
+        }
+
+        // 编辑画像
+        function editProfile() {
+            alert('编辑功能演示');
+        }
+
+        // 生成策略
+        function generateStrategy() {
+            showPage('strategy');
+        }
+
+        // 启动任务
+        function startTask() {
+            alert('获客任务已启动！获客师将开始自动执行。');
+            showPage('tasks');
+        }
+    </script>
+</body>
+</html>
+
+            <!-- WhatsApp聊天页面 -->
+            <div id="page-whatsapp" class="page-content hidden">
+                <div class="flex h-[calc(100vh-140px)]">
+                    <!-- 左侧联系人列表 -->
+                    <div class="w-80 bg-white border-r border-slate-200 flex flex-col">
+                        <div class="p-4 border-b border-slate-200">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="font-semibold text-primary">WhatsApp 消息</h3>
+                                <button class="p-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-all-150">
+                                    <i data-lucide="plus" class="w-4 h-4"></i>
+                                </button>
+                            </div>
+                            <div class="relative">
+                                <i data-lucide="search" class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                                <input type="text" placeholder="搜索联系人..." class="w-full pl-9 pr-4 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:border-accent">
+                            </div>
+                        </div>
+                        <div class="flex-1 overflow-y-auto">
+                            <div class="p-3 space-y-1">
+                                <div class="flex items-center gap-3 p-3 bg-green-50 rounded-lg cursor-pointer border-l-4 border-green-500">
+                                    <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=john" class="w-12 h-12 rounded-full bg-slate-100">
+                                    <div class="flex-1 min-w-0">
+                                        <div class="flex items-center justify-between">
+                                            <p class="font-medium text-primary text-sm">John Miller</p>
+                                            <span class="text-xs text-green-600 font-medium">10:42</span>
+                                        </div>
+                                        <p class="text-sm text-slate-600 truncate">我对你们的户外帐篷很感兴趣...</p>
+                                    </div>
+                                    <span class="w-5 h-5 bg-green-500 text-white text-xs rounded-full flex items-center justify-center">2</span>
+                                </div>
+                                <div class="flex items-center gap-3 p-3 hover:bg-slate-50 rounded-lg cursor-pointer transition-all-150">
+                                    <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=sarah" class="w-12 h-12 rounded-full bg-slate-100">
+                                    <div class="flex-1 min-w-0">
+                                        <div class="flex items-center justify-between">
+                                            <p class="font-medium text-primary text-sm">Sarah Lee</p>
+                                            <span class="text-xs text-slate-400">昨天</span>
+                                        </div>
+                                        <p class="text-sm text-slate-500 truncate">请问最小起订量是多少？</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-3 p-3 hover:bg-slate-50 rounded-lg cursor-pointer transition-all-150">
+                                    <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=mike" class="w-12 h-12 rounded-full bg-slate-100">
+                                    <div class="flex-1 min-w-0">
+                                        <div class="flex items-center justify-between">
+                                            <p class="font-medium text-primary text-sm">Mike Johnson</p>
+                                            <span class="text-xs text-slate-400">昨天</span>
+                                        </div>
+                                        <p class="text-sm text-slate-500 truncate">感谢你的回复，我会考虑的</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-3 p-3 hover:bg-slate-50 rounded-lg cursor-pointer transition-all-150">
+                                    <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=emma" class="w-12 h-12 rounded-full bg-slate-100">
+                                    <div class="flex-1 min-w-0">
+                                        <div class="flex items-center justify-between">
+                                            <p class="font-medium text-primary text-sm">Emma Wilson</p>
+                                            <span class="text-xs text-slate-400">周一</span>
+                                        </div>
+                                        <p class="text-sm text-slate-500 truncate">可以发一下产品目录吗？</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 右侧聊天区域 -->
+                    <div class="flex-1 flex flex-col bg-slate-50">
+                        <!-- 聊天头部 -->
+                        <div class="bg-white px-6 py-4 border-b border-slate-200 flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=john" class="w-10 h-10 rounded-full bg-slate-100">
+                                <div>
+                                    <p class="font-medium text-primary">John Miller</p>
+                                    <p class="text-xs text-slate-500">采购总监 · OutdoorGear Inc.</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="px-3 py-1 bg-green-50 text-green-600 text-xs rounded-full">在线</span>
+                                <button class="p-2 text-slate-400 hover:text-primary transition-all-150">
+                                    <i data-lucide="more-vertical" class="w-5 h-5"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- 聊天内容 -->
+                        <div class="flex-1 overflow-y-auto p-6 space-y-4">
+                            <div class="flex justify-center">
+                                <span class="text-xs text-slate-400 bg-slate-200 px-3 py-1 rounded-full">今天 10:30</span>
+                            </div>
+                            
+                            <!-- 客户消息 -->
+                            <div class="flex items-start gap-3">
+                                <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=john" class="w-8 h-8 rounded-full bg-slate-100 mt-1">
+                                <div class="bg-white p-3 rounded-lg rounded-tl-none shadow-sm max-w-md">
+                                    <p class="text-sm text-slate-700">你好，我对你们的户外帐篷产品很感兴趣。我们是美国一家户外用品批发商，年采购额约200万美元。请问可以提供产品目录和报价吗？</p>
+                                    <span class="text-xs text-slate-400 mt-1 block">10:30</span>
+                                </div>
+                            </div>
+                            
+                            <!-- AI自动回复 -->
+                            <div class="flex items-start gap-3 flex-row-reverse">
+                                <div class="w-8 h-8 rounded-full bg-accent flex items-center justify-center mt-1">
+                                    <i data-lucide="bot" class="w-4 h-4 text-white"></i>
+                                </div>
+                                <div class="bg-green-100 p-3 rounded-lg rounded-tr-none max-w-md">
+                                    <p class="text-sm text-slate-700">您好 John！非常感谢您对我们产品的关注。😊</p>
+                                    <p class="text-sm text-slate-700 mt-2">我是 OutdoorGear Co. 的 AI 助手，很高兴为您服务。我可以立即为您发送产品目录和基础报价。</p>
+                                    <span class="text-xs text-slate-500 mt-1 block">10:31 · 自动回复</span>
+                                </div>
+                            </div>
+                            
+                            <!-- AI建议标签 -->
+                            <div class="flex justify-center">
+                                <div class="bg-amber-50 border border-amber-200 rounded-lg px-4 py-2 flex items-center gap-2">
+                                    <i data-lucide="lightbulb" class="w-4 h-4 text-amber-500"></i>
+                                    <span class="text-sm text-amber-700">AI 建议：发送产品目录 PDF</span>
+                                    <button class="text-xs bg-accent text-white px-2 py-1 rounded hover:bg-accent-hover transition-all-150">发送</button>
+                                </div>
+                            </div>
+                            
+                            <!-- 客户消息 -->
+                            <div class="flex items-start gap-3">
+                                <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=john" class="w-8 h-8 rounded-full bg-slate-100 mt-1">
+                                <div class="bg-white p-3 rounded-lg rounded-tl-none shadow-sm max-w-md">
+                                    <p class="text-sm text-slate-700">太好了！另外请问你们的最小起订量是多少？我们首批想订购 500 件试试市场反应。</p>
+                                    <span class="text-xs text-slate-400 mt-1 block">10:42</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 输入区域 -->
+                        <div class="bg-white border-t border-slate-200 p-4">
+                            <div class="flex items-center gap-3 mb-3">
+                                <button class="p-2 text-slate-400 hover:text-primary transition-all-150" title="快捷回复">
+                                    <i data-lucide="zap" class="w-5 h-5"></i>
+                                </button>
+                                <button class="p-2 text-slate-400 hover:text-primary transition-all-150" title="发送文件">
+                                    <i data-lucide="paperclip" class="w-5 h-5"></i>
+                                </button>
+                                <button class="p-2 text-slate-400 hover:text-primary transition-all-150" title="翻译">
+                                    <i data-lucide="languages" class="w-5 h-5"></i>
+                                </button>
+                                <div class="flex-1"></div>
+                                <span class="text-xs text-slate-400">AI辅助已开启</span>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" checked class="sr-only peer">
+                                    <div class="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-accent"></div>
+                                </label>
+                            </div>
+                            <div class="flex items-end gap-3">
+                                <textarea placeholder="输入消息..." class="flex-1 px-4 py-3 border border-slate-200 rounded-lg text-sm resize-none focus:outline-none focus:border-accent" rows="2"></textarea>
+                                <button class="p-3 bg-accent text-white rounded-lg hover:bg-accent-hover transition-all-150">
+                                    <i data-lucide="send" class="w-5 h-5"></i>
+                                </button>
+                            </div>
+                            <div class="flex items-center gap-2 mt-2">
+                                <span class="text-xs text-slate-400">快捷回复:</span>
+                                <button class="text-xs bg-slate-100 hover:bg-slate-200 px-2 py-1 rounded transition-all-150">发送报价</button>
+                                <button class="text-xs bg-slate-100 hover:bg-slate-200 px-2 py-1 rounded transition-all-150">产品目录</button>
+                                <button class="text-xs bg-slate-100 hover:bg-slate-200 px-2 py-1 rounded transition-all-150">转人工</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 右侧客户信息 -->
+                    <div class="w-72 bg-white border-l border-slate-200 p-6">
+                        <div class="text-center mb-6">
+                            <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=john" class="w-20 h-20 rounded-full bg-slate-100 mx-auto mb-3">
+                            <h4 class="font-semibold text-primary">John Miller</h4>
+                            <p class="text-sm text-slate-500">采购总监</p>
+                            <p class="text-xs text-slate-400">OutdoorGear Inc.</p>
+                        </div>
+                        
+                        <div class="space-y-4">
+                            <div>
+                                <p class="text-xs text-slate-400 mb-1">线索评分</p>
+                                <div class="flex items-center gap-2">
+                                    <span class="px-2 py-1 bg-red-50 text-red-600 text-sm font-semibold rounded">94 🔥</span>
+                                    <span class="text-xs text-green-600">高意向</span>
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <p class="text-xs text-slate-400 mb-1">标签</p>
+                                <div class="flex flex-wrap gap-2">
+                                    <span class="px-2 py-1 bg-blue-50 text-blue-600 text-xs rounded">美国</span>
+                                    <span class="px-2 py-1 bg-green-50 text-green-600 text-xs rounded">户外用品</span>
+                                    <span class="px-2 py-1 bg-purple-50 text-purple-600 text-xs rounded">批发商</span>
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <p class="text-xs text-slate-400 mb-1">来源</p>
+                                <p class="text-sm text-slate-700">网站 WhatsApp 按钮</p>
+                            </div>
+                            
+                            <div>
+                                <p class="text-xs text-slate-400 mb-2">操作</p>
+                                <div class="space-y-2">
+                                    <button class="w-full py-2 bg-accent text-white text-sm rounded-lg hover:bg-accent-hover transition-all-150">分配给销售</button>
+                                    <button class="w-full py-2 border border-slate-200 text-slate-600 text-sm rounded-lg hover:bg-slate-50 transition-all-150">标记为商机</button>
+                                    <button class="w-full py-2 border border-slate-200 text-slate-600 text-sm rounded-lg hover:bg-slate-50 transition-all-150">创建跟进任务</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SEO风控页面 -->
+            <div id="page-seo-control" class="page-content hidden">
+                <div class="space-y-6">
+                    <!-- 风险概览卡片 -->
+                    <div class="grid grid-cols-4 gap-6">
+                        <div class="bg-white rounded-xl border border-slate-200 p-6">
+                            <div class="flex items-center justify-between mb-4">
+                                <p class="text-sm text-slate-500">站点健康度</p>
+                                <div class="w-10 h-10 bg-green-50 rounded-lg flex items-center justify-center">
+                                    <i data-lucide="activity" class="w-5 h-5 text-green-500"></i>
+                                </div>
+                            </div>
+                            <p class="text-2xl font-bold text-primary">92<span class="text-sm font-normal text-slate-400">/100</span></p>
+                            <p class="text-xs text-green-600 mt-1">↑ 较上周 +3分</p>
+                        </div>
+                        <div class="bg-white rounded-xl border border-slate-200 p-6">
+                            <div class="flex items-center justify-between mb-4">
+                                <p class="text-sm text-slate-500">内容原创度</p>
+                                <div class="w-10 h-10 bg-green-50 rounded-lg flex items-center justify-center">
+                                    <i data-lucide="file-check" class="w-5 h-5 text-green-500"></i>
+                                </div>
+                            </div>
+                            <p class="text-2xl font-bold text-primary">96<span class="text-sm font-normal text-slate-400">%</span></p>
+                            <p class="text-xs text-slate-400 mt-1">平均检测值</p>
+                        </div>
+                        <div class="bg-white rounded-xl border border-slate-200 p-6">
+                            <div class="flex items-center justify-between mb-4">
+                                <p class="text-sm text-slate-500">AI痕迹检测</p>
+                                <div class="w-10 h-10 bg-amber-50 rounded-lg flex items-center justify-center">
+                                    <i data-lucide="brain" class="w-5 h-5 text-amber-500"></i>
+                                </div>
+                            </div>
+                            <p class="text-2xl font-bold text-primary">24<span class="text-sm font-normal text-slate-400">%</span></p>
+                            <p class="text-xs text-green-600 mt-1">↓ 需人工审核 2篇</p>
+                        </div>
+                        <div class="bg-white rounded-xl border border-slate-200 p-6">
+                            <div class="flex items-center justify-between mb-4">
+                                <p class="text-sm text-slate-500">风险预警</p>
+                                <div class="w-10 h-10 bg-red-50 rounded-lg flex items-center justify-center">
+                                    <i data-lucide="alert-triangle" class="w-5 h-5 text-red-500"></i>
+                                </div>
+                            </div>
+                            <p class="text-2xl font-bold text-primary">0</p>
+                            <p class="text-xs text-green-600 mt-1">当前无异常</p>
+                        </div>
+                    </div>
+                    
+                    <!-- 内容审核队列 -->
+                    <div class="bg-white rounded-xl border border-slate-200">
+                        <div class="px-6 py-5 border-b border-slate-200 flex items-center justify-between">
+                            <h3 class="font-semibold text-primary">内容审核队列</h3>
+                            <div class="flex gap-2">
+                                <button class="px-3 py-1.5 bg-accent text-white text-sm rounded-lg">待审核 2</button>
+                                <button class="px-3 py-1.5 text-slate-600 text-sm hover:bg-slate-50 rounded-lg">已通过 48</button>
+                                <button class="px-3 py-1.5 text-slate-600 text-sm hover:bg-slate-50 rounded-lg">已拒绝 3</button>
+                            </div>
+                        </div>
+                        <div class="divide-y divide-slate-100">
+                            <div class="px-6 py-4 hover:bg-slate-50 transition-all-150">
+                                <div class="flex items-start justify-between">
+                                    <div class="flex items-start gap-4">
+                                        <div class="w-10 h-10 bg-amber-50 rounded-lg flex items-center justify-center flex-shrink-0">
+                                            <i data-lucide="file-text" class="w-5 h-5 text-amber-500"></i>
+                                        </div>
+                                        <div>
+                                            <p class="font-medium text-primary">2024年户外用品市场趋势分析</p>
+                                            <p class="text-sm text-slate-500 mt-1">AI痕迹检测: 72% · 建议人工优化</p>
+                                            <div class="flex gap-2 mt-2">
+                                                <span class="px-2 py-0.5 bg-amber-50 text-amber-600 text-xs rounded">AI痕迹偏高</span>
+                                                <span class="px-2 py-0.5 bg-blue-50 text-blue-600 text-xs rounded">SEO博客</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="flex gap-2">
+                                        <button class="px-4 py-2 border border-slate-200 text-slate-600 text-sm rounded-lg hover:bg-slate-50 transition-all-150">查看</button>
+                                        <button class="px-4 py-2 bg-accent text-white text-sm rounded-lg hover:bg-accent-hover transition-all-150">通过</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="px-6 py-4 hover:bg-slate-50 transition-all-150">
+                                <div class="flex items-start justify-between">
+                                    <div class="flex items-start gap-4">
+                                        <div class="w-10 h-10 bg-amber-50 rounded-lg flex items-center justify-center flex-shrink-0">
+                                            <i data-lucide="file-text" class="w-5 h-5 text-amber-500"></i>
+                                        </div>
+                                        <div>
+                                            <p class="font-medium text-primary">如何选择可靠的帐篷供应商</p>
+                                            <p class="text-sm text-slate-500 mt-1">原创度: 85% · 关键词密度偏高</p>
+                                            <div class="flex gap-2 mt-2">
+                                                <span class="px-2 py-0.5 bg-amber-50 text-amber-600 text-xs rounded">需优化</span>
+                                                <span class="px-2 py-0.5 bg-blue-50 text-blue-600 text-xs rounded">SEO博客</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="flex gap-2">
+                                        <button class="px-4 py-2 border border-slate-200 text-slate-600 text-sm rounded-lg hover:bg-slate-50 transition-all-150">查看</button>
+                                        <button class="px-4 py-2 bg-accent text-white text-sm rounded-lg hover:bg-accent-hover transition-all-150">通过</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 站点监控 -->
+                    <div class="grid grid-cols-2 gap-6">
+                        <div class="bg-white rounded-xl border border-slate-200 p-6">
+                            <h3 class="font-semibold text-primary mb-4">收录监控</h3>
+                            <div class="space-y-4">
+                                <div>
+                                    <div class="flex items-center justify-between mb-2">
+                                        <span class="text-sm text-slate-600">Google收录</span>
+                                        <span class="text-sm font-medium text-primary">156 页</span>
+                                    </div>
+                                    <div class="h-2 bg-slate-100 rounded-full overflow-hidden">
+                                        <div class="h-full bg-green-500 rounded-full" style="width: 85%"></div>
+                                    </div>
+                                    <p class="text-xs text-green-600 mt-1">↑ 较上周 +12 页</p>
+                                </div>
+                                <div>
+                                    <div class="flex items-center justify-between mb-2">
+                                        <span class="text-sm text-slate-600">索引状态</span>
+                                        <span class="text-sm font-medium text-primary">正常</span>
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <span class="w-2 h-2 bg-green-500 rounded-full"></span>
+                                        <span class="text-xs text-slate-500">最后检测: 2小时前</span>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="flex items-center justify-between mb-2">
+                                        <span class="text-sm text-slate-600">排名波动</span>
+                                        <span class="text-sm font-medium text-primary">+3 上升</span>
+                                    </div>
+                                    <p class="text-xs text-slate-500">核心关键词平均排名变化</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-white rounded-xl border border-slate-200 p-6">
+                            <h3 class="font-semibold text-primary mb-4">发布节奏控制</h3>
+                            <div class="space-y-4">
+                                <div class="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
+                                    <div>
+                                        <p class="font-medium text-primary text-sm">当前发布频率</p>
+                                        <p class="text-xs text-slate-500">outdoorgear.dealclaw.com</p>
+                                    </div>
+                                    <span class="px-3 py-1 bg-green-50 text-green-600 text-sm font-medium rounded-full">每周 3 篇</span>
+                                </div>
+                                <div class="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
+                                    <div>
+                                        <p class="font-medium text-primary text-sm">站点权重</p>
+                                        <p class="text-xs text-slate-500">运营 4 个月</p>
+                                    </div>
+                                    <span class="px-3 py-1 bg-blue-50 text-blue-600 text-sm font-medium rounded-full">DR 28</span>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-slate-600 mb-2">建议调整</p>
+                                    <p class="text-xs text-slate-500">当前权重良好，可逐步增加至每周 5 篇</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 风控规则配置 -->
+                    <div class="bg-white rounded-xl border border-slate-200 p-6">
+                        <h3 class="font-semibold text-primary mb-4">风控规则配置</h3>
+                        <div class="grid grid-cols-3 gap-6">
+                            <div class="p-4 border border-slate-200 rounded-lg">
+                                <div class="flex items-center justify-between mb-3">
+                                    <p class="font-medium text-primary text-sm">AI痕迹检测</p>
+                                    <label class="relative inline-flex items-center cursor-pointer">
+                                        <input type="checkbox" checked class="sr-only peer">
+                                        <div class="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-accent"></div>
+                                    </label>
+                                </div>
+                                <p class="text-xs text-slate-500">AI生成内容超过 70% 时触发人工审核</p>
+                            </div>
+                            <div class="p-4 border border-slate-200 rounded-lg">
+                                <div class="flex items-center justify-between mb-3">
+                                    <p class="font-medium text-primary text-sm">原创度检查</p>
+                                    <label class="relative inline-flex items-center cursor-pointer">
+                                        <input type="checkbox" checked class="sr-only peer">
+                                        <div class="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-accent"></div>
+                                    </label>
+                                </div>
+                                <p class="text-xs text-slate-500">原创度低于 85% 时阻止发布</p>
+                            </div>
+                            <div class="p-4 border border-slate-200 rounded-lg">
+                                <div class="flex items-center justify-between mb-3">
+                                    <p class="font-medium text-primary text-sm">自动发布限速</p>
+                                    <label class="relative inline-flex items-center cursor-pointer">
+                                        <input type="checkbox" checked class="sr-only peer">
+                                        <div class="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-accent"></div>
+                                    </label>
+                                </div>
+                                <p class="text-xs text-slate-500">根据站点权重自动控制发布频率</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
