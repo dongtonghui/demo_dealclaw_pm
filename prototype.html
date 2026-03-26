@@ -7,6 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         tailwind.config = {
             theme: {
@@ -41,7 +42,151 @@
         .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
         .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
         @keyframes typing { 0%, 60%, 100% { transform: translateY(0); } 30% { transform: translateY(-4px); } }
-    </style>
+    
+        .glass {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        .card-hover {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .card-hover:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.15);
+        }
+        .gradient-border {
+            position: relative;
+            background: linear-gradient(135deg, #F8FAFC 0%, #FFFFFF 100%);
+        }
+        .gradient-border::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            border-radius: inherit;
+            padding: 1px;
+            background: linear-gradient(135deg, rgba(3, 105, 161, 0.2), rgba(3, 105, 161, 0.05));
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            pointer-events: none;
+        }
+        .status-pulse {
+            animation: pulse-ring 2s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+        }
+        @keyframes pulse-ring {
+            0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.5); }
+            70% { box-shadow: 0 0 0 8px rgba(16, 185, 129, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+        }
+        .progress-fill {
+            transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .animate-slide-up {
+            animation: slideUp 0.5s ease forwards;
+        }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .stagger-1 { animation-delay: 0.1s; }
+        .stagger-2 { animation-delay: 0.2s; }
+        .stagger-3 { animation-delay: 0.3s; }
+        .stagger-4 { animation-delay: 0.4s; }
+
+        .skeleton {
+            background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+        }
+        @keyframes shimmer {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+        .nav-indicator {
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 3px;
+            height: 0;
+            background: #0369A1;
+            border-radius: 0 4px 4px 0;
+            transition: height 0.2s ease;
+        }
+        .nav-item:hover .nav-indicator,
+        .nav-item.active .nav-indicator {
+            height: 24px;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 1280px) {
+            .grid-cols-4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        }
+        @media (max-width: 768px) {
+            aside { transform: translateX(-100%); transition: transform 0.3s ease; }
+            aside.open { transform: translateX(0); }
+            main { margin-left: 0; }
+            .grid-cols-4, .grid-cols-2 { grid-template-columns: 1fr; }
+        }
+        /* Smooth scrolling */
+        html { scroll-behavior: smooth; }
+        /* Selection color */
+        ::selection { background: rgba(3, 105, 161, 0.2); color: #0369A1; }
+
+        /* Click ripple effect */
+        .ripple {
+            position: relative;
+            overflow: hidden;
+        }
+        .ripple::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.3s, height 0.3s;
+        }
+        .ripple:active::after {
+            width: 200px;
+            height: 200px;
+        }
+        
+        /* Loading spinner */
+        .spinner {
+            border: 2px solid #f1f5f9;
+            border-top-color: #0369A1;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Focus visible styles for accessibility */
+        *:focus-visible {
+            outline: 2px solid #0369A1;
+            outline-offset: 2px;
+        }
+        
+        /* Active state for buttons */
+        button:active, a:active, .cursor-pointer:active {
+            transform: scale(0.98);
+        }
+        
+        /* Smooth transitions for all interactive elements */
+        button, a, input, select, textarea, .cursor-pointer {
+            transition: all 0.2s ease;
+        }
+</style>
 </head>
 <body class="text-slate-900">
     <!-- 侧边导航 -->
@@ -59,34 +204,34 @@
         </div>
         
         <nav class="p-4 space-y-1">
-            <a href="#" onclick="showPage('dashboard')" id="nav-dashboard" class="nav-item active flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-50 transition-all-150">
+            <a href="#" onclick="showPage('dashboard')" id="nav-dashboard" class="nav-item active flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-slate-600 hover:bg-slate-50 transition-all">
                 <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
                 仪表盘
             </a>
-            <a href="#" onclick="showPage('tasks')" id="nav-tasks" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-50 transition-all-150">
+            <a href="#" onclick="showPage('tasks')" id="nav-tasks" class="nav-item flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-slate-600 hover:bg-slate-50 transition-all">
                 <i data-lucide="zap" class="w-5 h-5"></i>
                 获客任务
-                <span class="ml-auto bg-accent text-white text-xs px-2 py-0.5 rounded-full">3</span>
+                <span class="ml-auto bg-accent text-white text-xs px-2 py-0.5 rounded-full shadow-sm">3</span>
             </a>
-            <a href="#" onclick="showPage('content')" id="nav-content" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-50 transition-all-150">
+            <a href="#" onclick="showPage('content')" id="nav-content" class="nav-item flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-slate-600 hover:bg-slate-50 transition-all">
                 <i data-lucide="file-text" class="w-5 h-5"></i>
                 内容中心
             </a>
-            <a href="#" onclick="showPage('leads')" id="nav-leads" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-50 transition-all-150">
+            <a href="#" onclick="showPage('leads')" id="nav-leads" class="nav-item flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-slate-600 hover:bg-slate-50 transition-all">
                 <i data-lucide="users" class="w-5 h-5"></i>
                 线索管理
-                <span class="ml-auto bg-red-500 text-white text-xs px-2 py-0.5 rounded-full">12</span>
+                <span class="ml-auto bg-red-500 text-white text-xs px-2 py-0.5 rounded-full shadow-sm">12</span>
             </a>
-            <a href="#" onclick="showPage('analytics')" id="nav-analytics" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-50 transition-all-150">
+            <a href="#" onclick="showPage('analytics')" id="nav-analytics" class="nav-item flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-slate-600 hover:bg-slate-50 transition-all">
                 <i data-lucide="bar-chart-3" class="w-5 h-5"></i>
                 数据分析
             </a>
-            <a href="#" onclick="showPage('whatsapp')" id="nav-whatsapp" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-50 transition-all-150">
+            <a href="#" onclick="showPage('whatsapp')" id="nav-whatsapp" class="nav-item flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-slate-600 hover:bg-slate-50 transition-all">
                 <i data-lucide="message-circle" class="w-5 h-5"></i>
                 WhatsApp
-                <span class="ml-auto bg-green-500 text-white text-xs px-2 py-0.5 rounded-full">5</span>
+                <span class="ml-auto bg-green-500 text-white text-xs px-2 py-0.5 rounded-full shadow-sm">5</span>
             </a>
-            <a href="#" onclick="showPage('seo-control')" id="nav-seo-control" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-50 transition-all-150">
+            <a href="#" onclick="showPage('seo-control')" id="nav-seo-control" class="nav-item flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-slate-600 hover:bg-slate-50 transition-all">
                 <i data-lucide="shield-check" class="w-5 h-5"></i>
                 SEO风控
             </a>
@@ -94,7 +239,10 @@
         
         <div class="absolute bottom-0 left-0 right-0 p-4 border-t border-slate-200">
             <div class="flex items-center gap-3 px-4 py-3">
-                <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=owner" class="w-10 h-10 rounded-full bg-slate-100">
+                <div class="relative">
+                <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=owner" class="w-10 h-10 rounded-full bg-slate-100 ring-2 ring-slate-100">
+                <span class="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 rounded-full ring-2 ring-white status-pulse"></span>
+            </div>
                 <div class="flex-1 min-w-0">
                     <p class="text-sm font-medium text-primary truncate">张经理</p>
                     <p class="text-xs text-slate-500 truncate">外贸部负责人</p>
@@ -106,17 +254,17 @@
     <!-- 主内容区 -->
     <main class="ml-64 min-h-screen">
         <!-- 顶部栏 -->
-        <header class="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-slate-200 px-8 py-4">
+        <header class="sticky top-0 z-40 glass px-8 py-4">
             <div class="flex items-center justify-between">
                 <div class="flex items-center gap-4">
                     <h2 id="page-title" class="text-xl font-semibold text-primary">仪表盘</h2>
                 </div>
                 <div class="flex items-center gap-4">
-                    <button class="relative p-2 text-slate-500 hover:text-primary transition-all-150">
+                    <button class="relative p-2.5 text-slate-500 hover:text-primary hover:bg-slate-100 rounded-xl transition-all">
                         <i data-lucide="bell" class="w-5 h-5"></i>
-                        <span class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+                        <span class="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full ring-2 ring-white animate-pulse"></span>
                     </button>
-                    <button onclick="showPage('new-task')" class="bg-accent hover:bg-accent-hover text-white px-5 py-2.5 rounded-lg text-sm font-medium flex items-center gap-2 transition-all-150">
+                    <button onclick="showPage('new-task')" class="bg-accent hover:bg-accent-hover text-white px-5 py-2.5 rounded-xl text-sm font-medium flex items-center gap-2 shadow-lg shadow-accent/25 transition-all hover:scale-105 tooltip" data-tooltip="快捷键: Ctrl+N">
                         <i data-lucide="plus" class="w-4 h-4"></i>
                         新建获客任务
                     </button>
@@ -130,7 +278,7 @@
             <div id="page-dashboard" class="page-content fade-in">
                 <!-- 数据卡片 -->
                 <div class="grid grid-cols-4 gap-6 mb-8">
-                    <div class="bg-white rounded-xl border border-slate-200 p-6 hover-lift transition-all-200 cursor-pointer" onclick="showPage('leads')">
+                    <div class="gradient-border bg-white rounded-2xl p-6 card-hover cursor-pointer opacity-0 animate-slide-up stagger-1" style="animation-fill-mode: forwards;" onclick="showPage('leads')">
                         <div class="flex items-center justify-between mb-4">
                             <div class="w-12 h-12 bg-red-50 rounded-lg flex items-center justify-center">
                                 <i data-lucide="flame" class="w-6 h-6 text-red-500"></i>
@@ -173,13 +321,13 @@
                 </div>
 
                 <!-- 活跃任务 -->
-                <div class="bg-white rounded-xl border border-slate-200 mb-8">
+                <div class="bg-white rounded-2xl border border-slate-200 mb-8 shadow-sm">
                     <div class="px-6 py-5 border-b border-slate-200 flex items-center justify-between">
-                        <h3 class="font-semibold text-primary">活跃获客任务</h3>
-                        <button onclick="showPage('tasks')" class="text-sm text-accent hover:underline">查看全部</button>
+                        <div class="flex items-center gap-3"><div class="w-8 h-8 bg-accent/10 rounded-lg flex items-center justify-center"><i data-lucide="activity" class="w-4 h-4 text-accent"></i></div><h3 class="font-semibold text-primary">活跃获客任务</h3></div>
+                        <button onclick="showPage('tasks')" class="text-sm text-accent hover:text-accent-hover font-medium flex items-center gap-1 transition-colors">查看全部<i data-lucide="arrow-right" class="w-4 h-4"></i></button>
                     </div>
                     <div class="divide-y divide-slate-100">
-                        <div class="px-6 py-4 flex items-center justify-between hover:bg-slate-50 transition-all-150 cursor-pointer">
+                        <div onclick="showToast("查看任务详情", "info")" class="px-6 py-4 flex items-center justify-between hover:bg-slate-50/50 transition-all cursor-pointer group">
                             <div class="flex items-center gap-4">
                                 <div class="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
                                     <i data-lucide="target" class="w-5 h-5 text-purple-600"></i>
@@ -200,16 +348,16 @@
                                         <span class="ml-auto">68%</span>
                                     </div>
                                     <div class="h-2 bg-slate-100 rounded-full overflow-hidden">
-                                        <div class="h-full bg-accent rounded-full" style="width: 68%"></div>
+                                        <div class="h-full bg-gradient-to-r from-accent to-accent-hover rounded-full progress-fill" style="width: 68%"></div>
                                     </div>
                                 </div>
-                                <span class="px-3 py-1 bg-green-50 text-green-600 text-xs font-medium rounded-full flex items-center gap-1">
-                                    <span class="w-1.5 h-1.5 bg-green-500 rounded-full pulse-dot"></span>
+                                <span class="px-3 py-1.5 bg-green-50 text-green-600 text-xs font-semibold rounded-full flex items-center gap-1.5 shadow-sm status-pulse">
+                                    <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
                                     运行中
                                 </span>
                             </div>
                         </div>
-                        <div class="px-6 py-4 flex items-center justify-between hover:bg-slate-50 transition-all-150 cursor-pointer">
+                        <div onclick="showToast("查看任务详情", "info")" class="px-6 py-4 flex items-center justify-between hover:bg-slate-50/50 transition-all cursor-pointer group">
                             <div class="flex items-center gap-4">
                                 <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
                                     <i data-lucide="cpu" class="w-5 h-5 text-blue-600"></i>
@@ -230,16 +378,16 @@
                                         <span class="ml-auto">35%</span>
                                     </div>
                                     <div class="h-2 bg-slate-100 rounded-full overflow-hidden">
-                                        <div class="h-full bg-accent rounded-full" style="width: 35%"></div>
+                                        <div class="h-full bg-gradient-to-r from-accent to-accent-hover rounded-full progress-fill" style="width: 35%"></div>
                                     </div>
                                 </div>
-                                <span class="px-3 py-1 bg-green-50 text-green-600 text-xs font-medium rounded-full flex items-center gap-1">
-                                    <span class="w-1.5 h-1.5 bg-green-500 rounded-full pulse-dot"></span>
+                                <span class="px-3 py-1.5 bg-green-50 text-green-600 text-xs font-semibold rounded-full flex items-center gap-1.5 shadow-sm status-pulse">
+                                    <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
                                     运行中
                                 </span>
                             </div>
                         </div>
-                        <div class="px-6 py-4 flex items-center justify-between hover:bg-slate-50 transition-all-150 cursor-pointer">
+                        <div onclick="showToast("查看任务详情", "info")" class="px-6 py-4 flex items-center justify-between hover:bg-slate-50/50 transition-all cursor-pointer group">
                             <div class="flex items-center gap-4">
                                 <div class="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center">
                                     <i data-lucide="home" class="w-5 h-5 text-orange-600"></i>
@@ -273,12 +421,12 @@
                 <div class="grid grid-cols-2 gap-6">
                     <div class="bg-white rounded-xl border border-slate-200">
                         <div class="px-6 py-5 border-b border-slate-200 flex items-center justify-between">
-                            <h3 class="font-semibold text-primary">最新线索</h3>
+                            <div class="flex items-center gap-3"><div class="w-8 h-8 bg-red-50 rounded-lg flex items-center justify-center"><i data-lucide="users" class="w-4 h-4 text-red-500"></i></div><h3 class="font-semibold text-primary">最新线索</h3></div>
                             <button onclick="showPage('leads')" class="text-sm text-accent hover:underline">查看全部</button>
                         </div>
                         <div class="divide-y divide-slate-100">
                             <div class="px-6 py-4 flex items-center gap-4">
-                                <div class="w-10 h-10 bg-red-50 rounded-full flex items-center justify-center text-red-500 font-semibold text-sm">JM</div>
+                                <div class="w-10 h-10 bg-gradient-to-br from-red-50 to-red-100 rounded-full flex items-center justify-center text-red-600 font-bold text-sm shadow-sm group-hover:scale-105 transition-transform">JM</div>
                                 <div class="flex-1 min-w-0">
                                     <p class="font-medium text-primary truncate">John Miller</p>
                                     <p class="text-sm text-slate-500 truncate">采购总监 · OutdoorGear Inc.</p>
@@ -286,7 +434,7 @@
                                 <span class="px-2 py-1 bg-red-50 text-red-600 text-xs font-medium rounded">94分</span>
                             </div>
                             <div class="px-6 py-4 flex items-center gap-4">
-                                <div class="w-10 h-10 bg-amber-50 rounded-full flex items-center justify-center text-amber-600 font-semibold text-sm">SL</div>
+                                <div class="w-10 h-10 bg-gradient-to-br from-amber-50 to-amber-100 rounded-full flex items-center justify-center text-amber-600 font-bold text-sm shadow-sm group-hover:scale-105 transition-transform">SL</div>
                                 <div class="flex-1 min-w-0">
                                     <p class="font-medium text-primary truncate">Sarah Lee</p>
                                     <p class="text-sm text-slate-500 truncate">采购经理 · TechSupply EU</p>
@@ -294,7 +442,7 @@
                                 <span class="px-2 py-1 bg-amber-50 text-amber-600 text-xs font-medium rounded">82分</span>
                             </div>
                             <div class="px-6 py-4 flex items-center gap-4">
-                                <div class="w-10 h-10 bg-blue-50 rounded-full flex items-center justify-center text-blue-500 font-semibold text-sm">MC</div>
+                                <div class="w-10 h-10 bg-gradient-to-br from-blue-50 to-blue-100 rounded-full flex items-center justify-center text-blue-600 font-bold text-sm shadow-sm group-hover:scale-105 transition-transform">MC</div>
                                 <div class="flex-1 min-w-0">
                                     <p class="font-medium text-primary truncate">Michael Chen</p>
                                     <p class="text-sm text-slate-500 truncate">CEO · BuildRight Materials</p>
@@ -305,7 +453,7 @@
                     </div>
                     <div class="bg-white rounded-xl border border-slate-200">
                         <div class="px-6 py-5 border-b border-slate-200 flex items-center justify-between">
-                            <h3 class="font-semibold text-primary">渠道效果</h3>
+                            <div class="flex items-center gap-3"><div class="w-8 h-8 bg-green-50 rounded-lg flex items-center justify-center"><i data-lucide="pie-chart" class="w-4 h-4 text-green-500"></i></div><h3 class="font-semibold text-primary">渠道效果</h3></div>
                             <button onclick="showPage('analytics')" class="text-sm text-accent hover:underline">详细分析</button>
                         </div>
                         <div class="p-6">
@@ -382,10 +530,10 @@
 
                         <!-- 自然语言输入 -->
                         <div id="input-natural" class="block">
-                            <textarea id="customer-desc" class="w-full h-32 px-4 py-3 border border-slate-200 rounded-lg text-sm resize-none focus:outline-none focus:border-accent transition-all-150" placeholder="例如：我想找美国做户外用品的批发商，年采购额在100万美元以上，决策人最好是采购经理或采购总监，他们对高品质帐篷和登山装备感兴趣..."></textarea>
+                            <textarea id="customer-desc" class="w-full h-32 px-4 py-3 border border-slate-200 rounded-xl text-sm resize-none focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/10 focus:ring-2 focus:ring-accent/10 transition-all" placeholder="例如：我想找美国做户外用品的批发商，年采购额在100万美元以上，决策人最好是采购经理或采购总监，他们对高品质帐篷和登山装备感兴趣..."></textarea>
                             <div class="flex items-center justify-between mt-3">
-                                <button onclick="fillExample()" class="text-sm text-accent hover:underline">查看示例</button>
-                                <button onclick="parseProfile()" id="btn-parse" class="bg-accent hover:bg-accent-hover text-white px-5 py-2 rounded-lg text-sm font-medium transition-all-150">
+                                <button onclick="fillExample()" class="text-sm text-accent hover:text-accent-hover font-medium flex items-center gap-1 transition-colors">查看示例</button>
+                                <button onclick="parseProfile()" id="btn-parse" class="bg-accent hover:bg-accent-hover text-white px-6 py-2.5 rounded-xl text-sm font-medium transition-all shadow-lg shadow-accent/25 flex items-center gap-2">
                                     AI 解析画像
                                 </button>
                             </div>
@@ -396,7 +544,7 @@
                             <div class="grid grid-cols-2 gap-4">
                                 <div>
                                     <label class="block text-sm font-medium text-slate-700 mb-2">目标地区</label>
-                                    <select class="w-full px-4 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:border-accent">
+                                    <select class="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/10">
                                         <option>北美</option>
                                         <option>欧洲</option>
                                         <option>东南亚</option>
@@ -406,7 +554,7 @@
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium text-slate-700 mb-2">目标行业</label>
-                                    <select class="w-full px-4 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:border-accent">
+                                    <select class="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/10">
                                         <option>户外用品</option>
                                         <option>电子产品</option>
                                         <option>建材</option>
@@ -416,7 +564,7 @@
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium text-slate-700 mb-2">公司规模</label>
-                                    <select class="w-full px-4 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:border-accent">
+                                    <select class="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/10">
                                         <option>初创 (<10人)</option>
                                         <option>小型 (10-50人)</option>
                                         <option>中型 (50-200人)</option>
@@ -425,7 +573,7 @@
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium text-slate-700 mb-2">年采购额</label>
-                                    <select class="w-full px-4 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:border-accent">
+                                    <select class="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/10">
                                         <option>10万-50万美元</option>
                                         <option>50万-100万美元</option>
                                         <option>100万-500万美元</option>
@@ -455,7 +603,7 @@
                                 </div>
                             </div>
                             <div class="flex justify-end mt-6">
-                                <button onclick="showStructuredProfile()" class="bg-accent hover:bg-accent-hover text-white px-5 py-2 rounded-lg text-sm font-medium transition-all-150">
+                                <button onclick="showStructuredProfile()" class="bg-accent hover:bg-accent-hover text-white px-5 py-2 rounded-xl text-sm font-medium transition-all-150">
                                     确认画像
                                 </button>
                             </div>
@@ -469,7 +617,7 @@
                                 <i data-lucide="sparkles" class="w-5 h-5 text-accent"></i>
                                 AI 解析结果
                             </h3>
-                            <button onclick="editProfile()" class="text-sm text-accent hover:underline">编辑</button>
+                            <button onclick="showToast(&quot;进入编辑模式&quot;, &quot;info&quot;)" class="text-sm text-accent hover:text-accent-hover font-medium transition-colors">编辑</button>
                         </div>
                         <div class="grid grid-cols-2 gap-4" id="profile-fields">
                             <div class="p-4 bg-slate-50 rounded-lg">
@@ -498,8 +646,8 @@
                             </div>
                         </div>
                         <div class="flex justify-end gap-3 mt-6">
-                            <button onclick="showPage('dashboard')" class="px-5 py-2 border border-slate-200 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-50 transition-all-150">取消</button>
-                            <button onclick="generateStrategy()" class="bg-accent hover:bg-accent-hover text-white px-6 py-2 rounded-lg text-sm font-medium transition-all-150">
+                            <button onclick="showPage('dashboard')" class="px-5 py-2 border border-slate-200 rounded-xl text-sm font-medium text-slate-600 hover:bg-slate-50 transition-all-150">取消</button>
+                            <button onclick="generateStrategy()" class="bg-accent hover:bg-accent-hover text-white px-6 py-2 rounded-xl text-sm font-medium transition-all-150">
                                 下一步：智能渠道决策
                                 <i data-lucide="arrow-right" class="w-4 h-4 inline ml-1"></i>
                             </button>
@@ -544,7 +692,7 @@
                                         <p class="text-sm text-slate-500">专业内容 + 精准触达 B2B 决策者</p>
                                     </div>
                                     <label class="relative inline-flex items-center cursor-pointer">
-                                        <input type="checkbox" checked class="sr-only peer">
+                                        <input type="checkbox" checked class="sr-only peer cursor-pointer" onchange="showToast(this.checked ? &quot;已启用&quot; : &quot;已禁用&quot;, &quot;success&quot;)">
                                         <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-accent"></div>
                                     </label>
                                 </div>
@@ -560,7 +708,7 @@
                                         <p class="text-sm text-slate-500">长期价值内容吸引搜索流量</p>
                                     </div>
                                     <label class="relative inline-flex items-center cursor-pointer">
-                                        <input type="checkbox" checked class="sr-only peer">
+                                        <input type="checkbox" checked class="sr-only peer cursor-pointer" onchange="showToast(this.checked ? &quot;已启用&quot; : &quot;已禁用&quot;, &quot;success&quot;)">
                                         <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-accent"></div>
                                     </label>
                                 </div>
@@ -605,7 +753,7 @@
                             <div class="grid grid-cols-2 gap-4">
                                 <div>
                                     <label class="block text-sm text-slate-600 mb-2">执行模式</label>
-                                    <select class="w-full px-4 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:border-accent">
+                                    <select class="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/10">
                                         <option>全自动执行（AI生成后直接发布）</option>
                                         <option>抽查模式（随机内容人工确认）</option>
                                         <option>全审核模式（全部内容需确认）</option>
@@ -613,7 +761,7 @@
                                 </div>
                                 <div>
                                     <label class="block text-sm text-slate-600 mb-2">内容语言</label>
-                                    <select class="w-full px-4 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:border-accent">
+                                    <select class="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/10">
                                         <option>英文</option>
                                         <option>多语言（自动翻译）</option>
                                     </select>
@@ -622,8 +770,8 @@
                         </div>
 
                         <div class="flex justify-end gap-3">
-                            <button onclick="showPage('new-task')" class="px-5 py-2 border border-slate-200 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-50 transition-all-150">上一步</button>
-                            <button onclick="showPage('task-settings')" class="bg-accent hover:bg-accent-hover text-white px-6 py-2 rounded-lg text-sm font-medium transition-all-150">
+                            <button onclick="showPage('new-task')" class="px-5 py-2 border border-slate-200 rounded-xl text-sm font-medium text-slate-600 hover:bg-slate-50 transition-all-150">上一步</button>
+                            <button onclick="showPage('task-settings')" class="bg-accent hover:bg-accent-hover text-white px-6 py-2 rounded-xl text-sm font-medium transition-all-150">
                                 配置渠道执行细节
                                 <i data-lucide="arrow-right" class="w-4 h-4 inline ml-1"></i>
                             </button>
@@ -639,35 +787,35 @@
                         <div class="flex items-center gap-4">
                             <h3 class="font-semibold text-primary">获客任务</h3>
                             <div class="flex gap-2">
-                                <button class="px-3 py-1.5 bg-accent text-white text-sm rounded-lg">全部</button>
-                                <button class="px-3 py-1.5 text-slate-600 text-sm hover:bg-slate-50 rounded-lg">运行中</button>
-                                <button class="px-3 py-1.5 text-slate-600 text-sm hover:bg-slate-50 rounded-lg">已完成</button>
+                                <button onclick="showToast("筛选: 全部", "info")" class="px-3 py-1.5 bg-accent text-white text-sm rounded-lg">全部</button>
+                                <button onclick="showToast("筛选: 运行中", "info")" class="px-3 py-1.5 text-slate-600 text-sm hover:bg-slate-50 rounded-lg">运行中</button>
+                                <button onclick="showToast("筛选: 已完成", "info")" class="px-3 py-1.5 text-slate-600 text-sm hover:bg-slate-50 rounded-lg">已完成</button>
                             </div>
                         </div>
-                        <button onclick="showPage('new-task')" class="bg-accent hover:bg-accent-hover text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition-all-150">
+                        <button onclick="showPage('new-task')" class="bg-accent hover:bg-accent-hover text-white px-4 py-2 rounded-xl text-sm font-medium flex items-center gap-2 transition-all-150">
                             <i data-lucide="plus" class="w-4 h-4"></i>
                             新建任务
                         </button>
                     </div>
                     <div class="divide-y divide-slate-100">
-                        <div class="px-6 py-5 hover:bg-slate-50 transition-all-150">
+                        <div onclick="showToast("查看任务详情", "info")" class="px-6 py-5 hover:bg-slate-50/70 transition-all cursor-pointer group">
                             <div class="flex items-start justify-between">
                                 <div class="flex items-start gap-4">
-                                    <div class="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center">
+                                    <div class="w-12 h-12 bg-gradient-to-br from-purple-100 to-purple-50 rounded-xl flex items-center justify-center shadow-sm group-hover:scale-105 transition-transform">
                                         <i data-lucide="target" class="w-6 h-6 text-purple-600"></i>
                                     </div>
                                     <div>
                                         <h4 class="font-semibold text-primary mb-1">美国户外用品批发商获客</h4>
                                         <p class="text-sm text-slate-500 mb-3">目标客户：美国 · 户外用品 · 中型批发商 · 采购经理/总监</p>
                                         <div class="flex items-center gap-2">
-                                            <span class="px-2 py-1 bg-blue-50 text-blue-600 text-xs rounded">LinkedIn</span>
-                                            <span class="px-2 py-1 bg-green-50 text-green-600 text-xs rounded">SEO博客</span>
+                                            <span class="px-2 py-1 bg-blue-50 text-blue-600 text-xs rounded-md font-medium">LinkedIn</span>
+                                            <span class="px-2 py-1 bg-green-50 text-green-600 text-xs rounded-md font-medium">SEO博客</span>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="text-right">
                                     <span class="px-3 py-1 bg-green-50 text-green-600 text-xs font-medium rounded-full flex items-center gap-1 mb-3">
-                                        <span class="w-1.5 h-1.5 bg-green-500 rounded-full pulse-dot"></span>
+                                        <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
                                         运行中
                                     </span>
                                     <p class="text-2xl font-bold text-primary">18</p>
@@ -681,19 +829,19 @@
                                     <span class="text-slate-500">下次发布：今天 15:00</span>
                                 </div>
                                 <div class="flex gap-2">
-                                    <button class="p-2 text-slate-400 hover:text-primary transition-all-150">
+                                    <button onclick="event.stopPropagation(); showToast("任务已暂停", "success")" class="p-2 text-slate-400 hover:text-primary hover:bg-slate-100 rounded-lg transition-all">
                                         <i data-lucide="pause" class="w-4 h-4"></i>
                                     </button>
-                                    <button class="p-2 text-slate-400 hover:text-primary transition-all-150">
+                                    <button onclick="event.stopPropagation(); showToast("打开设置", "info")" class="p-2 text-slate-400 hover:text-primary hover:bg-slate-100 rounded-lg transition-all">
                                         <i data-lucide="settings" class="w-4 h-4"></i>
                                     </button>
                                 </div>
                             </div>
                         </div>
-                        <div class="px-6 py-5 hover:bg-slate-50 transition-all-150">
+                        <div onclick="showToast("查看任务详情", "info")" class="px-6 py-5 hover:bg-slate-50/70 transition-all cursor-pointer group">
                             <div class="flex items-start justify-between">
                                 <div class="flex items-start gap-4">
-                                    <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
+                                    <div class="w-12 h-12 bg-gradient-to-br from-blue-100 to-blue-50 rounded-xl flex items-center justify-center shadow-sm group-hover:scale-105 transition-transform">
                                         <i data-lucide="cpu" class="w-6 h-6 text-blue-600"></i>
                                     </div>
                                     <div>
@@ -706,7 +854,7 @@
                                 </div>
                                 <div class="text-right">
                                     <span class="px-3 py-1 bg-green-50 text-green-600 text-xs font-medium rounded-full flex items-center gap-1 mb-3">
-                                        <span class="w-1.5 h-1.5 bg-green-500 rounded-full pulse-dot"></span>
+                                        <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
                                         运行中
                                     </span>
                                     <p class="text-2xl font-bold text-primary">7</p>
@@ -720,10 +868,10 @@
                                     <span class="text-slate-500">下次发送：明天 09:00</span>
                                 </div>
                                 <div class="flex gap-2">
-                                    <button class="p-2 text-slate-400 hover:text-primary transition-all-150">
+                                    <button onclick="event.stopPropagation(); showToast("任务已暂停", "success")" class="p-2 text-slate-400 hover:text-primary hover:bg-slate-100 rounded-lg transition-all">
                                         <i data-lucide="pause" class="w-4 h-4"></i>
                                     </button>
-                                    <button class="p-2 text-slate-400 hover:text-primary transition-all-150">
+                                    <button onclick="event.stopPropagation(); showToast("打开设置", "info")" class="p-2 text-slate-400 hover:text-primary hover:bg-slate-100 rounded-lg transition-all">
                                         <i data-lucide="settings" class="w-4 h-4"></i>
                                     </button>
                                 </div>
@@ -740,13 +888,13 @@
                         <div class="flex items-center gap-4">
                             <h3 class="font-semibold text-primary">线索管理</h3>
                             <div class="flex gap-2">
-                                <button class="px-3 py-1.5 bg-accent text-white text-sm rounded-lg">全部线索</button>
-                                <button class="px-3 py-1.5 text-slate-600 text-sm hover:bg-slate-50 rounded-lg">🔥 热门</button>
-                                <button class="px-3 py-1.5 text-slate-600 text-sm hover:bg-slate-50 rounded-lg">⚡ 高意向</button>
+                                <button onclick="showToast(&quot;筛选: 全部线索&quot;, &quot;info&quot;)" class="px-3 py-1.5 bg-accent text-white text-sm rounded-lg">全部线索</button>
+                                <button onclick="showToast(&quot;筛选: 热门线索&quot;, &quot;info&quot;)" class="px-3 py-1.5 text-slate-600 text-sm hover:bg-slate-50 rounded-lg">🔥 热门</button>
+                                <button onclick="showToast(&quot;筛选: 高意向&quot;, &quot;info&quot;)" class="px-3 py-1.5 text-slate-600 text-sm hover:bg-slate-50 rounded-lg">⚡ 高意向</button>
                             </div>
                         </div>
                         <div class="flex gap-2">
-                            <button class="px-4 py-2 border border-slate-200 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-50 transition-all-150">
+                            <button onclick="showToast("开始导出数据...", "success")" class="px-4 py-2 border border-slate-200 rounded-xl text-sm font-medium text-slate-600 hover:bg-slate-50 transition-all">
                                 <i data-lucide="download" class="w-4 h-4 inline mr-1"></i>
                                 导出
                             </button>
@@ -765,10 +913,10 @@
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-slate-100">
-                                <tr class="hover:bg-slate-50 transition-all-150">
+                                <tr onclick="showToast("查看线索详情", "info")" class="hover:bg-slate-50/70 transition-all cursor-pointer group">
                                     <td class="px-6 py-4">
                                         <div class="flex items-center gap-3">
-                                            <div class="w-10 h-10 bg-red-50 rounded-full flex items-center justify-center text-red-500 font-semibold text-sm">JM</div>
+                                            <div class="w-10 h-10 bg-gradient-to-br from-red-50 to-red-100 rounded-full flex items-center justify-center text-red-600 font-bold text-sm shadow-sm group-hover:scale-105 transition-transform">JM</div>
                                             <div>
                                                 <p class="font-medium text-primary">John Miller</p>
                                                 <p class="text-sm text-slate-500">采购总监</p>
@@ -780,20 +928,20 @@
                                         <p class="text-sm text-slate-500">美国 · 户外用品</p>
                                     </td>
                                     <td class="px-6 py-4">
-                                        <span class="px-2 py-1 bg-blue-50 text-blue-600 text-xs rounded">LinkedIn</span>
+                                        <span class="px-2 py-1 bg-blue-50 text-blue-600 text-xs rounded-md font-medium">LinkedIn</span>
                                     </td>
                                     <td class="px-6 py-4">
-                                        <span class="px-2 py-1 bg-red-50 text-red-600 text-sm font-semibold rounded">94 🔥</span>
+                                        <span class="px-3 py-1 bg-gradient-to-r from-red-50 to-red-100 text-red-600 text-xs font-bold rounded-full shadow-sm">94 🔥</span>
                                     </td>
                                     <td class="px-6 py-4 text-sm text-slate-500">2小时前</td>
                                     <td class="px-6 py-4">
                                         <button class="text-accent hover:underline text-sm">查看详情</button>
                                     </td>
                                 </tr>
-                                <tr class="hover:bg-slate-50 transition-all-150">
+                                <tr onclick="showToast("查看线索详情", "info")" class="hover:bg-slate-50/70 transition-all cursor-pointer group">
                                     <td class="px-6 py-4">
                                         <div class="flex items-center gap-3">
-                                            <div class="w-10 h-10 bg-amber-50 rounded-full flex items-center justify-center text-amber-600 font-semibold text-sm">SL</div>
+                                            <div class="w-10 h-10 bg-gradient-to-br from-amber-50 to-amber-100 rounded-full flex items-center justify-center text-amber-600 font-bold text-sm shadow-sm group-hover:scale-105 transition-transform">SL</div>
                                             <div>
                                                 <p class="font-medium text-primary">Sarah Lee</p>
                                                 <p class="text-sm text-slate-500">采购经理</p>
@@ -808,17 +956,17 @@
                                         <span class="px-2 py-1 bg-purple-50 text-purple-600 text-xs rounded">邮件</span>
                                     </td>
                                     <td class="px-6 py-4">
-                                        <span class="px-2 py-1 bg-amber-50 text-amber-600 text-sm font-semibold rounded">82 ⚡</span>
+                                        <span class="px-3 py-1 bg-gradient-to-r from-amber-50 to-amber-100 text-amber-600 text-xs font-bold rounded-full shadow-sm">82 ⚡</span>
                                     </td>
                                     <td class="px-6 py-4 text-sm text-slate-500">5小时前</td>
                                     <td class="px-6 py-4">
                                         <button class="text-accent hover:underline text-sm">查看详情</button>
                                     </td>
                                 </tr>
-                                <tr class="hover:bg-slate-50 transition-all-150">
+                                <tr onclick="showToast("查看线索详情", "info")" class="hover:bg-slate-50/70 transition-all cursor-pointer group">
                                     <td class="px-6 py-4">
                                         <div class="flex items-center gap-3">
-                                            <div class="w-10 h-10 bg-blue-50 rounded-full flex items-center justify-center text-blue-500 font-semibold text-sm">MC</div>
+                                            <div class="w-10 h-10 bg-gradient-to-br from-blue-50 to-blue-100 rounded-full flex items-center justify-center text-blue-600 font-bold text-sm shadow-sm group-hover:scale-105 transition-transform">MC</div>
                                             <div>
                                                 <p class="font-medium text-primary">Michael Chen</p>
                                                 <p class="text-sm text-slate-500">CEO</p>
@@ -830,10 +978,10 @@
                                         <p class="text-sm text-slate-500">阿联酋 · 建材</p>
                                     </td>
                                     <td class="px-6 py-4">
-                                        <span class="px-2 py-1 bg-green-50 text-green-600 text-xs rounded">SEO博客</span>
+                                        <span class="px-2 py-1 bg-green-50 text-green-600 text-xs rounded-md font-medium">SEO博客</span>
                                     </td>
                                     <td class="px-6 py-4">
-                                        <span class="px-2 py-1 bg-blue-50 text-blue-600 text-sm font-semibold rounded">67 💡</span>
+                                        <span class="px-3 py-1 bg-gradient-to-r from-blue-50 to-blue-100 text-blue-600 text-xs font-bold rounded-full shadow-sm">67 💡</span>
                                     </td>
                                     <td class="px-6 py-4 text-sm text-slate-500">昨天</td>
                                     <td class="px-6 py-4">
@@ -852,8 +1000,8 @@
                     <div class="px-6 py-5 border-b border-slate-200 flex items-center justify-between">
                         <h3 class="font-semibold text-primary">内容日历</h3>
                         <div class="flex gap-2">
-                            <button class="px-3 py-1.5 bg-accent text-white text-sm rounded-lg">月视图</button>
-                            <button class="px-3 py-1.5 text-slate-600 text-sm hover:bg-slate-50 rounded-lg">列表视图</button>
+                            <button onclick="showToast("切换到月视图", "info")" class="px-3 py-1.5 bg-accent text-white text-sm rounded-lg">月视图</button>
+                            <button onclick="showToast("切换到列表视图", "info")" class="px-3 py-1.5 text-slate-600 text-sm hover:bg-slate-50 rounded-lg">列表视图</button>
                         </div>
                     </div>
                     <div class="p-6">
@@ -873,7 +1021,7 @@
                             <div class="aspect-square p-2 border border-slate-100 rounded-lg"></div>
                             <div class="aspect-square p-2 border border-slate-100 rounded-lg"></div>
                             <div class="aspect-square p-2 border border-slate-100 rounded-lg"></div>
-                            <div class="aspect-square p-2 border border-slate-100 rounded-lg bg-slate-50">
+                            <div onclick="showToast(&quot;查看该日期的内容&quot;, &quot;info&quot;)" class="aspect-square p-2 border border-slate-100 rounded-xl bg-slate-50/50 cursor-pointer hover:bg-slate-100 transition-all">
                                 <span class="text-sm text-slate-400">1</span>
                             </div>
                             <div class="aspect-square p-2 border border-slate-100 rounded-lg">
@@ -895,7 +1043,7 @@
                                 <span class="text-sm text-slate-400">6</span>
                                 <div class="mt-1 px-1.5 py-0.5 bg-purple-100 text-purple-600 text-xs rounded truncate">邮件</div>
                             </div>
-                            <div class="aspect-square p-2 border border-slate-100 rounded-lg bg-slate-50">
+                            <div onclick="showToast(&quot;查看该日期的内容&quot;, &quot;info&quot;)" class="aspect-square p-2 border border-slate-100 rounded-xl bg-slate-50/50 cursor-pointer hover:bg-slate-100 transition-all">
                                 <span class="text-sm text-slate-400">7</span>
                             </div>
                             <div class="aspect-square p-2 border border-slate-100 rounded-lg">
@@ -919,10 +1067,10 @@
                             <div class="aspect-square p-2 border border-slate-100 rounded-lg">
                                 <span class="text-sm text-slate-400">13</span>
                             </div>
-                            <div class="aspect-square p-2 border border-slate-100 rounded-lg bg-slate-50">
+                            <div onclick="showToast(&quot;查看该日期的内容&quot;, &quot;info&quot;)" class="aspect-square p-2 border border-slate-100 rounded-xl bg-slate-50/50 cursor-pointer hover:bg-slate-100 transition-all">
                                 <span class="text-sm text-slate-400">14</span>
                             </div>
-                            <div class="aspect-square p-2 border-2 border-accent rounded-lg bg-accent/5">
+                            <div onclick="showToast(&quot;今天的内容安排&quot;, &quot;info&quot;)" class="aspect-square p-2 border-2 border-accent rounded-xl bg-accent/5 shadow-sm cursor-pointer hover:bg-accent/10 transition-all">
                                 <span class="text-sm font-medium text-accent">15</span>
                                 <div class="mt-1 px-1.5 py-0.5 bg-blue-100 text-blue-600 text-xs rounded truncate">LinkedIn</div>
                             </div>
@@ -936,7 +1084,7 @@
                         <h3 class="font-semibold text-primary">最近生成的内容</h3>
                     </div>
                     <div class="divide-y divide-slate-100">
-                        <div class="px-6 py-4 flex items-center justify-between">
+                        <div onclick="showToast("查看内容详情", "info")" class="px-6 py-4 flex items-center justify-between cursor-pointer hover:bg-slate-50/50 transition-all">
                             <div class="flex items-center gap-4">
                                 <div class="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center">
                                     <i data-lucide="linkedin" class="w-5 h-5 text-blue-500"></i>
@@ -948,10 +1096,10 @@
                             </div>
                             <div class="flex items-center gap-4">
                                 <span class="text-sm text-slate-500">👁 1,234 浏览</span>
-                                <button class="text-accent hover:underline text-sm">查看</button>
+                                <button onclick="showToast("查看详情功能", "info")" class="text-accent hover:text-accent-hover font-medium text-sm transition-colors">查看</button>
                             </div>
                         </div>
-                        <div class="px-6 py-4 flex items-center justify-between">
+                        <div onclick="showToast("查看内容详情", "info")" class="px-6 py-4 flex items-center justify-between cursor-pointer hover:bg-slate-50/50 transition-all">
                             <div class="flex items-center gap-4">
                                 <div class="w-10 h-10 bg-green-50 rounded-lg flex items-center justify-center">
                                     <i data-lucide="file-text" class="w-5 h-5 text-green-500"></i>
@@ -963,7 +1111,7 @@
                             </div>
                             <div class="flex items-center gap-4">
                                 <span class="text-sm text-slate-500">👁 892 浏览</span>
-                                <button class="text-accent hover:underline text-sm">查看</button>
+                                <button onclick="showToast("查看详情功能", "info")" class="text-accent hover:text-accent-hover font-medium text-sm transition-colors">查看</button>
                             </div>
                         </div>
                     </div>
@@ -975,7 +1123,10 @@
                 <div class="grid grid-cols-2 gap-6 mb-6">
                     <div class="bg-white rounded-xl border border-slate-200 p-6">
                         <h3 class="font-semibold text-primary mb-4">获客漏斗</h3>
-                        <div class="space-y-4">
+                        <div class="chart-container" style="height: 180px;">
+                                <canvas id="funnelChart"></canvas>
+                            </div>
+                        <div class="space-y-4 mt-4">
                             <div>
                                 <div class="flex items-center justify-between mb-2">
                                     <span class="text-sm text-slate-600">内容曝光</span>
@@ -1055,7 +1206,7 @@
                 <div class="bg-white rounded-xl border border-slate-200 p-6">
                     <h3 class="font-semibold text-primary mb-4">AI 优化建议</h3>
                     <div class="space-y-4">
-                        <div class="flex items-start gap-4 p-4 bg-amber-50 rounded-lg border border-amber-100">
+                        <div onclick="showToast("查看优化建议详情", "info")" class="flex items-start gap-4 p-4 bg-amber-50 rounded-lg border border-amber-100 cursor-pointer hover:shadow-sm transition-all">
                             <div class="w-8 h-8 bg-amber-100 rounded-full flex items-center justify-center flex-shrink-0">
                                 <i data-lucide="lightbulb" class="w-4 h-4 text-amber-600"></i>
                             </div>
@@ -1064,7 +1215,7 @@
                                 <p class="text-sm text-slate-600">根据数据分析，视频内容的互动率比图文高 3.2 倍，建议增加短视频内容。</p>
                             </div>
                         </div>
-                        <div class="flex items-start gap-4 p-4 bg-blue-50 rounded-lg border border-blue-100">
+                        <div onclick="showToast("查看发布时间建议", "info")" class="flex items-start gap-4 p-4 bg-blue-50 rounded-lg border border-blue-100 cursor-pointer hover:shadow-sm transition-all">
                             <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
                                 <i data-lucide="clock" class="w-4 h-4 text-blue-600"></i>
                             </div>
@@ -1100,8 +1251,8 @@
                         <div class="mb-6">
                             <h4 class="text-sm font-medium text-slate-700 mb-3">选择站点类型</h4>
                             <div class="grid grid-cols-2 gap-4">
-                                <label class="border-2 border-accent bg-accent/5 rounded-lg p-4 cursor-pointer transition-all-150">
-                                    <input type="radio" name="site-type" checked class="sr-only">
+                                <label class="border-2 border-accent bg-accent/5 rounded-xl p-4 cursor-pointer transition-all hover:shadow-md">
+                                    <input type="radio" name="site-type" checked class="sr-only" onclick="showToast(&quot;已选择平台子域名&quot;, &quot;success&quot;)">
                                     <div class="flex items-start gap-3">
                                         <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
                                             <i data-lucide="globe" class="w-5 h-5 text-blue-600"></i>
@@ -1114,7 +1265,7 @@
                                     </div>
                                 </label>
                                 <label class="border-2 border-slate-200 rounded-lg p-4 cursor-pointer hover:border-accent/50 transition-all-150">
-                                    <input type="radio" name="site-type" class="sr-only">
+                                    <input type="radio" name="site-type" class="sr-only" onclick="showToast(&quot;已选择关联自有站点&quot;, &quot;success&quot;)">
                                     <div class="flex items-start gap-3">
                                         <div class="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center flex-shrink-0">
                                             <i data-lucide="link" class="w-5 h-5 text-purple-600"></i>
@@ -1192,8 +1343,8 @@
                         </div>
 
                         <div class="flex justify-end gap-3">
-                            <button onclick="showPage('strategy')" class="px-5 py-2 border border-slate-200 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-50 transition-all-150">取消</button>
-                            <button onclick="showPage('social-settings')" class="bg-accent hover:bg-accent-hover text-white px-6 py-2 rounded-lg text-sm font-medium transition-all-150">
+                            <button onclick="showPage('strategy')" class="px-5 py-2 border border-slate-200 rounded-xl text-sm font-medium text-slate-600 hover:bg-slate-50 transition-all-150">取消</button>
+                            <button onclick="showPage('social-settings')" class="bg-accent hover:bg-accent-hover text-white px-6 py-2 rounded-xl text-sm font-medium transition-all-150">
                                 保存并配置社媒
                                 <i data-lucide="arrow-right" class="w-4 h-4 inline ml-1"></i>
                             </button>
@@ -1233,11 +1384,11 @@
                                     </div>
                                 </div>
                                 <div class="flex items-center gap-3">
-                                    <span class="px-3 py-1 bg-green-50 text-green-600 text-xs font-medium rounded-full flex items-center gap-1">
+                                    <span class="px-3 py-1.5 bg-green-50 text-green-600 text-xs font-semibold rounded-full flex items-center gap-1.5 shadow-sm">
                                         <span class="w-1.5 h-1.5 bg-green-500 rounded-full"></span>
                                         已连接
                                     </span>
-                                    <button class="text-sm text-red-500 hover:underline">断开</button>
+                                    <button onclick="showToast(&quot;已断开连接&quot;, &quot;success&quot;)" class="text-sm text-red-500 hover:text-red-600 font-medium transition-colors">断开</button>
                                 </div>
                             </div>
                         </div>
@@ -1251,20 +1402,20 @@
                                         <p class="font-medium text-primary text-sm">内容类型配置</p>
                                     </div>
                                     <div class="grid grid-cols-2 gap-3">
-                                        <label class="flex items-center gap-2 text-sm">
-                                            <input type="checkbox" checked class="rounded text-accent">
+                                        <label class="flex items-center gap-2 text-sm cursor-pointer hover:bg-slate-50 p-1 rounded transition-all">
+                                            <input type="checkbox" checked class="rounded text-accent cursor-pointer" onchange="showToast(this.checked ? &quot;已启用: 行业洞察长文&quot; : &quot;已禁用: 行业洞察长文&quot;, &quot;success&quot;)">
                                             <span>行业洞察长文</span>
                                         </label>
-                                        <label class="flex items-center gap-2 text-sm">
-                                            <input type="checkbox" checked class="rounded text-accent">
+                                        <label class="flex items-center gap-2 text-sm cursor-pointer hover:bg-slate-50 p-1 rounded transition-all">
+                                            <input type="checkbox" checked class="rounded text-accent cursor-pointer" onchange="showToast(this.checked ? &quot;已启用: 产品展示&quot; : &quot;已禁用: 产品展示&quot;, &quot;success&quot;)">
                                             <span>产品展示</span>
                                         </label>
-                                        <label class="flex items-center gap-2 text-sm">
-                                            <input type="checkbox" checked class="rounded text-accent">
+                                        <label class="flex items-center gap-2 text-sm cursor-pointer hover:bg-slate-50 p-1 rounded transition-all">
+                                            <input type="checkbox" checked class="rounded text-accent cursor-pointer" onchange="showToast(this.checked ? &quot;已启用: 客户案例&quot; : &quot;已禁用: 客户案例&quot;, &quot;success&quot;)">
                                             <span>客户案例</span>
                                         </label>
-                                        <label class="flex items-center gap-2 text-sm">
-                                            <input type="checkbox" class="rounded text-accent">
+                                        <label class="flex items-center gap-2 text-sm cursor-pointer hover:bg-slate-50 p-1 rounded transition-all">
+                                            <input type="checkbox" class="rounded text-accent cursor-pointer" onchange="showToast(this.checked ? &quot;已启用: 互动投票&quot; : &quot;已禁用: 互动投票&quot;, &quot;success&quot;)">
                                             <span>互动投票/提问</span>
                                         </label>
                                     </div>
@@ -1309,8 +1460,8 @@
                         </div>
 
                         <div class="flex justify-end gap-3">
-                            <button onclick="showPage('task-settings')" class="px-5 py-2 border border-slate-200 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-50 transition-all-150">上一步</button>
-                            <button onclick="showPage('email-settings')" class="bg-accent hover:bg-accent-hover text-white px-6 py-2 rounded-lg text-sm font-medium transition-all-150">
+                            <button onclick="showPage('task-settings')" class="px-5 py-2 border border-slate-200 rounded-xl text-sm font-medium text-slate-600 hover:bg-slate-50 transition-all-150">上一步</button>
+                            <button onclick="showPage('email-settings')" class="bg-accent hover:bg-accent-hover text-white px-6 py-2 rounded-xl text-sm font-medium transition-all-150">
                                 保存并配置邮件
                                 <i data-lucide="arrow-right" class="w-4 h-4 inline ml-1"></i>
                             </button>
@@ -1357,7 +1508,7 @@
                         <div class="mb-6">
                             <h4 class="text-sm font-medium text-slate-700 mb-3">邮件序列 <span class="text-slate-400 font-normal">（5封自动化跟进）</span></h4>
                             <div class="space-y-3">
-                                <div class="flex items-center gap-4 p-4 border border-accent bg-accent/5 rounded-lg">
+                                <div onclick="showToast(&quot;编辑邮件序列&quot;, &quot;info&quot;)" class="flex items-center gap-4 p-4 border-2 border-accent bg-accent/5 rounded-xl shadow-sm cursor-pointer hover:shadow-md transition-all">
                                     <div class="w-8 h-8 bg-accent text-white rounded-full flex items-center justify-center text-sm font-medium">1</div>
                                     <div class="flex-1">
                                         <p class="font-medium text-primary text-sm">首封邮件 - 价值介绍</p>
@@ -1365,7 +1516,7 @@
                                     </div>
                                     <span class="text-xs text-green-600 bg-green-50 px-2 py-1 rounded">启用</span>
                                 </div>
-                                <div class="flex items-center gap-4 p-4 border border-slate-200 rounded-lg">
+                                <div onclick="showToast(&quot;编辑邮件序列&quot;, &quot;info&quot;)" class="flex items-center gap-4 p-4 border border-slate-200 rounded-xl hover:border-accent/30 hover:bg-slate-50/50 transition-all cursor-pointer">
                                     <div class="w-8 h-8 bg-slate-200 text-slate-600 rounded-full flex items-center justify-center text-sm font-medium">2</div>
                                     <div class="flex-1">
                                         <p class="font-medium text-primary text-sm">跟进邮件 - 社会证明</p>
@@ -1373,7 +1524,7 @@
                                     </div>
                                     <span class="text-xs text-green-600 bg-green-50 px-2 py-1 rounded">启用</span>
                                 </div>
-                                <div class="flex items-center gap-4 p-4 border border-slate-200 rounded-lg">
+                                <div onclick="showToast(&quot;编辑邮件序列&quot;, &quot;info&quot;)" class="flex items-center gap-4 p-4 border border-slate-200 rounded-xl hover:border-accent/30 hover:bg-slate-50/50 transition-all cursor-pointer">
                                     <div class="w-8 h-8 bg-slate-200 text-slate-600 rounded-full flex items-center justify-center text-sm font-medium">3</div>
                                     <div class="flex-1">
                                         <p class="font-medium text-primary text-sm">询问邮件 - 确认意向</p>
@@ -1381,7 +1532,7 @@
                                     </div>
                                     <span class="text-xs text-green-600 bg-green-50 px-2 py-1 rounded">启用</span>
                                 </div>
-                                <div class="flex items-center gap-4 p-4 border border-slate-200 rounded-lg">
+                                <div onclick="showToast(&quot;编辑邮件序列&quot;, &quot;info&quot;)" class="flex items-center gap-4 p-4 border border-slate-200 rounded-xl hover:border-accent/30 hover:bg-slate-50/50 transition-all cursor-pointer">
                                     <div class="w-8 h-8 bg-slate-200 text-slate-600 rounded-full flex items-center justify-center text-sm font-medium">4</div>
                                     <div class="flex-1">
                                         <p class="font-medium text-primary text-sm">告别邮件 - 礼貌结束</p>
@@ -1389,7 +1540,7 @@
                                     </div>
                                     <span class="text-xs text-green-600 bg-green-50 px-2 py-1 rounded">启用</span>
                                 </div>
-                                <div class="flex items-center gap-4 p-4 border border-slate-200 rounded-lg">
+                                <div onclick="showToast(&quot;编辑邮件序列&quot;, &quot;info&quot;)" class="flex items-center gap-4 p-4 border border-slate-200 rounded-xl hover:border-accent/30 hover:bg-slate-50/50 transition-all cursor-pointer">
                                     <div class="w-8 h-8 bg-slate-200 text-slate-600 rounded-full flex items-center justify-center text-sm font-medium">5</div>
                                     <div class="flex-1">
                                         <p class="font-medium text-primary text-sm">激活邮件 - 重新触达</p>
@@ -1433,8 +1584,8 @@
                         </div>
 
                         <div class="flex justify-end gap-3">
-                            <button onclick="showPage('social-settings')" class="px-5 py-2 border border-slate-200 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-50 transition-all-150">上一步</button>
-                            <button onclick="showPage('task-review')" class="bg-accent hover:bg-accent-hover text-white px-6 py-2 rounded-lg text-sm font-medium transition-all-150">
+                            <button onclick="showPage('social-settings')" class="px-5 py-2 border border-slate-200 rounded-xl text-sm font-medium text-slate-600 hover:bg-slate-50 transition-all-150">上一步</button>
+                            <button onclick="showPage('task-review')" class="bg-accent hover:bg-accent-hover text-white px-6 py-2 rounded-xl text-sm font-medium transition-all-150">
                                 查看完整方案
                                 <i data-lucide="arrow-right" class="w-4 h-4 inline ml-1"></i>
                             </button>
@@ -1497,8 +1648,8 @@
                         </div>
 
                         <div class="flex justify-end gap-3">
-                            <button onclick="showPage('email-settings')" class="px-5 py-2 border border-slate-200 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-50 transition-all-150">返回修改</button>
-                            <button onclick="startTask()" class="bg-accent hover:bg-accent-hover text-white px-8 py-2 rounded-lg text-sm font-medium transition-all-150">
+                            <button onclick="showPage('email-settings')" class="px-5 py-2 border border-slate-200 rounded-xl text-sm font-medium text-slate-600 hover:bg-slate-50 transition-all-150">返回修改</button>
+                            <button onclick="startTask()" class="bg-accent hover:bg-accent-hover text-white px-8 py-2 rounded-xl text-sm font-medium transition-all-150">
                                 <i data-lucide="play" class="w-4 h-4 inline mr-1"></i>
                                 确认并启动获客任务
                             </button>
@@ -1506,9 +1657,417 @@
                     </div>
                 </div>
             </div>
+            <!-- WhatsApp聊天页面 -->
+            <div id="page-whatsapp" class="page-content hidden">
+                <div class="flex h-[calc(100vh-140px)]">
+                    <!-- 左侧联系人列表 -->
+                    <div class="w-80 bg-white border-r border-slate-200 flex flex-col">
+                        <div class="p-4 border-b border-slate-200">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="font-semibold text-primary">WhatsApp 消息</h3>
+                                <button class="p-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-all-150">
+                                    <i data-lucide="plus" class="w-4 h-4"></i>
+                                </button>
+                            </div>
+                            <div class="relative">
+                                <i data-lucide="search" class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                                <input type="text" placeholder="搜索联系人..." class="w-full pl-9 pr-4 py-2 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/10">
+                            </div>
+                        </div>
+                        <div class="flex-1 overflow-y-auto">
+                            <div class="p-3 space-y-1">
+                                <div onclick="showToast("打开聊天", "success")" class="flex items-center gap-3 p-3 bg-green-50 rounded-xl cursor-pointer border-l-4 border-green-500 shadow-sm">
+                                    <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=john" class="w-12 h-12 rounded-full bg-slate-100">
+                                    <div class="flex-1 min-w-0">
+                                        <div class="flex items-center justify-between">
+                                            <p class="font-medium text-primary text-sm">John Miller</p>
+                                            <span class="text-xs text-green-600 font-medium">10:42</span>
+                                        </div>
+                                        <p class="text-sm text-slate-600 truncate">我对你们的户外帐篷很感兴趣...</p>
+                                    </div>
+                                    <span class="w-5 h-5 bg-green-500 text-white text-xs rounded-full flex items-center justify-center">2</span>
+                                </div>
+                                <div onclick="showToast("打开聊天", "info")" class="flex items-center gap-3 p-3 hover:bg-slate-50 rounded-lg cursor-pointer transition-all">
+                                    <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=sarah" class="w-12 h-12 rounded-full bg-slate-100">
+                                    <div class="flex-1 min-w-0">
+                                        <div class="flex items-center justify-between">
+                                            <p class="font-medium text-primary text-sm">Sarah Lee</p>
+                                            <span class="text-xs text-slate-400">昨天</span>
+                                        </div>
+                                        <p class="text-sm text-slate-500 truncate">请问最小起订量是多少？</p>
+                                    </div>
+                                </div>
+                                <div onclick="showToast("打开聊天", "info")" class="flex items-center gap-3 p-3 hover:bg-slate-50 rounded-lg cursor-pointer transition-all">
+                                    <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=mike" class="w-12 h-12 rounded-full bg-slate-100">
+                                    <div class="flex-1 min-w-0">
+                                        <div class="flex items-center justify-between">
+                                            <p class="font-medium text-primary text-sm">Mike Johnson</p>
+                                            <span class="text-xs text-slate-400">昨天</span>
+                                        </div>
+                                        <p class="text-sm text-slate-500 truncate">感谢你的回复，我会考虑的</p>
+                                    </div>
+                                </div>
+                                <div onclick="showToast("打开聊天", "info")" class="flex items-center gap-3 p-3 hover:bg-slate-50 rounded-lg cursor-pointer transition-all">
+                                    <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=emma" class="w-12 h-12 rounded-full bg-slate-100">
+                                    <div class="flex-1 min-w-0">
+                                        <div class="flex items-center justify-between">
+                                            <p class="font-medium text-primary text-sm">Emma Wilson</p>
+                                            <span class="text-xs text-slate-400">周一</span>
+                                        </div>
+                                        <p class="text-sm text-slate-500 truncate">可以发一下产品目录吗？</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 右侧聊天区域 -->
+                    <div class="flex-1 flex flex-col bg-slate-50">
+                        <!-- 聊天头部 -->
+                        <div class="bg-white px-6 py-4 border-b border-slate-200 flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=john" class="w-10 h-10 rounded-full bg-slate-100">
+                                <div>
+                                    <p class="font-medium text-primary">John Miller</p>
+                                    <p class="text-xs text-slate-500">采购总监 · OutdoorGear Inc.</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="px-3 py-1 bg-green-50 text-green-600 text-xs rounded-full">在线</span>
+                                <button class="p-2 text-slate-400 hover:text-primary transition-all-150">
+                                    <i data-lucide="more-vertical" class="w-5 h-5"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- 聊天内容 -->
+                        <div class="flex-1 overflow-y-auto p-6 space-y-4">
+                            <div class="flex justify-center">
+                                <span class="text-xs text-slate-400 bg-slate-200 px-3 py-1 rounded-full">今天 10:30</span>
+                            </div>
+                            
+                            <!-- 客户消息 -->
+                            <div class="flex items-start gap-3">
+                                <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=john" class="w-8 h-8 rounded-full bg-slate-100 mt-1">
+                                <div class="bg-white p-3 rounded-lg rounded-tl-none shadow-sm max-w-md">
+                                    <p class="text-sm text-slate-700">你好，我对你们的户外帐篷产品很感兴趣。我们是美国一家户外用品批发商，年采购额约200万美元。请问可以提供产品目录和报价吗？</p>
+                                    <span class="text-xs text-slate-400 mt-1 block">10:30</span>
+                                </div>
+                            </div>
+                            
+                            <!-- AI自动回复 -->
+                            <div class="flex items-start gap-3 flex-row-reverse">
+                                <div class="w-8 h-8 rounded-full bg-accent flex items-center justify-center mt-1">
+                                    <i data-lucide="bot" class="w-4 h-4 text-white"></i>
+                                </div>
+                                <div class="bg-green-100 p-3 rounded-lg rounded-tr-none max-w-md">
+                                    <p class="text-sm text-slate-700">您好 John！非常感谢您对我们产品的关注。😊</p>
+                                    <p class="text-sm text-slate-700 mt-2">我是 OutdoorGear Co. 的 AI 助手，很高兴为您服务。我可以立即为您发送产品目录和基础报价。</p>
+                                    <span class="text-xs text-slate-500 mt-1 block">10:31 · 自动回复</span>
+                                </div>
+                            </div>
+                            
+                            <!-- AI建议标签 -->
+                            <div class="flex justify-center">
+                                <div class="bg-amber-50 border border-amber-200 rounded-lg px-4 py-2 flex items-center gap-2">
+                                    <i data-lucide="lightbulb" class="w-4 h-4 text-amber-500"></i>
+                                    <span class="text-sm text-amber-700">AI 建议：发送产品目录 PDF</span>
+                                    <button onclick="showToast("PDF已发送", "success")" class="text-xs bg-accent text-white px-2 py-1 rounded hover:bg-accent-hover transition-all">发送</button>
+                                </div>
+                            </div>
+                            
+                            <!-- 客户消息 -->
+                            <div class="flex items-start gap-3">
+                                <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=john" class="w-8 h-8 rounded-full bg-slate-100 mt-1">
+                                <div class="bg-white p-3 rounded-lg rounded-tl-none shadow-sm max-w-md">
+                                    <p class="text-sm text-slate-700">太好了！另外请问你们的最小起订量是多少？我们首批想订购 500 件试试市场反应。</p>
+                                    <span class="text-xs text-slate-400 mt-1 block">10:42</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 输入区域 -->
+                        <div class="bg-white border-t border-slate-200 p-4">
+                            <div class="flex items-center gap-3 mb-3">
+                                <button onclick="showToast(&quot;快捷回复模板&quot;, &quot;info&quot;)" class="p-2 text-slate-400 hover:text-primary hover:bg-slate-100 rounded-lg transition-all" title="快捷回复">
+                                    <i data-lucide="zap" class="w-5 h-5"></i>
+                                </button>
+                                <button onclick="showToast(&quot;选择文件...&quot;, &quot;info&quot;)" class="p-2 text-slate-400 hover:text-primary hover:bg-slate-100 rounded-lg transition-all" title="发送文件">
+                                    <i data-lucide="paperclip" class="w-5 h-5"></i>
+                                </button>
+                                <button onclick="showToast(&quot;翻译功能已开启&quot;, &quot;success&quot;)" class="p-2 text-slate-400 hover:text-primary hover:bg-slate-100 rounded-lg transition-all" title="翻译">
+                                    <i data-lucide="languages" class="w-5 h-5"></i>
+                                </button>
+                                <div class="flex-1"></div>
+                                <span class="text-xs text-slate-400">AI辅助已开启</span>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" checked class="sr-only peer cursor-pointer" onchange="showToast(this.checked ? &quot;已启用&quot; : &quot;已禁用&quot;, &quot;success&quot;)">
+                                    <div class="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-accent"></div>
+                                </label>
+                            </div>
+                            <div class="flex items-end gap-3">
+                                <textarea placeholder="输入消息..." class="flex-1 px-4 py-3 border border-slate-200 rounded-xl text-sm resize-none focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/10" rows="2"></textarea>
+                                <button onclick="showToast(&quot;消息已发送&quot;, &quot;success&quot;)" class="p-3 bg-accent text-white rounded-xl hover:bg-accent-hover transition-all hover:scale-105">
+                                    <i data-lucide="send" class="w-5 h-5"></i>
+                                </button>
+                            </div>
+                            <div class="flex items-center gap-2 mt-2">
+                                <span class="text-xs text-slate-400">快捷回复:</span>
+                                <button onclick="showToast("已添加: 发送报价", "success")" class="text-xs bg-slate-100 hover:bg-slate-200 px-2 py-1 rounded transition-all">发送报价</button>
+                                <button onclick="showToast("已添加: 产品目录", "success")" class="text-xs bg-slate-100 hover:bg-slate-200 px-2 py-1 rounded transition-all">产品目录</button>
+                                <button onclick="showToast("已转接人工客服", "success")" class="text-xs bg-slate-100 hover:bg-slate-200 px-2 py-1 rounded transition-all">转人工</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 右侧客户信息 -->
+                    <div class="w-72 bg-white border-l border-slate-200 p-6">
+                        <div class="text-center mb-6">
+                            <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=john" class="w-20 h-20 rounded-full bg-slate-100 mx-auto mb-3">
+                            <h4 class="font-semibold text-primary">John Miller</h4>
+                            <p class="text-sm text-slate-500">采购总监</p>
+                            <p class="text-xs text-slate-400">OutdoorGear Inc.</p>
+                        </div>
+                        
+                        <div class="space-y-4">
+                            <div>
+                                <p class="text-xs text-slate-400 mb-1">线索评分</p>
+                                <div class="flex items-center gap-2">
+                                    <span class="px-3 py-1 bg-gradient-to-r from-red-50 to-red-100 text-red-600 text-xs font-bold rounded-full shadow-sm">94 🔥</span>
+                                    <span class="text-xs text-green-600">高意向</span>
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <p class="text-xs text-slate-400 mb-1">标签</p>
+                                <div class="flex flex-wrap gap-2">
+                                    <span class="px-2 py-1 bg-blue-50 text-blue-600 text-xs rounded-md font-medium">美国</span>
+                                    <span class="px-2 py-1 bg-green-50 text-green-600 text-xs rounded-md font-medium">户外用品</span>
+                                    <span class="px-2 py-1 bg-purple-50 text-purple-600 text-xs rounded">批发商</span>
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <p class="text-xs text-slate-400 mb-1">来源</p>
+                                <p class="text-sm text-slate-700">网站 WhatsApp 按钮</p>
+                            </div>
+                            
+                            <div>
+                                <p class="text-xs text-slate-400 mb-2">操作</p>
+                                <div class="space-y-2">
+                                    <button onclick="showToast("已分配给销售", "success")" class="w-full py-2 bg-accent text-white text-sm rounded-lg hover:bg-accent-hover transition-all">分配给销售</button>
+                                    <button onclick="showToast("已标记为商机", "success")" class="w-full py-2 border border-slate-200 text-slate-600 text-sm rounded-lg hover:bg-slate-50 transition-all">标记为商机</button>
+                                    <button onclick="showToast("跟进任务已创建", "success")" class="w-full py-2 border border-slate-200 text-slate-600 text-sm rounded-lg hover:bg-slate-50 transition-all">创建跟进任务</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SEO风控页面 -->
+            <div id="page-seo-control" class="page-content hidden">
+                <div class="space-y-6">
+                    <!-- 风险概览卡片 -->
+                    <div class="grid grid-cols-4 gap-6">
+                        <div class="gradient-border bg-white rounded-2xl p-6 card-hover">
+                            <div class="flex items-center justify-between mb-4">
+                                <p class="text-sm text-slate-500">站点健康度</p>
+                                <div class="w-10 h-10 bg-green-50 rounded-lg flex items-center justify-center">
+                                    <i data-lucide="activity" class="w-5 h-5 text-green-500"></i>
+                                </div>
+                            </div>
+                            <p class="text-2xl font-bold text-primary">92<span class="text-sm font-normal text-slate-400">/100</span></p>
+                            <p class="text-xs text-green-600 mt-1">↑ 较上周 +3分</p>
+                        </div>
+                        <div class="bg-white rounded-xl border border-slate-200 p-6">
+                            <div class="flex items-center justify-between mb-4">
+                                <p class="text-sm text-slate-500">内容原创度</p>
+                                <div class="w-10 h-10 bg-green-50 rounded-lg flex items-center justify-center">
+                                    <i data-lucide="file-check" class="w-5 h-5 text-green-500"></i>
+                                </div>
+                            </div>
+                            <p class="text-2xl font-bold text-primary">96<span class="text-sm font-normal text-slate-400">%</span></p>
+                            <p class="text-xs text-slate-400 mt-1">平均检测值</p>
+                        </div>
+                        <div class="bg-white rounded-xl border border-slate-200 p-6">
+                            <div class="flex items-center justify-between mb-4">
+                                <p class="text-sm text-slate-500">AI痕迹检测</p>
+                                <div class="w-10 h-10 bg-amber-50 rounded-lg flex items-center justify-center">
+                                    <i data-lucide="brain" class="w-5 h-5 text-amber-500"></i>
+                                </div>
+                            </div>
+                            <p class="text-2xl font-bold text-primary">24<span class="text-sm font-normal text-slate-400">%</span></p>
+                            <p class="text-xs text-green-600 mt-1">↓ 需人工审核 2篇</p>
+                        </div>
+                        <div class="bg-white rounded-xl border border-slate-200 p-6">
+                            <div class="flex items-center justify-between mb-4">
+                                <p class="text-sm text-slate-500">风险预警</p>
+                                <div class="w-10 h-10 bg-red-50 rounded-lg flex items-center justify-center">
+                                    <i data-lucide="alert-triangle" class="w-5 h-5 text-red-500"></i>
+                                </div>
+                            </div>
+                            <p class="text-2xl font-bold text-primary">0</p>
+                            <p class="text-xs text-green-600 mt-1">当前无异常</p>
+                        </div>
+                    </div>
+                    
+                    <!-- 内容审核队列 -->
+                    <div class="bg-white rounded-xl border border-slate-200">
+                        <div class="px-6 py-5 border-b border-slate-200 flex items-center justify-between">
+                            <h3 class="font-semibold text-primary">内容审核队列</h3>
+                            <div class="flex gap-2">
+                                <button onclick="showToast(&quot;筛选: 待审核&quot;, &quot;info&quot;)" class="px-3 py-1.5 bg-accent text-white text-sm rounded-lg">待审核 2</button>
+                                <button onclick="showToast(&quot;筛选: 已通过&quot;, &quot;info&quot;)" class="px-3 py-1.5 text-slate-600 text-sm hover:bg-slate-50 rounded-lg">已通过 48</button>
+                                <button onclick="showToast(&quot;筛选: 已拒绝&quot;, &quot;info&quot;)" class="px-3 py-1.5 text-slate-600 text-sm hover:bg-slate-50 rounded-lg">已拒绝 3</button>
+                            </div>
+                        </div>
+                        <div class="divide-y divide-slate-100">
+                            <div onclick="showToast("查看内容审核详情", "info")" class="px-6 py-4 hover:bg-slate-50 transition-all cursor-pointer">
+                                <div class="flex items-start justify-between">
+                                    <div class="flex items-start gap-4">
+                                        <div class="w-10 h-10 bg-amber-50 rounded-lg flex items-center justify-center flex-shrink-0">
+                                            <i data-lucide="file-text" class="w-5 h-5 text-amber-500"></i>
+                                        </div>
+                                        <div>
+                                            <p class="font-medium text-primary">2024年户外用品市场趋势分析</p>
+                                            <p class="text-sm text-slate-500 mt-1">AI痕迹检测: 72% · 建议人工优化</p>
+                                            <div class="flex gap-2 mt-2">
+                                                <span class="px-2 py-0.5 bg-amber-50 text-amber-600 text-xs rounded">AI痕迹偏高</span>
+                                                <span class="px-2 py-0.5 bg-blue-50 text-blue-600 text-xs rounded">SEO博客</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="flex gap-2">
+                                        <button onclick="showToast("查看内容详情", "info")" class="px-4 py-2 border border-slate-200 text-slate-600 text-sm rounded-lg hover:bg-slate-50 transition-all">查看</button>
+                                        <button onclick="showToast("内容已通过审核", "success")" class="px-4 py-2 bg-accent text-white text-sm rounded-lg hover:bg-accent-hover transition-all">通过</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div onclick="showToast("查看内容审核详情", "info")" class="px-6 py-4 hover:bg-slate-50 transition-all cursor-pointer">
+                                <div class="flex items-start justify-between">
+                                    <div class="flex items-start gap-4">
+                                        <div class="w-10 h-10 bg-amber-50 rounded-lg flex items-center justify-center flex-shrink-0">
+                                            <i data-lucide="file-text" class="w-5 h-5 text-amber-500"></i>
+                                        </div>
+                                        <div>
+                                            <p class="font-medium text-primary">如何选择可靠的帐篷供应商</p>
+                                            <p class="text-sm text-slate-500 mt-1">原创度: 85% · 关键词密度偏高</p>
+                                            <div class="flex gap-2 mt-2">
+                                                <span class="px-2 py-0.5 bg-amber-50 text-amber-600 text-xs rounded">需优化</span>
+                                                <span class="px-2 py-0.5 bg-blue-50 text-blue-600 text-xs rounded">SEO博客</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="flex gap-2">
+                                        <button onclick="showToast("查看内容详情", "info")" class="px-4 py-2 border border-slate-200 text-slate-600 text-sm rounded-lg hover:bg-slate-50 transition-all">查看</button>
+                                        <button onclick="showToast("内容已通过审核", "success")" class="px-4 py-2 bg-accent text-white text-sm rounded-lg hover:bg-accent-hover transition-all">通过</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 站点监控 -->
+                    <div class="grid grid-cols-2 gap-6">
+                        <div class="bg-white rounded-xl border border-slate-200 p-6">
+                            <h3 class="font-semibold text-primary mb-4">收录监控</h3>
+                            <div class="space-y-4">
+                                <div>
+                                    <div class="flex items-center justify-between mb-2">
+                                        <span class="text-sm text-slate-600">Google收录</span>
+                                        <span class="text-sm font-medium text-primary">156 页</span>
+                                    </div>
+                                    <div class="h-2 bg-slate-100 rounded-full overflow-hidden">
+                                        <div class="h-full bg-green-500 rounded-full" style="width: 85%"></div>
+                                    </div>
+                                    <p class="text-xs text-green-600 mt-1">↑ 较上周 +12 页</p>
+                                </div>
+                                <div>
+                                    <div class="flex items-center justify-between mb-2">
+                                        <span class="text-sm text-slate-600">索引状态</span>
+                                        <span class="text-sm font-medium text-primary">正常</span>
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <span class="w-2 h-2 bg-green-500 rounded-full"></span>
+                                        <span class="text-xs text-slate-500">最后检测: 2小时前</span>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="flex items-center justify-between mb-2">
+                                        <span class="text-sm text-slate-600">排名波动</span>
+                                        <span class="text-sm font-medium text-primary">+3 上升</span>
+                                    </div>
+                                    <p class="text-xs text-slate-500">核心关键词平均排名变化</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-white rounded-xl border border-slate-200 p-6">
+                            <h3 class="font-semibold text-primary mb-4">发布节奏控制</h3>
+                            <div class="space-y-4">
+                                <div class="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
+                                    <div>
+                                        <p class="font-medium text-primary text-sm">当前发布频率</p>
+                                        <p class="text-xs text-slate-500">outdoorgear.dealclaw.com</p>
+                                    </div>
+                                    <span class="px-3 py-1 bg-green-50 text-green-600 text-sm font-medium rounded-full">每周 3 篇</span>
+                                </div>
+                                <div class="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
+                                    <div>
+                                        <p class="font-medium text-primary text-sm">站点权重</p>
+                                        <p class="text-xs text-slate-500">运营 4 个月</p>
+                                    </div>
+                                    <span class="px-3 py-1 bg-blue-50 text-blue-600 text-sm font-medium rounded-full">DR 28</span>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-slate-600 mb-2">建议调整</p>
+                                    <p class="text-xs text-slate-500">当前权重良好，可逐步增加至每周 5 篇</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 风控规则配置 -->
+                    <div class="bg-white rounded-xl border border-slate-200 p-6">
+                        <h3 class="font-semibold text-primary mb-4">风控规则配置</h3>
+                        <div class="grid grid-cols-3 gap-6">
+                            <div class="p-4 border border-slate-200 rounded-lg">
+                                <div class="flex items-center justify-between mb-3">
+                                    <p class="font-medium text-primary text-sm">AI痕迹检测</p>
+                                    <label class="relative inline-flex items-center cursor-pointer">
+                                        <input type="checkbox" checked class="sr-only peer cursor-pointer" onchange="showToast(this.checked ? &quot;已启用&quot; : &quot;已禁用&quot;, &quot;success&quot;)">
+                                        <div class="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-accent"></div>
+                                    </label>
+                                </div>
+                                <p class="text-xs text-slate-500">AI生成内容超过 70% 时触发人工审核</p>
+                            </div>
+                            <div class="p-4 border border-slate-200 rounded-lg">
+                                <div class="flex items-center justify-between mb-3">
+                                    <p class="font-medium text-primary text-sm">原创度检查</p>
+                                    <label class="relative inline-flex items-center cursor-pointer">
+                                        <input type="checkbox" checked class="sr-only peer cursor-pointer" onchange="showToast(this.checked ? &quot;已启用&quot; : &quot;已禁用&quot;, &quot;success&quot;)">
+                                        <div class="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-accent"></div>
+                                    </label>
+                                </div>
+                                <p class="text-xs text-slate-500">原创度低于 85% 时阻止发布</p>
+                            </div>
+                            <div class="p-4 border border-slate-200 rounded-lg">
+                                <div class="flex items-center justify-between mb-3">
+                                    <p class="font-medium text-primary text-sm">自动发布限速</p>
+                                    <label class="relative inline-flex items-center cursor-pointer">
+                                        <input type="checkbox" checked class="sr-only peer cursor-pointer" onchange="showToast(this.checked ? &quot;已启用&quot; : &quot;已禁用&quot;, &quot;success&quot;)">
+                                        <div class="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-accent"></div>
+                                    </label>
+                                </div>
+                                <p class="text-xs text-slate-500">根据站点权重自动控制发布频率</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </main>
-
     <script>
         // 初始化图标
         lucide.createIcons();
@@ -1598,13 +2157,17 @@
             }
             
             // 显示加载状态
-            btn.innerHTML = '<span class="typing-indicator"><span>.</span><span>.</span><span>.</span></span> AI解析中';
+            btn.innerHTML = '<span class="flex items-center gap-2"><span class="spinner"></span>AI解析中...</span>';
+            btn.disabled = true;
+            btn.classList.add('opacity-75', 'cursor-not-allowed');
             btn.disabled = true;
             
             setTimeout(() => {
                 document.getElementById('parsed-profile').classList.remove('hidden');
-                btn.innerHTML = 'AI 解析画像';
+                btn.innerHTML = '<i data-lucide="sparkles" class="w-4 h-4"></i>AI 解析画像';
                 btn.disabled = false;
+                btn.classList.remove('opacity-75', 'cursor-not-allowed');
+                showToast('画像解析完成！', 'success');
                 lucide.createIcons();
             }, 1500);
         }
@@ -1625,421 +2188,158 @@
             showPage('strategy');
         }
 
+        
+        // Initialize Chart.js
+        
+        // Funnel Chart
+        setTimeout(() => {
+            const funnelCtx = document.getElementById('funnelChart');
+            if (funnelCtx) {
+                new Chart(funnelCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['曝光', '访问', '注册', 'MQL'],
+                        datasets: [{
+                            label: '数量',
+                            data: [12456, 3284, 156, 47],
+                            backgroundColor: ['#BFDBFE', '#93C5FD', '#60A5FA', '#3B82F6'],
+                            borderRadius: 8,
+                            barThickness: 40
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        indexAxis: 'y',
+                        plugins: { legend: { display: false } },
+                        scales: {
+                            x: { grid: { display: false } },
+                            y: { grid: { display: false } }
+                        }
+                    }
+                });
+            }
+        }, 200);
+
+        function initCharts() {
+            const ctx = document.getElementById('channelChart');
+            if (ctx) {
+                new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['LinkedIn', 'SEO博客', '邮件外联'],
+                        datasets: [{
+                            data: [24, 15, 8],
+                            backgroundColor: ['#3B82F6', '#10B981', '#8B5CF6'],
+                            borderWidth: 0,
+                            hoverOffset: 4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        cutout: '70%',
+                        plugins: {
+                            legend: { display: false }
+                        }
+                    }
+                });
+            }
+        }
+        
+        // Toast notification function
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toast-container') || createToastContainer();
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            
+            const colors = {
+                success: 'text-green-500',
+                error: 'text-red-500',
+                info: 'text-blue-500'
+            };
+            
+            const icons = {
+                success: 'check-circle',
+                error: 'alert-circle',
+                info: 'info'
+            };
+            
+            toast.innerHTML = `
+                <i data-lucide="${icons[type]}" class="w-5 h-5 ${colors[type]}"></i>
+                <span class="text-sm font-medium text-slate-700">${message}</span>
+            `;
+            
+            container.appendChild(toast);
+            lucide.createIcons();
+            
+            setTimeout(() => toast.classList.add('show'), 10);
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 400);
+            }, 3000);
+        }
+        
+        function createToastContainer() {
+            const container = document.createElement('div');
+            container.id = 'toast-container';
+            container.className = 'toast-container';
+            document.body.appendChild(container);
+            return container;
+        }
+        
+        // Initialize charts on dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(initCharts, 100);
+        });
+
+        
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            // ESC to close any modal or go back
+            if (e.key === 'Escape') {
+                const currentPage = document.querySelector('.page-content:not(.hidden)').id;
+                if (currentPage !== 'page-dashboard') {
+                    showPage('dashboard');
+                    showToast('已返回仪表盘', 'info');
+                }
+            }
+            
+            // Ctrl/Cmd + N for new task
+            if ((e.ctrlKey || e.metaKey) && e.key === 'n') {
+                e.preventDefault();
+                showPage('new-task');
+                showToast('新建获客任务', 'success');
+            }
+            
+            // Ctrl/Cmd + 1-7 for navigation
+            if ((e.ctrlKey || e.metaKey) && e.key >= '1' && e.key <= '7') {
+                e.preventDefault();
+                const pages = ['dashboard', 'tasks', 'content', 'leads', 'analytics', 'whatsapp', 'seo-control'];
+                const page = pages[parseInt(e.key) - 1];
+                if (page) {
+                    showPage(page);
+                    showToast('切换到: ' + page, 'info');
+                }
+            }
+        });
+        
+        // Add hover sound effect simulation (visual feedback)
+        document.querySelectorAll('button, a, .cursor-pointer').forEach(el => {
+            el.addEventListener('mouseenter', function() {
+                this.style.transform = this.style.transform || '';
+            });
+        });
+
         // 启动任务
-        function startTask() {
-            alert('获客任务已启动！获客师将开始自动执行。');
+        function startTask() { 
+            showToast("获客任务已启动成功！", "success");
+            // Add a small delay for visual effect
+            setTimeout(() => {
+                showPage('tasks');
+            }, 500);
             showPage('tasks');
         }
     </script>
 </body>
 </html>
-
-            <!-- WhatsApp聊天页面 -->
-            <div id="page-whatsapp" class="page-content hidden">
-                <div class="flex h-[calc(100vh-140px)]">
-                    <!-- 左侧联系人列表 -->
-                    <div class="w-80 bg-white border-r border-slate-200 flex flex-col">
-                        <div class="p-4 border-b border-slate-200">
-                            <div class="flex items-center justify-between mb-4">
-                                <h3 class="font-semibold text-primary">WhatsApp 消息</h3>
-                                <button class="p-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-all-150">
-                                    <i data-lucide="plus" class="w-4 h-4"></i>
-                                </button>
-                            </div>
-                            <div class="relative">
-                                <i data-lucide="search" class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></i>
-                                <input type="text" placeholder="搜索联系人..." class="w-full pl-9 pr-4 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:border-accent">
-                            </div>
-                        </div>
-                        <div class="flex-1 overflow-y-auto">
-                            <div class="p-3 space-y-1">
-                                <div class="flex items-center gap-3 p-3 bg-green-50 rounded-lg cursor-pointer border-l-4 border-green-500">
-                                    <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=john" class="w-12 h-12 rounded-full bg-slate-100">
-                                    <div class="flex-1 min-w-0">
-                                        <div class="flex items-center justify-between">
-                                            <p class="font-medium text-primary text-sm">John Miller</p>
-                                            <span class="text-xs text-green-600 font-medium">10:42</span>
-                                        </div>
-                                        <p class="text-sm text-slate-600 truncate">我对你们的户外帐篷很感兴趣...</p>
-                                    </div>
-                                    <span class="w-5 h-5 bg-green-500 text-white text-xs rounded-full flex items-center justify-center">2</span>
-                                </div>
-                                <div class="flex items-center gap-3 p-3 hover:bg-slate-50 rounded-lg cursor-pointer transition-all-150">
-                                    <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=sarah" class="w-12 h-12 rounded-full bg-slate-100">
-                                    <div class="flex-1 min-w-0">
-                                        <div class="flex items-center justify-between">
-                                            <p class="font-medium text-primary text-sm">Sarah Lee</p>
-                                            <span class="text-xs text-slate-400">昨天</span>
-                                        </div>
-                                        <p class="text-sm text-slate-500 truncate">请问最小起订量是多少？</p>
-                                    </div>
-                                </div>
-                                <div class="flex items-center gap-3 p-3 hover:bg-slate-50 rounded-lg cursor-pointer transition-all-150">
-                                    <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=mike" class="w-12 h-12 rounded-full bg-slate-100">
-                                    <div class="flex-1 min-w-0">
-                                        <div class="flex items-center justify-between">
-                                            <p class="font-medium text-primary text-sm">Mike Johnson</p>
-                                            <span class="text-xs text-slate-400">昨天</span>
-                                        </div>
-                                        <p class="text-sm text-slate-500 truncate">感谢你的回复，我会考虑的</p>
-                                    </div>
-                                </div>
-                                <div class="flex items-center gap-3 p-3 hover:bg-slate-50 rounded-lg cursor-pointer transition-all-150">
-                                    <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=emma" class="w-12 h-12 rounded-full bg-slate-100">
-                                    <div class="flex-1 min-w-0">
-                                        <div class="flex items-center justify-between">
-                                            <p class="font-medium text-primary text-sm">Emma Wilson</p>
-                                            <span class="text-xs text-slate-400">周一</span>
-                                        </div>
-                                        <p class="text-sm text-slate-500 truncate">可以发一下产品目录吗？</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- 右侧聊天区域 -->
-                    <div class="flex-1 flex flex-col bg-slate-50">
-                        <!-- 聊天头部 -->
-                        <div class="bg-white px-6 py-4 border-b border-slate-200 flex items-center justify-between">
-                            <div class="flex items-center gap-3">
-                                <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=john" class="w-10 h-10 rounded-full bg-slate-100">
-                                <div>
-                                    <p class="font-medium text-primary">John Miller</p>
-                                    <p class="text-xs text-slate-500">采购总监 · OutdoorGear Inc.</p>
-                                </div>
-                            </div>
-                            <div class="flex items-center gap-2">
-                                <span class="px-3 py-1 bg-green-50 text-green-600 text-xs rounded-full">在线</span>
-                                <button class="p-2 text-slate-400 hover:text-primary transition-all-150">
-                                    <i data-lucide="more-vertical" class="w-5 h-5"></i>
-                                </button>
-                            </div>
-                        </div>
-                        
-                        <!-- 聊天内容 -->
-                        <div class="flex-1 overflow-y-auto p-6 space-y-4">
-                            <div class="flex justify-center">
-                                <span class="text-xs text-slate-400 bg-slate-200 px-3 py-1 rounded-full">今天 10:30</span>
-                            </div>
-                            
-                            <!-- 客户消息 -->
-                            <div class="flex items-start gap-3">
-                                <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=john" class="w-8 h-8 rounded-full bg-slate-100 mt-1">
-                                <div class="bg-white p-3 rounded-lg rounded-tl-none shadow-sm max-w-md">
-                                    <p class="text-sm text-slate-700">你好，我对你们的户外帐篷产品很感兴趣。我们是美国一家户外用品批发商，年采购额约200万美元。请问可以提供产品目录和报价吗？</p>
-                                    <span class="text-xs text-slate-400 mt-1 block">10:30</span>
-                                </div>
-                            </div>
-                            
-                            <!-- AI自动回复 -->
-                            <div class="flex items-start gap-3 flex-row-reverse">
-                                <div class="w-8 h-8 rounded-full bg-accent flex items-center justify-center mt-1">
-                                    <i data-lucide="bot" class="w-4 h-4 text-white"></i>
-                                </div>
-                                <div class="bg-green-100 p-3 rounded-lg rounded-tr-none max-w-md">
-                                    <p class="text-sm text-slate-700">您好 John！非常感谢您对我们产品的关注。😊</p>
-                                    <p class="text-sm text-slate-700 mt-2">我是 OutdoorGear Co. 的 AI 助手，很高兴为您服务。我可以立即为您发送产品目录和基础报价。</p>
-                                    <span class="text-xs text-slate-500 mt-1 block">10:31 · 自动回复</span>
-                                </div>
-                            </div>
-                            
-                            <!-- AI建议标签 -->
-                            <div class="flex justify-center">
-                                <div class="bg-amber-50 border border-amber-200 rounded-lg px-4 py-2 flex items-center gap-2">
-                                    <i data-lucide="lightbulb" class="w-4 h-4 text-amber-500"></i>
-                                    <span class="text-sm text-amber-700">AI 建议：发送产品目录 PDF</span>
-                                    <button class="text-xs bg-accent text-white px-2 py-1 rounded hover:bg-accent-hover transition-all-150">发送</button>
-                                </div>
-                            </div>
-                            
-                            <!-- 客户消息 -->
-                            <div class="flex items-start gap-3">
-                                <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=john" class="w-8 h-8 rounded-full bg-slate-100 mt-1">
-                                <div class="bg-white p-3 rounded-lg rounded-tl-none shadow-sm max-w-md">
-                                    <p class="text-sm text-slate-700">太好了！另外请问你们的最小起订量是多少？我们首批想订购 500 件试试市场反应。</p>
-                                    <span class="text-xs text-slate-400 mt-1 block">10:42</span>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- 输入区域 -->
-                        <div class="bg-white border-t border-slate-200 p-4">
-                            <div class="flex items-center gap-3 mb-3">
-                                <button class="p-2 text-slate-400 hover:text-primary transition-all-150" title="快捷回复">
-                                    <i data-lucide="zap" class="w-5 h-5"></i>
-                                </button>
-                                <button class="p-2 text-slate-400 hover:text-primary transition-all-150" title="发送文件">
-                                    <i data-lucide="paperclip" class="w-5 h-5"></i>
-                                </button>
-                                <button class="p-2 text-slate-400 hover:text-primary transition-all-150" title="翻译">
-                                    <i data-lucide="languages" class="w-5 h-5"></i>
-                                </button>
-                                <div class="flex-1"></div>
-                                <span class="text-xs text-slate-400">AI辅助已开启</span>
-                                <label class="relative inline-flex items-center cursor-pointer">
-                                    <input type="checkbox" checked class="sr-only peer">
-                                    <div class="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-accent"></div>
-                                </label>
-                            </div>
-                            <div class="flex items-end gap-3">
-                                <textarea placeholder="输入消息..." class="flex-1 px-4 py-3 border border-slate-200 rounded-lg text-sm resize-none focus:outline-none focus:border-accent" rows="2"></textarea>
-                                <button class="p-3 bg-accent text-white rounded-lg hover:bg-accent-hover transition-all-150">
-                                    <i data-lucide="send" class="w-5 h-5"></i>
-                                </button>
-                            </div>
-                            <div class="flex items-center gap-2 mt-2">
-                                <span class="text-xs text-slate-400">快捷回复:</span>
-                                <button class="text-xs bg-slate-100 hover:bg-slate-200 px-2 py-1 rounded transition-all-150">发送报价</button>
-                                <button class="text-xs bg-slate-100 hover:bg-slate-200 px-2 py-1 rounded transition-all-150">产品目录</button>
-                                <button class="text-xs bg-slate-100 hover:bg-slate-200 px-2 py-1 rounded transition-all-150">转人工</button>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- 右侧客户信息 -->
-                    <div class="w-72 bg-white border-l border-slate-200 p-6">
-                        <div class="text-center mb-6">
-                            <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=john" class="w-20 h-20 rounded-full bg-slate-100 mx-auto mb-3">
-                            <h4 class="font-semibold text-primary">John Miller</h4>
-                            <p class="text-sm text-slate-500">采购总监</p>
-                            <p class="text-xs text-slate-400">OutdoorGear Inc.</p>
-                        </div>
-                        
-                        <div class="space-y-4">
-                            <div>
-                                <p class="text-xs text-slate-400 mb-1">线索评分</p>
-                                <div class="flex items-center gap-2">
-                                    <span class="px-2 py-1 bg-red-50 text-red-600 text-sm font-semibold rounded">94 🔥</span>
-                                    <span class="text-xs text-green-600">高意向</span>
-                                </div>
-                            </div>
-                            
-                            <div>
-                                <p class="text-xs text-slate-400 mb-1">标签</p>
-                                <div class="flex flex-wrap gap-2">
-                                    <span class="px-2 py-1 bg-blue-50 text-blue-600 text-xs rounded">美国</span>
-                                    <span class="px-2 py-1 bg-green-50 text-green-600 text-xs rounded">户外用品</span>
-                                    <span class="px-2 py-1 bg-purple-50 text-purple-600 text-xs rounded">批发商</span>
-                                </div>
-                            </div>
-                            
-                            <div>
-                                <p class="text-xs text-slate-400 mb-1">来源</p>
-                                <p class="text-sm text-slate-700">网站 WhatsApp 按钮</p>
-                            </div>
-                            
-                            <div>
-                                <p class="text-xs text-slate-400 mb-2">操作</p>
-                                <div class="space-y-2">
-                                    <button class="w-full py-2 bg-accent text-white text-sm rounded-lg hover:bg-accent-hover transition-all-150">分配给销售</button>
-                                    <button class="w-full py-2 border border-slate-200 text-slate-600 text-sm rounded-lg hover:bg-slate-50 transition-all-150">标记为商机</button>
-                                    <button class="w-full py-2 border border-slate-200 text-slate-600 text-sm rounded-lg hover:bg-slate-50 transition-all-150">创建跟进任务</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- SEO风控页面 -->
-            <div id="page-seo-control" class="page-content hidden">
-                <div class="space-y-6">
-                    <!-- 风险概览卡片 -->
-                    <div class="grid grid-cols-4 gap-6">
-                        <div class="bg-white rounded-xl border border-slate-200 p-6">
-                            <div class="flex items-center justify-between mb-4">
-                                <p class="text-sm text-slate-500">站点健康度</p>
-                                <div class="w-10 h-10 bg-green-50 rounded-lg flex items-center justify-center">
-                                    <i data-lucide="activity" class="w-5 h-5 text-green-500"></i>
-                                </div>
-                            </div>
-                            <p class="text-2xl font-bold text-primary">92<span class="text-sm font-normal text-slate-400">/100</span></p>
-                            <p class="text-xs text-green-600 mt-1">↑ 较上周 +3分</p>
-                        </div>
-                        <div class="bg-white rounded-xl border border-slate-200 p-6">
-                            <div class="flex items-center justify-between mb-4">
-                                <p class="text-sm text-slate-500">内容原创度</p>
-                                <div class="w-10 h-10 bg-green-50 rounded-lg flex items-center justify-center">
-                                    <i data-lucide="file-check" class="w-5 h-5 text-green-500"></i>
-                                </div>
-                            </div>
-                            <p class="text-2xl font-bold text-primary">96<span class="text-sm font-normal text-slate-400">%</span></p>
-                            <p class="text-xs text-slate-400 mt-1">平均检测值</p>
-                        </div>
-                        <div class="bg-white rounded-xl border border-slate-200 p-6">
-                            <div class="flex items-center justify-between mb-4">
-                                <p class="text-sm text-slate-500">AI痕迹检测</p>
-                                <div class="w-10 h-10 bg-amber-50 rounded-lg flex items-center justify-center">
-                                    <i data-lucide="brain" class="w-5 h-5 text-amber-500"></i>
-                                </div>
-                            </div>
-                            <p class="text-2xl font-bold text-primary">24<span class="text-sm font-normal text-slate-400">%</span></p>
-                            <p class="text-xs text-green-600 mt-1">↓ 需人工审核 2篇</p>
-                        </div>
-                        <div class="bg-white rounded-xl border border-slate-200 p-6">
-                            <div class="flex items-center justify-between mb-4">
-                                <p class="text-sm text-slate-500">风险预警</p>
-                                <div class="w-10 h-10 bg-red-50 rounded-lg flex items-center justify-center">
-                                    <i data-lucide="alert-triangle" class="w-5 h-5 text-red-500"></i>
-                                </div>
-                            </div>
-                            <p class="text-2xl font-bold text-primary">0</p>
-                            <p class="text-xs text-green-600 mt-1">当前无异常</p>
-                        </div>
-                    </div>
-                    
-                    <!-- 内容审核队列 -->
-                    <div class="bg-white rounded-xl border border-slate-200">
-                        <div class="px-6 py-5 border-b border-slate-200 flex items-center justify-between">
-                            <h3 class="font-semibold text-primary">内容审核队列</h3>
-                            <div class="flex gap-2">
-                                <button class="px-3 py-1.5 bg-accent text-white text-sm rounded-lg">待审核 2</button>
-                                <button class="px-3 py-1.5 text-slate-600 text-sm hover:bg-slate-50 rounded-lg">已通过 48</button>
-                                <button class="px-3 py-1.5 text-slate-600 text-sm hover:bg-slate-50 rounded-lg">已拒绝 3</button>
-                            </div>
-                        </div>
-                        <div class="divide-y divide-slate-100">
-                            <div class="px-6 py-4 hover:bg-slate-50 transition-all-150">
-                                <div class="flex items-start justify-between">
-                                    <div class="flex items-start gap-4">
-                                        <div class="w-10 h-10 bg-amber-50 rounded-lg flex items-center justify-center flex-shrink-0">
-                                            <i data-lucide="file-text" class="w-5 h-5 text-amber-500"></i>
-                                        </div>
-                                        <div>
-                                            <p class="font-medium text-primary">2024年户外用品市场趋势分析</p>
-                                            <p class="text-sm text-slate-500 mt-1">AI痕迹检测: 72% · 建议人工优化</p>
-                                            <div class="flex gap-2 mt-2">
-                                                <span class="px-2 py-0.5 bg-amber-50 text-amber-600 text-xs rounded">AI痕迹偏高</span>
-                                                <span class="px-2 py-0.5 bg-blue-50 text-blue-600 text-xs rounded">SEO博客</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="flex gap-2">
-                                        <button class="px-4 py-2 border border-slate-200 text-slate-600 text-sm rounded-lg hover:bg-slate-50 transition-all-150">查看</button>
-                                        <button class="px-4 py-2 bg-accent text-white text-sm rounded-lg hover:bg-accent-hover transition-all-150">通过</button>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="px-6 py-4 hover:bg-slate-50 transition-all-150">
-                                <div class="flex items-start justify-between">
-                                    <div class="flex items-start gap-4">
-                                        <div class="w-10 h-10 bg-amber-50 rounded-lg flex items-center justify-center flex-shrink-0">
-                                            <i data-lucide="file-text" class="w-5 h-5 text-amber-500"></i>
-                                        </div>
-                                        <div>
-                                            <p class="font-medium text-primary">如何选择可靠的帐篷供应商</p>
-                                            <p class="text-sm text-slate-500 mt-1">原创度: 85% · 关键词密度偏高</p>
-                                            <div class="flex gap-2 mt-2">
-                                                <span class="px-2 py-0.5 bg-amber-50 text-amber-600 text-xs rounded">需优化</span>
-                                                <span class="px-2 py-0.5 bg-blue-50 text-blue-600 text-xs rounded">SEO博客</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="flex gap-2">
-                                        <button class="px-4 py-2 border border-slate-200 text-slate-600 text-sm rounded-lg hover:bg-slate-50 transition-all-150">查看</button>
-                                        <button class="px-4 py-2 bg-accent text-white text-sm rounded-lg hover:bg-accent-hover transition-all-150">通过</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- 站点监控 -->
-                    <div class="grid grid-cols-2 gap-6">
-                        <div class="bg-white rounded-xl border border-slate-200 p-6">
-                            <h3 class="font-semibold text-primary mb-4">收录监控</h3>
-                            <div class="space-y-4">
-                                <div>
-                                    <div class="flex items-center justify-between mb-2">
-                                        <span class="text-sm text-slate-600">Google收录</span>
-                                        <span class="text-sm font-medium text-primary">156 页</span>
-                                    </div>
-                                    <div class="h-2 bg-slate-100 rounded-full overflow-hidden">
-                                        <div class="h-full bg-green-500 rounded-full" style="width: 85%"></div>
-                                    </div>
-                                    <p class="text-xs text-green-600 mt-1">↑ 较上周 +12 页</p>
-                                </div>
-                                <div>
-                                    <div class="flex items-center justify-between mb-2">
-                                        <span class="text-sm text-slate-600">索引状态</span>
-                                        <span class="text-sm font-medium text-primary">正常</span>
-                                    </div>
-                                    <div class="flex items-center gap-2">
-                                        <span class="w-2 h-2 bg-green-500 rounded-full"></span>
-                                        <span class="text-xs text-slate-500">最后检测: 2小时前</span>
-                                    </div>
-                                </div>
-                                <div>
-                                    <div class="flex items-center justify-between mb-2">
-                                        <span class="text-sm text-slate-600">排名波动</span>
-                                        <span class="text-sm font-medium text-primary">+3 上升</span>
-                                    </div>
-                                    <p class="text-xs text-slate-500">核心关键词平均排名变化</p>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="bg-white rounded-xl border border-slate-200 p-6">
-                            <h3 class="font-semibold text-primary mb-4">发布节奏控制</h3>
-                            <div class="space-y-4">
-                                <div class="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
-                                    <div>
-                                        <p class="font-medium text-primary text-sm">当前发布频率</p>
-                                        <p class="text-xs text-slate-500">outdoorgear.dealclaw.com</p>
-                                    </div>
-                                    <span class="px-3 py-1 bg-green-50 text-green-600 text-sm font-medium rounded-full">每周 3 篇</span>
-                                </div>
-                                <div class="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
-                                    <div>
-                                        <p class="font-medium text-primary text-sm">站点权重</p>
-                                        <p class="text-xs text-slate-500">运营 4 个月</p>
-                                    </div>
-                                    <span class="px-3 py-1 bg-blue-50 text-blue-600 text-sm font-medium rounded-full">DR 28</span>
-                                </div>
-                                <div>
-                                    <p class="text-sm text-slate-600 mb-2">建议调整</p>
-                                    <p class="text-xs text-slate-500">当前权重良好，可逐步增加至每周 5 篇</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- 风控规则配置 -->
-                    <div class="bg-white rounded-xl border border-slate-200 p-6">
-                        <h3 class="font-semibold text-primary mb-4">风控规则配置</h3>
-                        <div class="grid grid-cols-3 gap-6">
-                            <div class="p-4 border border-slate-200 rounded-lg">
-                                <div class="flex items-center justify-between mb-3">
-                                    <p class="font-medium text-primary text-sm">AI痕迹检测</p>
-                                    <label class="relative inline-flex items-center cursor-pointer">
-                                        <input type="checkbox" checked class="sr-only peer">
-                                        <div class="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-accent"></div>
-                                    </label>
-                                </div>
-                                <p class="text-xs text-slate-500">AI生成内容超过 70% 时触发人工审核</p>
-                            </div>
-                            <div class="p-4 border border-slate-200 rounded-lg">
-                                <div class="flex items-center justify-between mb-3">
-                                    <p class="font-medium text-primary text-sm">原创度检查</p>
-                                    <label class="relative inline-flex items-center cursor-pointer">
-                                        <input type="checkbox" checked class="sr-only peer">
-                                        <div class="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-accent"></div>
-                                    </label>
-                                </div>
-                                <p class="text-xs text-slate-500">原创度低于 85% 时阻止发布</p>
-                            </div>
-                            <div class="p-4 border border-slate-200 rounded-lg">
-                                <div class="flex items-center justify-between mb-3">
-                                    <p class="font-medium text-primary text-sm">自动发布限速</p>
-                                    <label class="relative inline-flex items-center cursor-pointer">
-                                        <input type="checkbox" checked class="sr-only peer">
-                                        <div class="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-accent"></div>
-                                    </label>
-                                </div>
-                                <p class="text-xs text-slate-500">根据站点权重自动控制发布频率</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
