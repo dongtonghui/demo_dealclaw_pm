@@ -909,23 +909,1106 @@ flowchart TD
     K --> B
 ```
 
+
+
 ---
+
+## 5.7 SEO AI建站技术架构
+
+### 5.7.1 系统架构图
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                           SEO建站技术架构                                     │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                              │
+│  ┌──────────────┐    ┌──────────────┐    ┌──────────────┐                   │
+│  │   前端控制台  │    │  站点生成引擎 │    │  内容生成AI  │                   │
+│  │  (React)     │◄──►│  (Node.js)   │◄──►│  (LLM API)   │                   │
+│  └──────┬───────┘    └──────┬───────┘    └──────────────┘                   │
+│         │                   │                                               │
+│         │            ┌──────┴───────┐                                       │
+│         │            │  站点渲染引擎 │                                       │
+│         │            │  (Next.js)   │                                       │
+│         │            └──────┬───────┘                                       │
+│         │                   │                                               │
+│         └───────────────────┼──────────────────────────────────┐            │
+│                             │                                  │            │
+│  ┌──────────────────────────┼──────────────────────────┐      │            │
+│  │      数据层              │                          │      │            │
+│  │  ┌─────────────┐  ┌─────┴──────┐  ┌─────────────┐  │      │            │
+│  │  │ 站点配置DB   │  │ 内容存储    │  │ 发布队列    │  │      │            │
+│  │  │ (PostgreSQL)│  │ (S3/MinIO) │  │ (Redis)     │  │      │            │
+│  │  └─────────────┘  └────────────┘  └─────────────┘  │      │            │
+│  └────────────────────────────────────────────────────┘      │            │
+│                                                              │            │
+└──────────────────────────────────────────────────────────────┼────────────┘
+                                                               │
+┌──────────────────────────────────────────────────────────────┼────────────┐
+│                    第三方服务层                               │            │
+│  ┌────────────┐  ┌────────────┐  ┌────────────┐             │            │
+│  │  Cloudflare│  │   Vercel   │  │  Supabase  │             │            │
+│  │  (DNS/CDN) │  │  (Hosting) │  │   (DB)     │             │            │
+│  └────────────┘  └────────────┘  └────────────┘             │            │
+│                                                              │            │
+│  ┌────────────┐  ┌────────────┐  ┌────────────┐             │            │
+│  │WordPress   │  │  Shopify   │  │   Meta     │             │            │
+│  │   API      │  │    API     │  │  (WA API)  │             │            │
+│  └────────────┘  └────────────┘  └────────────┘             │            │
+└──────────────────────────────────────────────────────────────┴────────────┘
+```
+
+### 5.7.2 站点生成引擎详细设计
+
+#### 技术栈选择
+
+| 层级 | 技术 | 选型理由 |
+|-----|------|---------|
+| 站点框架 | Next.js 14 (App Router) | SSR/SSG支持、SEO友好、Vercel原生部署 |
+| 样式 | Tailwind CSS | 原子化CSS、构建时优化、无运行时开销 |
+| UI组件 | shadcn/ui | 可定制、无额外依赖 |
+| 内容 | MDX | Markdown+React组件、支持富媒体 |
+| 部署 | Vercel | 边缘网络、自动HTTPS、Preview部署 |
+
+#### 站点目录结构
+
+```
+站点项目结构（每个子域名一个仓库）
+├── app/
+│   ├── layout.tsx          # 根布局（SEO Meta、导航）
+│   ├── page.tsx            # 首页
+│   ├── about/
+│   │   └── page.tsx        # About Us
+│   ├── products/
+│   │   └── page.tsx        # 产品列表
+│   │   └── [slug]/
+│   │       └── page.tsx    # 产品详情（动态路由）
+│   ├── blog/
+│   │   └── page.tsx        # 博客列表
+│   │   └── [slug]/
+│   │       └── page.tsx    # 博客详情（SSG）
+│   └── contact/
+│       └── page.tsx        # 联系页（含表单）
+├── components/
+│   ├── ui/                 # shadcn组件
+│   ├── sections/           # 页面区块组件
+│   └── forms/              # 表单组件
+├── content/
+│   ├── blog/               # MDX博客文章
+│   └── products/           # 产品数据JSON
+├── lib/
+│   ├── seo.ts              # SEO工具函数
+│   └── api.ts              # API客户端
+├── public/
+│   └── images/             # 静态资源
+├── next.config.js
+└── package.json
+```
+
+### 5.7.3 多租户架构
+
+```
+┌─────────────────────────────────────────────────────────┐
+│                    多租户站点管理                         │
+├─────────────────────────────────────────────────────────┤
+│                                                          │
+│  租户隔离策略：子域名 + 独立Git仓库 + 独立Vercel项目       │
+│                                                          │
+│  company-a.dealclaw.com                                 │
+│      │                                                  │
+│      ▼                                                  │
+│  ┌──────────────┐      ┌──────────────┐                │
+│  │ Git Repo:    │      │ Vercel Proj: │                │
+│  │ dealclaw-    │─────►│ company-a-   │                │
+│  │ sites/company│      │ site         │                │
+│  │ -a           │      │              │                │
+│  └──────────────┘      └──────────────┘                │
+│         │                      │                        │
+│         │                      ▼                        │
+│         │               Cloudflare DNS                  │
+│         │               *.dealclaw.com → Vercel         │
+│         │                      │                        │
+│         │                      ▼                        │
+│         │              ┌──────────────┐                │
+│         └─────────────►│  Edge CDN    │                │
+│                        │  (全球节点)   │                │
+│                        └──────────────┘                │
+│                                                          │
+│  数据库关联：                                             │
+│  sites 表 ──► company_a_site_config                     │
+│       ├──► company_a_content                            │
+│       └──► company_a_leads                              │
+│                                                          │
+└─────────────────────────────────────────────────────────┘
+```
+
+### 5.7.4 动态站点生成流程
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant U as 用户
+    participant API as API服务
+    participant Gen as 站点生成器
+    participant Git as Git服务
+    participant Vercel as Vercel
+    participant CDN as Cloudflare
+    
+    U->>API: 创建获客任务（选择SEO模式）
+    API->>API: 验证公司信息完整性
+    API->>Gen: 触发站点生成
+    
+    Gen->>Gen: 1. 渲染基础模板
+    Gen->>Gen: 2. 生成页面组件
+    Gen->>Gen: 3. 创建Next.js项目结构
+    
+    Gen->>API: 获取公司信息
+    API-->>Gen: 公司名称、产品、介绍
+    
+    Gen->>Gen: 4. 填充内容到模板
+    Gen->>Gen: 5. 生成SEO Meta标签
+    
+    Gen->>Git: 创建新仓库<br/>dealclaw-sites/{company}
+    Git-->>Gen: 仓库地址
+    
+    Gen->>Git: 推送代码
+    Git-->>Gen: 推送成功
+    
+    Gen->>Vercel: 创建项目并关联Git
+    Vercel-->>Gen: 项目ID
+    
+    Gen->>Vercel: 触发首次部署
+    Vercel->>Vercel: 构建站点
+    Vercel-->>Gen: 部署完成，返回URL
+    
+    Gen->>CDN: 创建子域名DNS记录<br/>{company}.dealclaw.com
+    CDN-->>Gen: DNS记录创建成功
+    
+    Gen->>API: 保存站点配置
+    API-->>U: 站点创建完成<br/>返回访问地址
+```
+
+---
+
+## 5.8 第三方系统集成架构
+
+### 5.8.1 集成总览
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                      第三方集成网关                              │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│   ┌──────────────┐                                               │
+│   │  统一API网关  │  ← 认证、限流、日志、错误处理                   │
+│   │   (Kong/    │                                               │
+│   │   Express)   │                                               │
+│   └──────┬───────┘                                               │
+│          │                                                       │
+│    ┌─────┴──────┬────────────┬────────────┬────────────┐        │
+│    │            │            │            │            │        │
+│    ▼            ▼            ▼            ▼            ▼        │
+│ ┌──────┐   ┌──────┐   ┌──────┐   ┌──────┐   ┌──────┐          │
+│ │Meta  │   │Linked│   │Word- │   │Shopi │   │Send- │          │
+│ │(WA)  │   │ In   │   │Press │   │  fy  │   │grid  │          │
+│ │      │   │      │   │      │   │      │   │      │          │
+│ │Cloud │   │API   │   │REST  │   │Graph-│   │SMTP  │          │
+│ │API   │   │v2    │   │API   │   │QL    │   │API   │          │
+│ └──────┘   └──────┘   └──────┘   └──────┘   └──────┘          │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### 5.8.2 Meta WhatsApp Business Cloud API 集成
+
+#### 认证流程
+
+```
+┌─────────────────────────────────────────────────────────┐
+│              WhatsApp Cloud API 认证流程                  │
+├─────────────────────────────────────────────────────────┤
+│                                                          │
+│  1. 商家注册                                             │
+│     └─► Meta Business Manager 创建/登录                   │
+│                                                          │
+│  2. 应用创建                                             │
+│     └─► 开发者后台创建应用                                │
+│         ├─► 添加 WhatsApp 产品                           │
+│         ├─► 配置 Webhook 回调URL                          │
+│         └─► 获取 App ID + App Secret                      │
+│                                                          │
+│  3. 商家认证（Business Verification）                     │
+│     └─► 提交营业执照等文件                                 │
+│         └─► Meta 审核（1-5个工作日）                       │
+│                                                          │
+│  4. 手机号注册                                           │
+│     └─► 在 Business Manager 中添加手机号                   │
+│         └─► 接收验证码完成注册                             │
+│                                                          │
+│  5. 获取访问令牌                                          │
+│     └─► System User Token（长期有效）                      │
+│     └─► 或使用 OAuth 2.0 获取临时令牌                      │
+│                                                          │
+│  6. DealClaw 配置                                         │
+│     ├─► 用户输入：App ID、Phone Number ID、Access Token    │
+│     ├─► DealClaw 验证连接                                 │
+│     └─► 保存加密凭证到数据库                               │
+│                                                          │
+└─────────────────────────────────────────────────────────┘
+```
+
+#### API 调用示例
+
+```typescript
+// WhatsApp API 客户端封装
+class WhatsAppAPI {
+  private baseUrl = 'https://graph.facebook.com/v18.0';
+  private phoneNumberId: string;
+  private accessToken: string;
+
+  // 发送文本消息
+  async sendTextMessage(to: string, text: string) {
+    const response = await fetch(
+      `${this.baseUrl}/${this.phoneNumberId}/messages`,
+      {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${this.accessToken}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          messaging_product: 'whatsapp',
+          recipient_type: 'individual',
+          to: to,
+          type: 'text',
+          text: { body: text }
+        })
+      }
+    );
+    return response.json();
+  }
+
+  // 发送模板消息（用于群发/通知）
+  async sendTemplateMessage(
+    to: string, 
+    templateName: string, 
+    languageCode: string = 'zh_CN',
+    components?: any[]
+  ) {
+    return fetch(`${this.baseUrl}/${this.phoneNumberId}/messages`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${this.accessToken}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        messaging_product: 'whatsapp',
+        recipient_type: 'individual',
+        to: to,
+        type: 'template',
+        template: {
+          name: templateName,
+          language: { code: languageCode },
+          components
+        }
+      })
+    });
+  }
+}
+```
+
+#### Webhook 事件处理
+
+```typescript
+// Webhook 接收处理
+interface WhatsAppWebhookEvent {
+  object: 'whatsapp_business_account';
+  entry: Array<{
+    id: string;
+    changes: Array<{
+      value: {
+        messaging_product: 'whatsapp';
+        metadata: {
+          display_phone_number: string;
+          phone_number_id: string;
+        };
+        contacts?: Array<{
+          wa_id: string;
+          profile: { name: string };
+        }>;
+        messages?: Array<{
+          id: string;
+          from: string;
+          timestamp: string;
+          type: 'text' | 'image' | 'document' | 'voice' | 'button';
+          text?: { body: string };
+          button?: { payload: string; text: string };
+        }>;
+      };
+      field: 'messages';
+    }>;
+  }>;
+}
+
+// 消息处理器
+class WhatsAppWebhookHandler {
+  async handleEvent(event: WhatsAppWebhookEvent) {
+    for (const entry of event.entry) {
+      for (const change of entry.changes) {
+        const { messages } = change.value;
+        
+        if (messages) {
+          for (const message of messages) {
+            await this.processIncomingMessage(message);
+          }
+        }
+      }
+    }
+  }
+
+  private async processIncomingMessage(message: any) {
+    // 1. 保存消息到数据库
+    await this.saveMessage(message);
+    
+    // 2. 触发AI意图识别
+    const intent = await this.aiService.classifyIntent(message.text?.body);
+    
+    // 3. 根据意图执行工作流
+    await this.executeWorkflow(message.from, intent);
+  }
+}
+```
+
+### 5.8.3 WordPress 集成
+
+#### 接入方式对比
+
+| 方式 | 适用场景 | 权限要求 | 安全性 |
+|-----|---------|---------|-------|
+| **Application Password** | WordPress 5.6+ | 管理员生成应用密码 | 高（可撤销） |
+| **JWT插件** | 需要自定义权限 | 安装插件配置 | 中 |
+| **REST API + Cookie** | 同域部署 | 登录状态 | 低 |
+
+#### Application Password 接入流程
+
+```
+┌─────────────────────────────────────────────────────────┐
+│              WordPress Application Password               │
+│                    接入流程                                │
+├─────────────────────────────────────────────────────────┤
+│                                                          │
+│  1. 用户授权步骤                                          │
+│  ┌──────────────┐     ┌──────────────┐                  │
+│  │  DealClaw    │────►│  WordPress   │                  │
+│  │  后台        │     │  后台         │                  │
+│  │              │     │              │                  │
+│  │ "请点击授权  │     │ 1. 用户登录   │                  │
+│  │  您的WP站点" │     │ 2. 进入用户→  │                  │
+│  │              │     │    应用密码   │                  │
+│  │              │     │ 3. 生成密码   │                  │
+│  │              │◄────│ 4. 复制密码   │                  │
+│  │              │     │              │                  │
+│  └──────────────┘     └──────────────┘                  │
+│                                                          │
+│  2. DealClaw 保存凭证                                     │
+│     ├─► 站点URL: https://example.com                     │
+│     ├─► 用户名: admin                                    │
+│     └─► 应用密码: xxxx xxxx xxxx xxxx xxxx xxxx          │
+│         （存储时AES-256加密）                             │
+│                                                          │
+│  3. API调用示例                                           │
+│     GET /wp-json/wp/v2/posts                             │
+│     Authorization: Basic base64(username:password)       │
+│                                                          │
+└─────────────────────────────────────────────────────────┘
+```
+
+#### WordPress API 封装
+
+```typescript
+class WordPressAPI {
+  private baseUrl: string;
+  private auth: string;
+
+  constructor(siteUrl: string, username: string, appPassword: string) {
+    this.baseUrl = `${siteUrl}/wp-json/wp/v2`;
+    this.auth = Buffer.from(`${username}:${appPassword}`).toString('base64');
+  }
+
+  // 发布文章
+  async createPost(post: {
+    title: string;
+    content: string;
+    status: 'draft' | 'publish' | 'future';
+    categories?: number[];
+    tags?: number[];
+  }) {
+    const response = await fetch(`${this.baseUrl}/posts`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Basic ${this.auth}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(post)
+    });
+    return response.json();
+  }
+
+  // 上传图片
+  async uploadImage(imageBuffer: Buffer, filename: string) {
+    const formData = new FormData();
+    formData.append('file', new Blob([imageBuffer]), filename);
+    
+    const response = await fetch(`${this.baseUrl}/media`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Basic ${this.auth}`,
+      },
+      body: formData
+    });
+    return response.json();
+  }
+}
+```
+
+### 5.8.4 Shopify 集成
+
+```typescript
+// Shopify API 客户端
+class ShopifyAPI {
+  private shopDomain: string;
+  private accessToken: string;
+  private apiVersion = '2024-01';
+
+  constructor(shopDomain: string, accessToken: string) {
+    this.shopDomain = shopDomain;
+    this.accessToken = accessToken;
+  }
+
+  private async graphqlQuery(query: string, variables?: any) {
+    const response = await fetch(
+      `https://${this.shopDomain}/admin/api/${this.apiVersion}/graphql.json`,
+      {
+        method: 'POST',
+        headers: {
+          'X-Shopify-Access-Token': this.accessToken,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ query, variables })
+      }
+    );
+    return response.json();
+  }
+
+  // 创建博客文章
+  async createBlogPost(title: string, content: string, blogId: string) {
+    const mutation = `
+      mutation createArticle($input: ArticleCreateInput!) {
+        articleCreate(input: $input) {
+          article {
+            id
+            title
+            handle
+          }
+        }
+      }
+    `;
+    
+    return this.graphqlQuery(mutation, {
+      input: {
+        blogId,
+        title,
+        bodyHtml: content,
+        published: true
+      }
+    });
+  }
+}
+```
+
+---
+
+## 5.9 SEO内容自动发布系统
+
+### 5.9.1 发布流程架构
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                    内容发布流水线                                │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  ┌──────────┐   ┌──────────┐   ┌──────────┐   ┌──────────┐     │
+│  │ 内容生成  │──►│ 质量检测  │──►│ 格式转换  │──►│ 发布队列  │     │
+│  │ (AI)     │   │ (规则/ML)│   │ (渲染)   │   │ (Redis)  │     │
+│  └──────────┘   └──────────┘   └──────────┘   └────┬─────┘     │
+│                                                     │            │
+│  ┌──────────┐   ┌──────────┐   ┌──────────┐        │            │
+│  │ 发布历史  │◄──│ 发布执行  │◄──│ 队列消费  │◄───────┘            │
+│  │ (DB)     │   │ (Worker) │   │ (Job)    │                     │
+│  └──────────┘   └────┬─────┘   └──────────┘                     │
+│                      │                                           │
+│         ┌────────────┼────────────┐                             │
+│         │            │            │                             │
+│         ▼            ▼            ▼                             │
+│    ┌────────┐  ┌────────┐  ┌────────┐                          │
+│    │内部站点│  │WordPress│  │ Shopify │                          │
+│    │(Vercel)│  │        │  │        │                          │
+│    └────────┘  └────────┘  └────────┘                          │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### 5.9.2 内容生成与渲染
+
+#### AI内容生成Prompt模板
+
+```typescript
+// SEO博客文章生成Prompt
+const blogPostPrompt = `
+你是一位专业的外贸行业内容营销专家，请为以下客户撰写一篇SEO优化的博客文章。
+
+【客户信息】
+公司名称：{{companyName}}
+行业：{{industry}}
+产品：{{products}}
+目标市场：{{targetMarkets}}
+目标关键词：{{targetKeywords}}
+
+【文章要求】
+1. 标题：包含目标关键词，吸引人点击（50-60字符）
+2. 字数：1200-1500字
+3. 结构：
+   - H1标题
+   - 引言（100-150字）
+   - H2小标题（问题/背景/解决方案/案例/行动号召）
+   - 结论
+4. SEO要求：
+   - 关键词自然出现3-5次
+   - 使用相关LSI关键词
+   - 元描述：150-160字符
+
+【输出格式】
+返回JSON格式：
+{
+  "title": "文章标题",
+  "metaDescription": "元描述",
+  "content": { "introduction": "...", "sections": [...], "conclusion": "..." },
+  "keywords": ["关键词列表"]
+}
+`;
+```
+
+#### 内容渲染引擎
+
+```typescript
+// MDX内容渲染器
+class ContentRenderer {
+  // 将AI生成的内容渲染为MDX
+  renderBlogPost(content: BlogContent): string {
+    const { title, metaDescription, sections, conclusion } = content;
+    
+    const frontmatter = `---
+title: "${title}"
+description: "${metaDescription}"
+date: "${new Date().toISOString()}"
+---
+
+`;
+
+    const body = sections.map(section => `
+## ${section.heading}
+
+${section.content}
+`).join('\n');
+
+    return frontmatter + body + '\n## 结论\n\n' + conclusion;
+  }
+
+  // 生成Schema.org结构化数据
+  generateStructuredData(type: 'Article' | 'Product', data: any): object {
+    return {
+      "@context": "https://schema.org",
+      "@type": type,
+      headline: data.title,
+      description: data.description,
+      datePublished: data.publishDate,
+      author: { "@type": "Organization", name: data.companyName }
+    };
+  }
+}
+```
+
+### 5.9.3 发布调度系统
+
+```typescript
+// 发布调度器
+class PublishingScheduler {
+  private redis: Redis;
+  private queueName = 'content_publish_queue';
+
+  // 添加发布任务
+  async schedulePublish(task: PublishTask): Promise<string> {
+    const jobId = `publish_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    
+    // 计算SEO最佳发布时间
+    const publishAt = this.calculateOptimalPublishTime(
+      task.targetChannel,
+      task.targetTimezone
+    );
+
+    const job = {
+      id: jobId,
+      type: 'content_publish',
+      payload: task,
+      scheduledAt: publishAt,
+      status: 'pending'
+    };
+
+    await this.redis.zadd(this.queueName, publishAt.getTime(), JSON.stringify(job));
+    return jobId;
+  }
+
+  // 计算最佳发布时间
+  private calculateOptimalPublishTime(channel: string, timezone: string): Date {
+    const now = new Date();
+    const targetDate = new Date();
+
+    // 博客：周二/周四上午10点
+    if (channel === 'blog') {
+      const day = now.getDay();
+      if (day === 2 || day === 4) {
+        targetDate.setHours(10, 0, 0, 0);
+        if (targetDate <= now) {
+          targetDate.setDate(targetDate.getDate() + (day === 2 ? 2 : 5));
+        }
+      } else {
+        const daysUntilTuesday = (2 + 7 - day) % 7 || 7;
+        const daysUntilThursday = (4 + 7 - day) % 7 || 7;
+        targetDate.setDate(now.getDate() + Math.min(daysUntilTuesday, daysUntilThursday));
+        targetDate.setHours(10, 0, 0, 0);
+      }
+    }
+
+    return targetDate;
+  }
+}
+```
+
+---
+
+## 5.10 核心算法细节
+
+### 5.10.1 渠道匹配算法
+
+#### 算法输入输出
+
+```typescript
+interface ChannelMatchInput {
+  customerProfile: {
+    targetRegions: string[];
+    industry: string;
+    companySize: string;
+    decisionMakerRoles: string[];
+    businessType: string[];
+  };
+  resources: {
+    hasWebsite: boolean;
+    hasEmailList: boolean;
+    hasWhatsAppNumber: boolean;
+    budgetLevel: 'low' | 'medium' | 'high';
+  };
+}
+
+interface ChannelMatchOutput {
+  recommendations: Array<{
+    channel: 'seo' | 'email' | 'whatsapp' | 'linkedin';
+    priority: number;
+    confidence: number;
+    reasoning: string;
+  }>;
+}
+```
+
+#### 规则引擎 + 加权评分算法
+
+```typescript
+class ChannelMatchingAlgorithm {
+  private rules = [
+    {
+      id: 'email_list_priority',
+      condition: (input) => input.resources.hasEmailList,
+      channel: 'email',
+      weight: 8,
+      reason: '已有邮件列表，可快速启动外联'
+    },
+    {
+      id: 'linkedin_b2b_executive',
+      condition: (input) => 
+        input.customerProfile.businessType.includes('B2B') &&
+        input.customerProfile.decisionMakerRoles.some(r => 
+          ['CEO', 'VP', 'Director'].includes(r)
+        ),
+      channel: 'linkedin',
+      weight: 9,
+      reason: 'B2B业务 targeting 高管，LinkedIn是最佳触达渠道'
+    },
+    {
+      id: 'emerging_markets_whatsapp',
+      condition: (input) => 
+        input.customerProfile.targetRegions.some(r => 
+          ['Southeast Asia', 'Middle East', 'Latin America'].includes(r)
+        ),
+      channel: 'whatsapp',
+      weight: 8,
+      reason: '目标市场WhatsApp渗透率极高'
+    },
+    {
+      id: 'no_website_seo',
+      condition: (input) => !input.resources.hasWebsite,
+      channel: 'seo',
+      mode: 'build_new',
+      weight: 8,
+      reason: '无现有网站，建议AI建站积累长期资产'
+    }
+  ];
+
+  async match(input: ChannelMatchInput): Promise<ChannelMatchOutput> {
+    const scores = { email: 0, whatsapp: 0, linkedin: 0, seo: 0 };
+    const reasons = { email: [], whatsapp: [], linkedin: [], seo: [] };
+
+    // 应用所有规则
+    for (const rule of this.rules) {
+      if (rule.condition(input)) {
+        scores[rule.channel] += rule.weight;
+        reasons[rule.channel].push(rule.reason);
+      }
+    }
+
+    // 归一化并排序
+    const maxScore = Math.max(...Object.values(scores));
+    const recommendations = Object.entries(scores)
+      .map(([channel, score]) => ({
+        channel,
+        priority: Math.round((score / maxScore) * 10),
+        confidence: Math.min(score / 20, 1),
+        reasoning: reasons[channel].join('；')
+      }))
+      .filter(r => r.priority >= 5)
+      .sort((a, b) => b.priority - a.priority);
+
+    return { recommendations };
+  }
+}
+```
+
+### 5.10.2 线索评分算法
+
+```typescript
+interface LeadScoringInput {
+  companyMatch: {
+    industryMatch: boolean;
+    sizeMatch: boolean;
+    regionMatch: boolean;
+  };
+  behaviorSignals: {
+    emailOpens: number;
+    emailClicks: number;
+    websiteVisits: number;
+    pricingPageVisited: boolean;
+    whatsappReplies: number;
+  };
+  contactCompleteness: {
+    hasEmail: boolean;
+    hasPhone: boolean;
+    hasCompanyName: boolean;
+  };
+}
+
+class LeadScoringAlgorithm {
+  private weights = {
+    companyMatch: 0.25,
+    behavior: 0.45,
+    completeness: 0.15,
+    recency: 0.15
+  };
+
+  calculateScore(input: LeadScoringInput): {
+    totalScore: number;
+    grade: 'hot' | 'warm' | 'cold' | 'ice';
+  } {
+    // 公司匹配度
+    let companyScore = 0;
+    if (input.companyMatch.industryMatch) companyScore += 30;
+    if (input.companyMatch.sizeMatch) companyScore += 25;
+    if (input.companyMatch.regionMatch) companyScore += 25;
+
+    // 行为信号
+    let behaviorScore = 0;
+    behaviorScore += Math.min(input.behaviorSignals.emailOpens * 2, 15);
+    behaviorScore += Math.min(input.behaviorSignals.emailClicks * 5, 10);
+    behaviorScore += Math.min(input.behaviorSignals.websiteVisits * 3, 15);
+    if (input.behaviorSignals.pricingPageVisited) behaviorScore += 20;
+    behaviorScore += Math.min(input.behaviorSignals.whatsappReplies * 8, 25);
+
+    // 信息完整度
+    const fields = Object.values(input.contactCompleteness);
+    const completenessScore = (fields.filter(Boolean).length / fields.length) * 100;
+
+    // 计算总分
+    const totalScore = 
+      companyScore * this.weights.companyMatch +
+      behaviorScore * this.weights.behavior +
+      completenessScore * this.weights.completeness;
+
+    // 等级划分
+    let grade: 'hot' | 'warm' | 'cold' | 'ice';
+    if (totalScore >= 80) grade = 'hot';
+    else if (totalScore >= 60) grade = 'warm';
+    else if (totalScore >= 40) grade = 'cold';
+    else grade = 'ice';
+
+    return { totalScore: Math.round(totalScore), grade };
+  }
+}
+```
+
+### 5.10.3 AI意图识别算法（WhatsApp）
+
+```typescript
+type IntentType = 
+  | 'product_inquiry'
+  | 'pricing_inquiry'
+  | 'support_request'
+  | 'partnership'
+  | 'general_chat';
+
+class IntentRecognitionAlgorithm {
+  private keywordRules = [
+    {
+      intent: 'pricing_inquiry' as IntentType,
+      keywords: ['price', 'cost', 'quotation', '费用', '价格', '报价', '多少钱'],
+      weight: 10
+    },
+    {
+      intent: 'product_inquiry' as IntentType,
+      keywords: ['product', 'catalog', '产品', '目录', '规格', '样品'],
+      weight: 10
+    },
+    {
+      intent: 'support_request' as IntentType,
+      keywords: ['problem', 'issue', '问题', '故障', '售后'],
+      weight: 10
+    },
+    {
+      intent: 'partnership' as IntentType,
+      keywords: ['distributor', 'agent', '代理', '分销', '合作'],
+      weight: 10
+    }
+  ];
+
+  async classifyIntent(message: string): Promise<{
+    intent: IntentType;
+    confidence: number;
+    requiresHuman: boolean;
+  }> {
+    // 规则匹配
+    const ruleResult = this.ruleBasedMatch(message);
+    
+    // 高置信度直接返回
+    if (ruleResult.confidence > 0.8) {
+      return {
+        intent: ruleResult.intent,
+        confidence: ruleResult.confidence,
+        requiresHuman: ['support_request', 'partnership'].includes(ruleResult.intent)
+      };
+    }
+
+    // 低置信度调用LLM
+    const llmResult = await this.llmBasedMatch(message);
+    
+    return {
+      intent: llmResult.intent,
+      confidence: llmResult.confidence,
+      requiresHuman: llmResult.confidence < 0.6 || 
+        ['support_request', 'partnership', 'complaint'].includes(llmResult.intent)
+    };
+  }
+
+  private ruleBasedMatch(message: string) {
+    const lowerMessage = message.toLowerCase();
+    const scores: Record<string, number> = {};
+
+    for (const rule of this.keywordRules) {
+      scores[rule.intent] = 0;
+      for (const keyword of rule.keywords) {
+        if (lowerMessage.includes(keyword.toLowerCase())) {
+          scores[rule.intent] += rule.weight;
+        }
+      }
+    }
+
+    const entries = Object.entries(scores).sort((a, b) => b[1] - a[1]);
+    const [topIntent, topScore] = entries[0];
+    const totalScore = Object.values(scores).reduce((a, b) => a + b, 0);
+
+    return {
+      intent: (topScore > 0 ? topIntent : 'general_chat') as IntentType,
+      confidence: totalScore > 0 ? topScore / totalScore : 0.5
+    };
+  }
+
+  private async llmBasedMatch(message: string) {
+    const prompt = `
+分析以下WhatsApp消息的意图："${message}"
+
+意图选项：
+1. product_inquiry - 询问产品信息
+2. pricing_inquiry - 询问价格
+3. support_request - 售后支持
+4. partnership - 合作意向
+5. general_chat - 一般性闲聊
+
+返回JSON：{"intent": "意图类型", "confidence": 0-1之间的置信度}
+`;
+    // 调用LLM API
+    const response = await this.callLLM(prompt);
+    return JSON.parse(response);
+  }
+}
+```
+
+### 5.10.4 内容质量检测算法
+
+```typescript
+interface ContentQualityInput {
+  title: string;
+  content: string;
+  targetKeywords: string[];
+  expectedWordCount: { min: number; max: number };
+}
+
+class ContentQualityChecker {
+  async checkQuality(input: ContentQualityInput) {
+    const issues = [];
+    
+    // 1. 字数检查
+    const wordCount = this.countWords(input.content);
+    if (wordCount < input.expectedWordCount.min) {
+      issues.push({
+        type: 'error',
+        message: `字数不足：${wordCount}字，要求至少${input.expectedWordCount.min}字`,
+        suggestion: '扩充内容细节，增加案例分析'
+      });
+    }
+    
+    // 2. 关键词密度
+    const keywordDensity = this.calculateKeywordDensity(input.content, input.targetKeywords);
+    if (keywordDensity < 0.5) {
+      issues.push({
+        type: 'warning',
+        message: '关键词密度偏低',
+        suggestion: '适当增加关键词的自然出现'
+      });
+    } else if (keywordDensity > 3) {
+      issues.push({
+        type: 'error',
+        message: '关键词堆砌嫌疑',
+        suggestion: '减少关键词重复，使用同义词替换'
+      });
+    }
+    
+    // 3. 可读性评分
+    const readabilityScore = this.calculateReadability(input.content);
+    if (readabilityScore < 50) {
+      issues.push({
+        type: 'warning',
+        message: '可读性较低',
+        suggestion: '缩短句子长度，使用更简单的词汇'
+      });
+    }
+
+    // 计算总分
+    const score = this.calculateOverallScore({ wordCount, keywordDensity, readabilityScore }, issues);
+
+    return {
+      passed: score >= 70 && !issues.some(i => i.type === 'error'),
+      score,
+      issues,
+      metrics: { wordCount, keywordDensity, readabilityScore }
+    };
+  }
+
+  private countWords(text: string): number {
+    const chineseChars = (text.match(/[\u4e00-\u9fa5]/g) || []).length;
+    const englishWords = (text.match(/[a-zA-Z]+/g) || []).length;
+    return chineseChars + englishWords;
+  }
+
+  private calculateKeywordDensity(content: string, keywords: string[]): number {
+    const content_lower = content.toLowerCase();
+    let totalMatches = 0;
+    const wordCount = this.countWords(content);
+    
+    for (const keyword of keywords) {
+      const matches = (content_lower.match(new RegExp(keyword.toLowerCase(), 'g')) || []).length;
+      totalMatches += matches;
+    }
+    
+    return (totalMatches / wordCount) * 100;
+  }
+
+  private calculateReadability(content: string): number {
+    const sentences = content.split(/[.!?。！？]+/).filter(s => s.trim());
+    const words = content.split(/\s+/);
+    
+    if (sentences.length === 0 || words.length === 0) return 0;
+    
+    const avgSentenceLength = words.length / sentences.length;
+    return Math.max(0, 100 - Math.abs(avgSentenceLength - 17) * 5);
+  }
+
+  private calculateOverallScore(metrics: any, issues: any[]): number {
+    let score = 100;
+    
+    const wordCountScore = Math.min((metrics.wordCount / 1200) * 20, 20);
+    const readabilityScore = (metrics.readabilityScore / 100) * 20;
+    
+    score = wordCountScore + readabilityScore + 60; // 基础分60
+    
+    const errorCount = issues.filter(i => i.type === 'error').length;
+    const warningCount = issues.filter(i => i.type === 'warning').length;
+    
+    score -= errorCount * 15;
+    score -= warningCount * 5;
+    
+    return Math.max(0, Math.round(score));
+  }
+}
+```
+
+---
+
+
+## 6. 非功能需求
 
 ### 6.1 性能要求
 
-| 指标 | 要求 |
-|-----|------|
-| 页面加载时间 | ≤ 3s |
-| AI解析响应时间 | ≤ 5s |
-| 内容生成时间 | ≤ 30s |
-| 并发任务数 | ≥ 100 |
+| 指标 | 要求 | 测量方式 |
+|-----|-----|---------|
+| 页面加载时间 | ≤ 3s | Lighthouse Performance Score ≥ 90 |
+| AI解析响应时间 | ≤ 5s | API响应到首字节(TTFB) |
+| 内容生成时间 | ≤ 30s | 从请求到可编辑状态 |
+| 并发任务数 | ≥ 100 | 系统同时执行获客任务数 |
+| 系统可用性 | ≥ 99.5% | 月度统计 |
 
 ### 6.2 安全要求
 
-- [ ] 用户数据加密存储
-- [ ] API密钥安全管理
-- [ ] 操作日志记录
-- [ ] 敏感操作二次确认
+| 要求 | 实现方案 |
+|-----|---------|
+| 用户数据加密 | AES-256 静态加密 + TLS 1.3 传输加密 |
+| API密钥管理 | HashiCorp Vault 或 AWS Secrets Manager |
+| 操作日志 | 审计日志保留 1 年，不可篡改 |
+| 敏感操作二次确认 | 关键操作需邮箱/SMS验证码确认 |
 
 ### 6.3 兼容性要求
 
@@ -935,14 +2018,105 @@ flowchart TD
 | 设备 | PC, Tablet |
 | 分辨率 | 1920×1080, 1440×900, 1366×768 |
 
-## 7. 迭代规划
+### 6.4 WhatsApp 技术要求
 
-| 版本 | 包含功能 | 预计时间 |
-|-----|---------|---------|
-| **MVP** | 画像输入、SEO三种模式、LinkedIn渠道、内容生成、线索管理、基础看板 | 8周 |
-| **V1.1** | 邮件外联、WhatsApp整合、画像模板、渠道对比、CRM对接 | 6周 |
-| **V1.2** | SEO风控系统、AI内容审核、多语言支持、A/B测试 | 4周 |
-| **V2.0** | 更多社媒渠道（Facebook/TikTok）、高级分析、数字员工市场 | 6周 |
+| 项目 | 要求 |
+|-----|------|
+| 消息延迟 | ≤ 3秒（端到端） |
+| 并发会话 | ≥ 50个同时在线对话 |
+| 消息存储 | 永久保存，支持导出 |
+| Webhook稳定性 | 99.9%可用性，失败重试机制 |
+| 封号预防 | 新号养号策略，发送频率控制 |
+
+### 6.5 6周MVP资源假设
+
+| 角色 | 人数 | 职责 |
+|-----|------|-----|
+| 产品经理 | 1 | 需求确认、验收测试 |
+| 全栈工程师 | 2 | 前端+后端开发 |
+| AI/算法工程师 | 0.5 | WhatsApp意图识别、内容生成 |
+| 测试工程师 | 0.5 | 功能测试、渠道测试 |
+
+---
+
+## 7. 迭代规划（优化版）
+
+### 7.1 关键变更摘要
+
+| 变更项 | 原PRD | 优化后 |
+|-------|-------|-------|
+| **MVP 周期** | 8周 | **6周** |
+| **MVP 渠道** | 三种SEO模式+LinkedIn | **邮件+WhatsApp高级版+SEO模式二** |
+| **WhatsApp 功能** | 基础接入 | **高级版（AI意图识别+自动分配）** |
+| **LinkedIn** | MVP包含 | **延后至 MVP+** |
+| **迭代规划** | 4个版本 | **3个阶段（MVP/MVP+/V1.0）** |
+
+### 7.2 MVP Core（6周）
+
+**目标**：三渠道协同验证获客闭环，支持主动触达（邮件）、即时互动（WhatsApp）、长期沉淀（SEO）
+
+**Week-by-Week 拆解**：
+
+| 周次 | 重点 | 交付功能 |
+|-----|------|---------|
+| **Week 1** | 基础架构+邮件 | 用户系统、画像输入、邮件模板生成、CSV导入 |
+| **Week 2** | 邮件+WhatsApp接入 | 邮件发送统计、WhatsApp Cloud API接入、基础聊天界面 |
+| **Week 3** | WhatsApp高级功能 | AI意图识别、自动工作流、消息自动分配 |
+| **Week 4** | SEO建站基础 | 子域名站点生成、模板系统、公司/产品页生成 |
+| **Week 5** | SEO内容+线索统一 | 博客内容生成、三渠道线索统一收件箱、线索评分 |
+| **Week 6** | 数据看板+优化 | 三渠道效果看板、Bug修复、性能优化 |
+
+**MVP 功能清单**：
+
+| 模块 | 功能 | 优先级 | 验收标准 |
+|-----|------|-------|---------|
+| **客户画像** | F-02 结构化表单 | P0 | 支持邮件+WhatsApp+SEO三种场景字段 |
+| | F-03 画像模板库 | P1 | 至少3个：B2B批发、品牌商、零售商 |
+| **邮件外联** | F-20 邮箱列表导入 | P0 | CSV上传，自动去重验证 |
+| | F-21 邮件模板生成 | P0 | AI生成3种场景模板 |
+| | F-22 邮件发送执行 | P0 | 批量发送，防垃圾邮件策略 |
+| | F-23 邮件统计 | P0 | 发送/送达/打开/回复率 |
+| **WhatsApp高级** | F-24 Cloud API接入 | P0 | 官方API稳定连接 |
+| | F-25 统一收件箱 | P0 | 多客服消息分配 |
+| | F-26 AI意图识别 | P0 | 识别产品/价格/售后意图 |
+| | F-27 自动化工作流 | P0 | 欢迎语→意图识别→自动回复/转人工 |
+| | F-28 快捷回复模板 | P1 | 10个预设模板 |
+| | F-29 聊天标签管理 | P1 | 高/中/低意向标记 |
+| **SEO AI建站** | F-18 子域名站点 | P0 | company.dealclaw.com格式 |
+| | F-30 基础内容生成 | P0 | 公司页+产品页+2篇博客 |
+| | F-31 基础SEO | P1 | Meta标签、Sitemap |
+| | F-32 线索表单 | P0 | 联系表单，数据进线索库 |
+| **线索管理** | F-10 线索捕获 | P0 | 邮件回复+WA消息+网站表单 |
+| | F-11 线索评分V1 | P1 | 规则评分（互动行为+信息完整度） |
+| | F-12 线索详情 | P0 | 完整互动历史 |
+| **效果分析** | F-14 三渠道看板 | P0 | 各渠道线索数、转化率对比 |
+
+### 7.3 MVP+（+3周，共9周）
+
+**目标**：增加社媒渠道，扩展SEO模式，提升自动化程度
+
+| 新增功能 | 说明 |
+|---------|------|
+| **F-01 自然语言画像** | 基于MVP数据优化AI解析 |
+| **F-04 智能渠道匹配V2** | 从规则升级为轻量算法 |
+| **LinkedIn社媒** | 个人主页+Company Page内容发布 |
+| **F-17 模式一：自引流** | 已有WordPress/Shopify站点接入 |
+| **F-33 邮件序列** | 多封跟进邮件，自动触发 |
+| **F-34 建站模板选择** | 多行业模板 |
+
+### 7.4 V1.0（+4周，共13周）
+
+**目标**：平台化 + 规模化
+
+| 新增功能 | 说明 |
+|---------|------|
+| **F-19 模式三：垂直平台** | 行业B2B平台，商家入驻 |
+| **F-13 CRM同步** | Salesforce/HubSpot/Zoho对接 |
+| **F-15 渠道ROI对比** | 多维度效果分析 |
+| **F-16 AI优化建议** | 基于数据的策略调整建议 |
+| **SEO风控系统** | 内容审核、防惩罚机制 |
+
+---
 
 ## 8. 附录
 
@@ -955,13 +2129,55 @@ flowchart TD
 | MQL | Marketing Qualified Lead，营销合格线索 |
 | Cold Email | 陌生邮件外联 |
 | nurturing | 线索培育，持续互动提升意向 |
+| TTFB | Time To First Byte，首字节时间 |
+| SSG | Static Site Generation，静态站点生成 |
+| MDX | Markdown + JSX，支持React组件的Markdown |
 
-### 8.2 参考文档
+### 8.2 功能编号总表
 
-- OpenClaw 框架文档
-- 外贸行业获客最佳实践
-- 各社媒平台API文档
+| 编号 | 功能名称 | 所属迭代 |
+|-----|---------|---------|
+| F-01 | 自然语言画像输入 | MVP+ |
+| F-02 | 结构化表单输入 | MVP |
+| F-03 | 画像模板库 | MVP |
+| F-18 | 模式二：AI搭建独立站 | MVP |
+| F-20 | 邮件列表导入 | MVP |
+| F-21 | 邮件模板生成 | MVP |
+| F-22 | 邮件发送执行 | MVP |
+| F-23 | 邮件统计 | MVP |
+| F-24 | WhatsApp Cloud API接入 | MVP |
+| F-25 | 统一收件箱 | MVP |
+| F-26 | AI意图识别 | MVP |
+| F-27 | 自动化工作流 | MVP |
+| F-28 | 快捷回复模板 | MVP |
+| F-29 | 聊天标签管理 | MVP |
+| F-30 | 基础内容生成 | MVP |
+| F-31 | 基础SEO | MVP |
+| F-32 | 线索表单 | MVP |
+| F-10 | 线索捕获 | MVP |
+| F-11 | 线索评分V1 | MVP |
+| F-12 | 线索详情 | MVP |
+| F-14 | 三渠道数据看板 | MVP |
+| F-04 | 智能渠道匹配V2 | MVP+ |
+| F-17 | 模式一：自引流 | MVP+ |
+| F-33 | 邮件序列 | MVP+ |
+| F-34 | 建站模板选择 | MVP+ |
+| F-19 | 模式三：垂直平台 | V1.0 |
+| F-13 | CRM同步 | V1.0 |
+| F-15 | 渠道ROI对比 | V1.0 |
+| F-16 | AI优化建议 | V1.0 |
+
+### 8.3 参考文档
+
+- Next.js 14 App Router 文档: https://nextjs.org/docs
+- Meta WhatsApp Business API: https://developers.facebook.com/docs/whatsapp
+- WordPress REST API: https://developer.wordpress.org/rest-api/
+- Shopify GraphQL Admin API: https://shopify.dev/docs/api/admin-graphql
+- Vercel Platform: https://vercel.com/docs
+- Tailwind CSS: https://tailwindcss.com/docs
 
 ---
 
-*文档结束*
+*文档版本: V1.1 (技术细节补充版)*
+*最后更新: 2026-03-26*
+
