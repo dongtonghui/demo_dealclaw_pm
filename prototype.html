@@ -231,6 +231,18 @@
                 WhatsApp
                 <span class="ml-auto bg-green-500 text-white text-xs px-2 py-0.5 rounded-full shadow-sm">5</span>
             </a>
+            <a href="#" onclick="showPage('social-preview')" id="nav-social-preview" class="nav-item flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-slate-600 hover:bg-slate-50 transition-all">
+                <i data-lucide="monitor" class="w-5 h-5"></i>
+                <span>社媒预览</span>
+            </a>
+            <a href="#" onclick="showPage('account-auth')" id="nav-account-auth" class="nav-item flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-slate-600 hover:bg-slate-50 transition-all">
+                <i data-lucide="shield-check" class="w-5 h-5"></i>
+                <span>账号授权</span>
+            </a>
+            <a href="#" onclick="showPage('email-domain')" id="nav-email-domain" class="nav-item flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-slate-600 hover:bg-slate-50 transition-all">
+                <i data-lucide="mail-check" class="w-5 h-5"></i>
+                <span>邮件域名</span>
+            </a>
             <a href="#" onclick="showPage('seo-control')" id="nav-seo-control" class="nav-item flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-slate-600 hover:bg-slate-50 transition-all">
                 <i data-lucide="shield-check" class="w-5 h-5"></i>
                 SEO风控
@@ -2699,6 +2711,734 @@
         </div>
     </div>
 
+    <!-- 社媒效果预览页面 -->
+    <div id="page-social-preview" class="page-content hidden">
+        <div class="mb-6">
+            <h1 class="text-2xl font-bold text-primary mb-2">社媒效果预览</h1>
+            <p class="text-slate-500">无需翻墙，在DealClaw后台查看和管理社媒内容</p>
+        </div>
+        
+        <!-- 账号状态概览 -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            <div class="bg-white rounded-2xl p-5 border border-slate-100">
+                <div class="flex items-center justify-between mb-3">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center">
+                            <i data-lucide="linkedin" class="w-5 h-5 text-blue-600"></i>
+                        </div>
+                        <div>
+                            <p class="font-medium text-primary">LinkedIn</p>
+                            <p class="text-xs text-slate-500">personal@company.com</p>
+                        </div>
+                    </div>
+                    <span class="px-2 py-1 bg-green-50 text-green-600 text-xs rounded-full font-medium">正常</span>
+                </div>
+                <div class="flex items-center justify-between text-sm">
+                    <span class="text-slate-500">账号健康度</span>
+                    <span class="font-semibold text-green-600">92/100</span>
+                </div>
+                <div class="mt-2 h-2 bg-slate-100 rounded-full overflow-hidden">
+                    <div class="h-full bg-green-500 rounded-full" style="width: 92%"></div>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-2xl p-5 border border-slate-100">
+                <div class="flex items-center justify-between mb-3">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 bg-indigo-50 rounded-xl flex items-center justify-center">
+                            <i data-lucide="facebook" class="w-5 h-5 text-indigo-600"></i>
+                        </div>
+                        <div>
+                            <p class="font-medium text-primary">Facebook</p>
+                            <p class="text-xs text-slate-500">Company Page</p>
+                        </div>
+                    </div>
+                    <span class="px-2 py-1 bg-green-50 text-green-600 text-xs rounded-full font-medium">正常</span>
+                </div>
+                <div class="flex items-center justify-between text-sm">
+                    <span class="text-slate-500">账号健康度</span>
+                    <span class="font-semibold text-green-600">88/100</span>
+                </div>
+                <div class="mt-2 h-2 bg-slate-100 rounded-full overflow-hidden">
+                    <div class="h-full bg-green-500 rounded-full" style="width: 88%"></div>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-2xl p-5 border border-slate-100">
+                <div class="flex items-center justify-between mb-3">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 bg-amber-50 rounded-xl flex items-center justify-center">
+                            <i data-lucide="message-circle" class="w-5 h-5 text-amber-600"></i>
+                        </div>
+                        <div>
+                            <p class="font-medium text-primary">待回复消息</p>
+                            <p class="text-xs text-slate-500">LinkedIn + Facebook</p>
+                        </div>
+                    </div>
+                    <span class="w-6 h-6 bg-red-500 text-white text-xs rounded-full flex items-center justify-center font-medium">3</span>
+                </div>
+                <div class="flex items-center gap-4 mt-3">
+                    <div class="flex items-center gap-1 text-sm">
+                        <span class="w-2 h-2 bg-red-500 rounded-full"></span>
+                        <span class="text-slate-600">高意向 1</span>
+                    </div>
+                    <div class="flex items-center gap-1 text-sm">
+                        <span class="w-2 h-2 bg-amber-500 rounded-full"></span>
+                        <span class="text-slate-600">中意向 2</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- 社媒内容时间线 -->
+            <div class="lg:col-span-2 bg-white rounded-2xl border border-slate-100 overflow-hidden">
+                <div class="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
+                    <h3 class="font-semibold text-primary">📅 社媒内容时间线</h3>
+                    <div class="flex items-center gap-2">
+                        <select class="text-sm border border-slate-200 rounded-lg px-3 py-1.5 focus:outline-none focus:border-accent">
+                            <option>全部平台</option>
+                            <option>LinkedIn</option>
+                            <option>Facebook</option>
+                        </select>
+                        <select class="text-sm border border-slate-200 rounded-lg px-3 py-1.5 focus:outline-none focus:border-accent">
+                            <option>时间倒序</option>
+                            <option>互动最多</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="p-5 space-y-5 max-h-[600px] overflow-y-auto">
+                    <!-- 帖子1 -->
+                    <div class="border border-slate-100 rounded-xl p-4 hover:shadow-md transition-all">
+                        <div class="flex items-start gap-3 mb-3">
+                            <div class="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center flex-shrink-0">
+                                <i data-lucide="linkedin" class="w-5 h-5 text-blue-600"></i>
+                            </div>
+                            <div class="flex-1">
+                                <div class="flex items-center gap-2 mb-1">
+                                    <span class="font-medium text-primary">OutdoorGear Co.</span>
+                                    <span class="text-xs text-slate-400">· 今天 09:30</span>
+                                </div>
+                                <p class="text-sm text-slate-700 leading-relaxed">新品发布：Ultralight Pro 登山帐篷 ⛺
+
+专为专业户外爱好者设计：
+✨ 极致轻量：仅重 1.2kg，比同类产品轻 40%
+✨ 快速搭建：3 分钟单人完成，专利快拆系统
+✨ 全天候防护：防水指数 5000mm，抗 8 级风
+
+批量订购享新品优惠，私信获取报价单 📩</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-center gap-6 text-sm text-slate-500 ml-13">
+                            <button class="flex items-center gap-1.5 hover:text-blue-600 transition-colors">
+                                <i data-lucide="heart" class="w-4 h-4"></i>
+                                <span>45 点赞</span>
+                            </button>
+                            <button class="flex items-center gap-1.5 hover:text-blue-600 transition-colors">
+                                <i data-lucide="message-square" class="w-4 h-4"></i>
+                                <span>12 评论</span>
+                            </button>
+                            <button class="flex items-center gap-1.5 hover:text-blue-600 transition-colors">
+                                <i data-lucide="share-2" class="w-4 h-4"></i>
+                                <span>8 转发</span>
+                            </button>
+                        </div>
+                        
+                        <!-- 最新评论 -->
+                        <div class="mt-4 pt-4 border-t border-slate-100">
+                            <div class="flex items-start gap-2">
+                                <div class="w-8 h-8 bg-gradient-to-br from-red-50 to-red-100 rounded-full flex items-center justify-center text-xs font-medium text-red-600">SL</div>
+                                <div class="flex-1 bg-slate-50 rounded-lg p-3">
+                                    <div class="flex items-center gap-2 mb-1">
+                                        <span class="text-sm font-medium text-primary">Sarah Lee</span>
+                                        <span class="text-xs text-slate-400">2分钟前</span>
+                                    </div>
+                                    <p class="text-sm text-slate-600">"Great product! Can you send me a quote for 500 units?"</p>
+                                    <div class="flex items-center gap-2 mt-2">
+                                        <span class="px-2 py-0.5 bg-red-50 text-red-600 text-xs rounded">高意向</span>
+                                        <button class="text-xs text-accent hover:underline">回复</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 帖子2 -->
+                    <div class="border border-slate-100 rounded-xl p-4 hover:shadow-md transition-all">
+                        <div class="flex items-start gap-3 mb-3">
+                            <div class="w-10 h-10 bg-indigo-50 rounded-lg flex items-center justify-center flex-shrink-0">
+                                <i data-lucide="facebook" class="w-5 h-5 text-indigo-600"></i>
+                            </div>
+                            <div class="flex-1">
+                                <div class="flex items-center gap-2 mb-1">
+                                    <span class="font-medium text-primary">OutdoorGear Co.</span>
+                                    <span class="text-xs text-slate-400">· 昨天 14:20</span>
+                                </div>
+                                <p class="text-sm text-slate-700 leading-relaxed">工厂探访：质检流程大揭秘 🔍
+
+带你走进我们的生产车间，看看每一件产品出厂前都要经过哪些严格的质检程序...</p>
+                                <div class="mt-3 aspect-video bg-slate-100 rounded-lg flex items-center justify-center">
+                                    <div class="text-center">
+                                        <i data-lucide="image" class="w-10 h-10 text-slate-300 mx-auto mb-2"></i>
+                                        <span class="text-xs text-slate-400">工厂实拍照片 (3张)</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-center gap-6 text-sm text-slate-500">
+                            <button class="flex items-center gap-1.5 hover:text-indigo-600 transition-colors">
+                                <i data-lucide="heart" class="w-4 h-4"></i>
+                                <span>128 点赞</span>
+                            </button>
+                            <button class="flex items-center gap-1.5 hover:text-indigo-600 transition-colors">
+                                <i data-lucide="message-square" class="w-4 h-4"></i>
+                                <span>23 评论</span>
+                            </button>
+                            <button class="flex items-center gap-1.5 hover:text-indigo-600 transition-colors">
+                                <i data-lucide="share-2" class="w-4 h-4"></i>
+                                <span>15 转发</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 统一收件箱 -->
+            <div class="bg-white rounded-2xl border border-slate-100 overflow-hidden">
+                <div class="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
+                    <h3 class="font-semibold text-primary">💬 互动收件箱</h3>
+                    <span class="text-xs text-slate-500">3 条未读</span>
+                </div>
+                
+                <div class="border-b border-slate-100">
+                    <div class="flex text-sm">
+                        <button class="flex-1 py-3 border-b-2 border-accent text-accent font-medium">全部</button>
+                        <button class="flex-1 py-3 border-b-2 border-transparent text-slate-500">评论</button>
+                        <button class="flex-1 py-3 border-b-2 border-transparent text-slate-500">私信</button>
+                    </div>
+                </div>
+                
+                <div class="max-h-[500px] overflow-y-auto">
+                    <!-- 消息1 -->
+                    <div class="p-4 border-b border-slate-100 hover:bg-slate-50 cursor-pointer transition-colors bg-blue-50/30">
+                        <div class="flex items-start gap-3">
+                            <div class="w-10 h-10 bg-gradient-to-br from-red-50 to-red-100 rounded-full flex items-center justify-center text-sm font-medium text-red-600 flex-shrink-0">SL</div>
+                            <div class="flex-1 min-w-0">
+                                <div class="flex items-center justify-between mb-1">
+                                    <span class="font-medium text-primary text-sm">Sarah Lee</span>
+                                    <span class="text-xs text-slate-400">2分钟前</span>
+                                </div>
+                                <p class="text-xs text-slate-500 mb-1">LinkedIn 评论</p>
+                                <p class="text-sm text-slate-600 truncate">"Great product! Can you send me a quote for 500 units?"</p>
+                                <div class="flex items-center gap-2 mt-2">
+                                    <span class="px-2 py-0.5 bg-red-50 text-red-600 text-xs rounded">高意向</span>
+                                    <span class="px-2 py-0.5 bg-blue-50 text-blue-600 text-xs rounded">产品咨询</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 消息2 -->
+                    <div class="p-4 border-b border-slate-100 hover:bg-slate-50 cursor-pointer transition-colors">
+                        <div class="flex items-start gap-3">
+                            <div class="w-10 h-10 bg-gradient-to-br from-amber-50 to-amber-100 rounded-full flex items-center justify-center text-sm font-medium text-amber-600 flex-shrink-0">MC</div>
+                            <div class="flex-1 min-w-0">
+                                <div class="flex items-center justify-between mb-1">
+                                    <span class="font-medium text-primary text-sm">Mike Chen</span>
+                                    <span class="text-xs text-slate-400">15分钟前</span>
+                                </div>
+                                <p class="text-xs text-slate-500 mb-1">Facebook 私信</p>
+                                <p class="text-sm text-slate-600 truncate">"Hi, I'm interested in your camping gear for our store..."</p>
+                                <div class="flex items-center gap-2 mt-2">
+                                    <span class="px-2 py-0.5 bg-amber-50 text-amber-600 text-xs rounded">中意向</span>
+                                    <span class="px-2 py-0.5 bg-green-50 text-green-600 text-xs rounded">合作咨询</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 消息3 -->
+                    <div class="p-4 border-b border-slate-100 hover:bg-slate-50 cursor-pointer transition-colors">
+                        <div class="flex items-start gap-3">
+                            <div class="w-10 h-10 bg-gradient-to-br from-blue-50 to-blue-100 rounded-full flex items-center justify-center text-sm font-medium text-blue-600 flex-shrink-0">DW</div>
+                            <div class="flex-1 min-w-0">
+                                <div class="flex items-center justify-between mb-1">
+                                    <span class="font-medium text-primary text-sm">David Wilson</span>
+                                    <span class="text-xs text-slate-400">1小时前</span>
+                                </div>
+                                <p class="text-xs text-slate-500 mb-1">LinkedIn 评论</p>
+                                <p class="text-sm text-slate-600 truncate">"Thanks for sharing! 👍"</p>
+                                <div class="flex items-center gap-2 mt-2">
+                                    <span class="px-2 py-0.5 bg-slate-100 text-slate-600 text-xs rounded">一般互动</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="p-4 border-t border-slate-100">
+                    <button class="w-full py-2 text-sm text-accent hover:text-accent-hover font-medium transition-colors">
+                        查看全部消息
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 账号授权管理页面 -->
+    <div id="page-account-auth" class="page-content hidden">
+        <div class="mb-6">
+            <h1 class="text-2xl font-bold text-primary mb-2">账号授权管理</h1>
+            <p class="text-slate-500">管理您的社媒账号授权与风控设置</p>
+        </div>
+        
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- 已授权账号列表 -->
+            <div class="lg:col-span-2 space-y-6">
+                <div class="bg-white rounded-2xl border border-slate-100 overflow-hidden">
+                    <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+                        <h3 class="font-semibold text-primary">已授权账号</h3>
+                        <button class="bg-accent hover:bg-accent-hover text-white px-4 py-2 rounded-xl text-sm font-medium flex items-center gap-2 transition-all">
+                            <i data-lucide="plus" class="w-4 h-4"></i>
+                            添加账号
+                        </button>
+                    </div>
+                    
+                    <div class="divide-y divide-slate-100">
+                        <!-- LinkedIn 账号 -->
+                        <div class="p-6">
+                            <div class="flex items-start justify-between mb-4">
+                                <div class="flex items-center gap-4">
+                                    <div class="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center">
+                                        <i data-lucide="linkedin" class="w-6 h-6 text-blue-600"></i>
+                                    </div>
+                                    <div>
+                                        <p class="font-medium text-primary">LinkedIn 个人主页</p>
+                                        <p class="text-sm text-slate-500">linkedin.com/in/outdoorgear</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <span class="w-2 h-2 bg-green-500 rounded-full"></span>
+                                    <span class="text-sm text-green-600 font-medium">正常</span>
+                                </div>
+                            </div>
+                            
+                            <div class="grid grid-cols-4 gap-4 mb-4">
+                                <div class="bg-slate-50 rounded-xl p-3 text-center">
+                                    <p class="text-2xl font-bold text-primary">92</p>
+                                    <p class="text-xs text-slate-500">健康度</p>
+                                </div>
+                                <div class="bg-slate-50 rounded-xl p-3 text-center">
+                                    <p class="text-2xl font-bold text-primary">1,234</p>
+                                    <p class="text-xs text-slate-500">关注者</p>
+                                </div>
+                                <div class="bg-slate-50 rounded-xl p-3 text-center">
+                                    <p class="text-2xl font-bold text-primary">89</p>
+                                    <p class="text-xs text-slate-500">发布内容</p>
+                                </div>
+                                <div class="bg-slate-50 rounded-xl p-3 text-center">
+                                    <p class="text-2xl font-bold text-primary">156</p>
+                                    <p class="text-xs text-slate-500">获赞数</p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-4 text-sm text-slate-500">
+                                    <span>授权时间: 2026-01-15</span>
+                                    <span>最后同步: 5分钟前</span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <button class="px-3 py-1.5 text-sm text-slate-600 hover:text-primary transition-colors">设置</button>
+                                    <button class="px-3 py-1.5 text-sm text-red-600 hover:text-red-700 transition-colors">撤销授权</button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Facebook 账号 -->
+                        <div class="p-6">
+                            <div class="flex items-start justify-between mb-4">
+                                <div class="flex items-center gap-4">
+                                    <div class="w-12 h-12 bg-indigo-50 rounded-xl flex items-center justify-center">
+                                        <i data-lucide="facebook" class="w-6 h-6 text-indigo-600"></i>
+                                    </div>
+                                    <div>
+                                        <p class="font-medium text-primary">Facebook 公司主页</p>
+                                        <p class="text-sm text-slate-500">facebook.com/outdoorgearco</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <span class="w-2 h-2 bg-green-500 rounded-full"></span>
+                                    <span class="text-sm text-green-600 font-medium">正常</span>
+                                </div>
+                            </div>
+                            
+                            <div class="grid grid-cols-4 gap-4 mb-4">
+                                <div class="bg-slate-50 rounded-xl p-3 text-center">
+                                    <p class="text-2xl font-bold text-primary">88</p>
+                                    <p class="text-xs text-slate-500">健康度</p>
+                                </div>
+                                <div class="bg-slate-50 rounded-xl p-3 text-center">
+                                    <p class="text-2xl font-bold text-primary">2,456</p>
+                                    <p class="text-xs text-slate-500">关注者</p>
+                                </div>
+                                <div class="bg-slate-50 rounded-xl p-3 text-center">
+                                    <p class="text-2xl font-bold text-primary">45</p>
+                                    <p class="text-xs text-slate-500">发布内容</p>
+                                </div>
+                                <div class="bg-slate-50 rounded-xl p-3 text-center">
+                                    <p class="text-2xl font-bold text-primary">234</p>
+                                    <p class="text-xs text-slate-500">获赞数</p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-4 text-sm text-slate-500">
+                                    <span>授权时间: 2026-02-01</span>
+                                    <span>最后同步: 10分钟前</span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <button class="px-3 py-1.5 text-sm text-slate-600 hover:text-primary transition-colors">设置</button>
+                                    <button class="px-3 py-1.5 text-sm text-red-600 hover:text-red-700 transition-colors">撤销授权</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 风控设置 -->
+                <div class="bg-white rounded-2xl border border-slate-100 p-6">
+                    <h3 class="font-semibold text-primary mb-4">🛡️ 风控设置</h3>
+                    
+                    <div class="space-y-5">
+                        <div>
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-sm font-medium text-primary">发布频率模式</span>
+                                <span class="text-xs px-2 py-1 bg-blue-50 text-blue-600 rounded">标准模式</span>
+                            </div>
+                            <div class="grid grid-cols-3 gap-3">
+                                <button class="p-3 border border-slate-200 rounded-xl text-center hover:border-accent hover:bg-accent/5 transition-all">
+                                    <p class="text-sm font-medium text-primary mb-1">保守</p>
+                                    <p class="text-xs text-slate-500">1-2篇/周</p>
+                                </button>
+                                <button class="p-3 border-2 border-accent bg-accent/5 rounded-xl text-center">
+                                    <p class="text-sm font-medium text-primary mb-1">标准</p>
+                                    <p class="text-xs text-slate-500">3-5篇/周</p>
+                                </button>
+                                <button class="p-3 border border-slate-200 rounded-xl text-center hover:border-accent hover:bg-accent/5 transition-all">
+                                    <p class="text-sm font-medium text-primary mb-1">积极</p>
+                                    <p class="text-xs text-slate-500">7-10篇/周</p>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="border-t border-slate-100 pt-5">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-sm font-medium text-primary">内容审核级别</span>
+                                <span class="text-xs px-2 py-1 bg-amber-50 text-amber-600 rounded">AI+人工</span>
+                            </div>
+                            <div class="space-y-2">
+                                <label class="flex items-center gap-3 p-3 border border-slate-200 rounded-xl cursor-pointer hover:bg-slate-50">
+                                    <input type="radio" name="review-level" class="w-4 h-4 text-accent">
+                                    <div class="flex-1">
+                                        <p class="text-sm font-medium text-primary">AI生成后自动发布</p>
+                                        <p class="text-xs text-slate-500">仅检测高风险内容</p>
+                                    </div>
+                                </label>
+                                <label class="flex items-center gap-3 p-3 border-2 border-accent bg-accent/5 rounded-xl cursor-pointer">
+                                    <input type="radio" name="review-level" class="w-4 h-4 text-accent" checked>
+                                    <div class="flex-1">
+                                        <p class="text-sm font-medium text-primary">AI生成后人工确认再发布</p>
+                                        <p class="text-xs text-slate-500">推荐：平衡效率与风险</p>
+                                    </div>
+                                </label>
+                                <label class="flex items-center gap-3 p-3 border border-slate-200 rounded-xl cursor-pointer hover:bg-slate-50">
+                                    <input type="radio" name="review-level" class="w-4 h-4 text-accent">
+                                    <div class="flex-1">
+                                        <p class="text-sm font-medium text-primary">所有内容需人工审核</p>
+                                        <p class="text-xs text-slate-500">最高安全级别</p>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 侧边栏：风险提示与帮助 -->
+            <div class="space-y-6">
+                <div class="bg-gradient-to-br from-amber-50 to-orange-50 rounded-2xl p-5 border border-amber-100">
+                    <div class="flex items-start gap-3">
+                        <div class="w-10 h-10 bg-amber-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                            <i data-lucide="alert-triangle" class="w-5 h-5 text-amber-600"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-medium text-amber-800 mb-1">账号安全提示</h4>
+                            <p class="text-sm text-amber-700 mb-3">请确保您的社媒账号信息安全，定期检查授权状态。</p>
+                            <ul class="text-xs text-amber-700 space-y-1">
+                                <li>• 新账号建议从保守模式开始</li>
+                                <li>• 定期更换账号密码</li>
+                                <li>• 发现异常立即撤销授权</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded-2xl border border-slate-100 p-5">
+                    <h4 class="font-medium text-primary mb-3">📊 账号健康度说明</h4>
+                    <div class="space-y-3">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 bg-green-50 rounded-lg flex items-center justify-center">
+                                <span class="text-sm font-bold text-green-600">80+</span>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-primary">优秀</p>
+                                <p class="text-xs text-slate-500">可正常运营</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 bg-amber-50 rounded-lg flex items-center justify-center">
+                                <span class="text-sm font-bold text-amber-600">60-79</span>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-primary">良好</p>
+                                <p class="text-xs text-slate-500">建议优化</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 bg-red-50 rounded-lg flex items-center justify-center">
+                                <span class="text-sm font-bold text-red-600">&lt;60</span>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-primary">需关注</p>
+                                <p class="text-xs text-slate-500">立即处理</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 邮件域名配置页面 -->
+    <div id="page-email-domain" class="page-content hidden">
+        <div class="mb-6">
+            <h1 class="text-2xl font-bold text-primary mb-2">邮件域名配置</h1>
+            <p class="text-slate-500">配置您的专属发件域名，提升邮件送达率和品牌形象</p>
+        </div>
+        
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- 域名配置向导 -->
+            <div class="lg:col-span-2 space-y-6">
+                <!-- 当前域名状态 -->
+                <div class="bg-white rounded-2xl border border-slate-100 p-6">
+                    <div class="flex items-center justify-between mb-6">
+                        <div>
+                            <h3 class="font-semibold text-primary mb-1">当前发件域名</h3>
+                            <p class="text-sm text-slate-500">配置您的专属发件域名</p>
+                        </div>
+                        <span class="px-3 py-1.5 bg-green-50 text-green-600 text-sm font-medium rounded-full flex items-center gap-1">
+                            <i data-lucide="check-circle" class="w-4 h-4"></i>
+                            已验证
+                        </span>
+                    </div>
+                    
+                    <div class="bg-slate-50 rounded-xl p-4 mb-6">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 bg-accent/10 rounded-lg flex items-center justify-center">
+                                <i data-lucide="mail" class="w-5 h-5 text-accent"></i>
+                            </div>
+                            <div>
+                                <p class="font-medium text-primary">mail.outdoorgearco.com</p>
+                                <p class="text-sm text-slate-500">推荐：子域名委托方案</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-3 gap-4">
+                        <div class="text-center p-4 bg-slate-50 rounded-xl">
+                            <div class="w-12 h-12 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-2">
+                                <i data-lucide="check" class="w-6 h-6 text-green-600"></i>
+                            </div>
+                            <p class="text-sm font-medium text-primary">SPF 记录</p>
+                            <p class="text-xs text-slate-500 mt-1">已配置</p>
+                        </div>
+                        <div class="text-center p-4 bg-slate-50 rounded-xl">
+                            <div class="w-12 h-12 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-2">
+                                <i data-lucide="check" class="w-6 h-6 text-green-600"></i>
+                            </div>
+                            <p class="text-sm font-medium text-primary">DKIM 签名</p>
+                            <p class="text-xs text-slate-500 mt-1">已配置</p>
+                        </div>
+                        <div class="text-center p-4 bg-slate-50 rounded-xl">
+                            <div class="w-12 h-12 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-2">
+                                <i data-lucide="check" class="w-6 h-6 text-green-600"></i>
+                            </div>
+                            <p class="text-sm font-medium text-primary">DMARC 策略</p>
+                            <p class="text-xs text-slate-500 mt-1">已配置</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- DNS 配置详情 -->
+                <div class="bg-white rounded-2xl border border-slate-100 overflow-hidden">
+                    <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+                        <h3 class="font-semibold text-primary">DNS 配置记录</h3>
+                        <button class="text-sm text-accent hover:text-accent-hover flex items-center gap-1">
+                            <i data-lucide="copy" class="w-4 h-4"></i>
+                            复制全部
+                        </button>
+                    </div>
+                    
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead class="bg-slate-50 text-left">
+                                <tr>
+                                    <th class="px-6 py-3 text-xs font-medium text-slate-500">记录类型</th>
+                                    <th class="px-6 py-3 text-xs font-medium text-slate-500">主机记录</th>
+                                    <th class="px-6 py-3 text-xs font-medium text-slate-500">记录值</th>
+                                    <th class="px-6 py-3 text-xs font-medium text-slate-500">状态</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100">
+                                <tr>
+                                    <td class="px-6 py-4 text-sm font-medium text-primary">TXT</td>
+                                    <td class="px-6 py-4 text-sm text-slate-600">mail</td>
+                                    <td class="px-6 py-4 text-sm text-slate-600 font-mono text-xs">v=spf1 include:sendgrid.net ~all</td>
+                                    <td class="px-6 py-4"><span class="px-2 py-1 bg-green-50 text-green-600 text-xs rounded-full">已验证</span></td>
+                                </tr>
+                                <tr>
+                                    <td class="px-6 py-4 text-sm font-medium text-primary">TXT</td>
+                                    <td class="px-6 py-4 text-sm text-slate-600">s1._domainkey.mail</td>
+                                    <td class="px-6 py-4 text-sm text-slate-600 font-mono text-xs truncate max-w-xs">v=DKIM1; k=rsa; p=MIGfMA0GCS...</td>
+                                    <td class="px-6 py-4"><span class="px-2 py-1 bg-green-50 text-green-600 text-xs rounded-full">已验证</span></td>
+                                </tr>
+                                <tr>
+                                    <td class="px-6 py-4 text-sm font-medium text-primary">TXT</td>
+                                    <td class="px-6 py-4 text-sm text-slate-600">_dmarc.mail</td>
+                                    <td class="px-6 py-4 text-sm text-slate-600 font-mono text-xs">v=DMARC1; p=none; rua=mailto:dmarc@dealclaw.com</td>
+                                    <td class="px-6 py-4"><span class="px-2 py-1 bg-green-50 text-green-600 text-xs rounded-full">已验证</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <!-- 发送信誉监控 -->
+                <div class="bg-white rounded-2xl border border-slate-100 p-6">
+                    <h3 class="font-semibold text-primary mb-4">📊 发送信誉监控</h3>
+                    
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                        <div class="bg-slate-50 rounded-xl p-4 text-center">
+                            <p class="text-2xl font-bold text-green-600">98.5%</p>
+                            <p class="text-xs text-slate-500">送达率</p>
+                        </div>
+                        <div class="bg-slate-50 rounded-xl p-4 text-center">
+                            <p class="text-2xl font-bold text-green-600">87%</p>
+                            <p class="text-xs text-slate-500">收件箱率</p>
+                        </div>
+                        <div class="bg-slate-50 rounded-xl p-4 text-center">
+                            <p class="text-2xl font-bold text-green-600">28%</p>
+                            <p class="text-xs text-slate-500">打开率</p>
+                        </div>
+                        <div class="bg-slate-50 rounded-xl p-4 text-center">
+                            <p class="text-2xl font-bold text-green-600">0.02%</p>
+                            <p class="text-xs text-slate-500">投诉率</p>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-amber-50 rounded-xl p-4 border border-amber-100">
+                        <div class="flex items-start gap-3">
+                            <i data-lucide="info" class="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5"></i>
+                            <div>
+                                <p class="text-sm font-medium text-amber-800">Warm-up 进度</p>
+                                <p class="text-xs text-amber-700 mt-1">当前处于预热期第 8 天，建议继续按 50 封/天的频率发送，预计 6 天后可提升至 200 封/天。</p>
+                                <div class="mt-3 h-2 bg-amber-200 rounded-full overflow-hidden">
+                                    <div class="h-full bg-amber-500 rounded-full" style="width: 57%"></div>
+                                </div>
+                                <p class="text-xs text-amber-600 mt-1">57% - 8/14 天</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 侧边栏 -->
+            <div class="space-y-6">
+                <div class="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-5 border border-blue-100">
+                    <h4 class="font-medium text-blue-800 mb-3">💡 域名方案对比</h4>
+                    <div class="space-y-3">
+                        <div class="flex items-center gap-3 p-3 bg-white/50 rounded-xl">
+                            <div class="w-8 h-8 bg-slate-100 rounded-lg flex items-center justify-center text-xs font-medium text-slate-500">A</div>
+                            <div class="flex-1">
+                                <p class="text-sm font-medium text-primary">统一域名</p>
+                                <p class="text-xs text-slate-500">@mail.dealclaw.com</p>
+                            </div>
+                            <span class="text-xs text-slate-400">试用</span>
+                        </div>
+                        <div class="flex items-center gap-3 p-3 bg-blue-100/50 rounded-xl border border-blue-200">
+                            <div class="w-8 h-8 bg-accent rounded-lg flex items-center justify-center text-xs font-medium text-white">C</div>
+                            <div class="flex-1">
+                                <p class="text-sm font-medium text-primary">子域名</p>
+                                <p class="text-xs text-slate-500">@mail.yourdomain.com</p>
+                            </div>
+                            <span class="text-xs text-accent font-medium">推荐</span>
+                        </div>
+                        <div class="flex items-center gap-3 p-3 bg-white/50 rounded-xl">
+                            <div class="w-8 h-8 bg-slate-100 rounded-lg flex items-center justify-center text-xs font-medium text-slate-500">B</div>
+                            <div class="flex-1">
+                                <p class="text-sm font-medium text-primary">自有域名</p>
+                                <p class="text-xs text-slate-500">@yourdomain.com</p>
+                            </div>
+                            <span class="text-xs text-slate-400">企业</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded-2xl border border-slate-100 p-5">
+                    <h4 class="font-medium text-primary mb-3">📋 配置检查清单</h4>
+                    <div class="space-y-2">
+                        <label class="flex items-center gap-3 text-sm cursor-pointer">
+                            <input type="checkbox" checked class="w-4 h-4 text-accent rounded" disabled>
+                            <span class="text-slate-600">添加 SPF 记录</span>
+                        </label>
+                        <label class="flex items-center gap-3 text-sm cursor-pointer">
+                            <input type="checkbox" checked class="w-4 h-4 text-accent rounded" disabled>
+                            <span class="text-slate-600">配置 DKIM 签名</span>
+                        </label>
+                        <label class="flex items-center gap-3 text-sm cursor-pointer">
+                            <input type="checkbox" checked class="w-4 h-4 text-accent rounded" disabled>
+                            <span class="text-slate-600">设置 DMARC 策略</span>
+                        </label>
+                        <label class="flex items-center gap-3 text-sm cursor-pointer">
+                            <input type="checkbox" class="w-4 h-4 text-accent rounded">
+                            <span class="text-slate-600">配置 MX 记录（可选）</span>
+                        </label>
+                        <label class="flex items-center gap-3 text-sm cursor-pointer">
+                            <input type="checkbox" class="w-4 h-4 text-accent rounded">
+                            <span class="text-slate-600">完成 Warm-up 预热</span>
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded-2xl border border-slate-100 p-5">
+                    <h4 class="font-medium text-primary mb-3">🆘 需要帮助？</h4>
+                    <p class="text-sm text-slate-500 mb-4">DNS配置遇到问题？我们的技术支持团队随时为您服务。</p>
+                    <div class="space-y-2">
+                        <button class="w-full py-2 px-4 bg-accent text-white rounded-xl text-sm font-medium hover:bg-accent-hover transition-all">
+                            联系技术支持
+                        </button>
+                        <button class="w-full py-2 px-4 border border-slate-200 text-slate-600 rounded-xl text-sm font-medium hover:bg-slate-50 transition-all">
+                            查看配置指南
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- 内容编辑弹窗 -->
     <div id="content-edit-modal" class="fixed inset-0 bg-black/50 z-50 hidden items-center justify-center">
         <div class="bg-white rounded-2xl w-[800px] max-h-[90vh] overflow-hidden shadow-2xl flex flex-col">
@@ -2784,7 +3524,10 @@
                 'email-settings': '邮件配置',
                 'task-review': '方案确认',
                 'whatsapp': 'WhatsApp消息',
-                'seo-control': 'SEO风控中心'
+                'seo-control': 'SEO风控中心',
+                'social-preview': '社媒效果预览',
+                'account-auth': '账号授权管理',
+                'email-domain': '邮件域名配置'
             };
             document.getElementById('page-title').textContent = titles[pageName] || '';
             
