@@ -119,42 +119,11 @@
         .score-high { background: linear-gradient(135deg, #10B981 0%, #059669 100%); }
         .score-medium { background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%); }
         .score-low { background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%); }
-        
-        /* Mac屏幕适配 */
-        .safe-area-bottom {
-            padding-bottom: max(1.5rem, env(safe-area-inset-bottom));
-        }
-        
-        /* 响应式高度适配 */
-        @supports (height: 100dvh) {
-            .h-\[100dvh\] {
-                height: 100dvh;
-            }
-        }
-        
-        @supports not (height: 100dvh) {
-            .h-\[100dvh\] {
-                height: 100vh;
-            }
-        }
-        
-        /* 确保内容区域不会溢出 */
-        #chat-container {
-            flex: 1 1 auto;
-            min-height: 0;
-        }
-        
-        /* 防止输入框被遮挡 */
-        #view-chat {
-            display: flex;
-            flex-direction: column;
-            height: 100%;
-        }
     </style>
 </head>
 <body class="bg-bg-primary text-slate-800 font-sans antialiased">
     <!-- 主布局容器 -->
-    <div class="flex h-[100dvh] max-h-screen overflow-hidden">
+    <div class="flex h-screen max-h-[calc(100vh-30px)] overflow-hidden">
         
         <!-- 左侧导航栏 -->
         <aside class="w-64 bg-white border-r border-slate-200 flex flex-col z-20 shadow-sm">
@@ -336,7 +305,7 @@
             </div>
             
             <!-- 输入区域 -->
-            <div class="p-4 pb-6 bg-white/80 backdrop-blur-md border-t border-slate-200 safe-area-bottom">
+            <div class="p-4 pb-6 bg-white/80 backdrop-blur-md border-t border-slate-200">
                 <div class="max-w-4xl mx-auto">
                     <div class="flex items-end gap-3 bg-slate-50 rounded-2xl p-2 border border-slate-200 focus-within:border-accent focus-within:ring-4 focus-within:ring-blue-100 transition-all">
                         <button class="p-3 hover:bg-slate-200 rounded-xl transition-colors">
@@ -377,7 +346,7 @@
                         </button>
                     </div>
                 </header>
-                <div class="flex-1 overflow-y-auto p-6 pb-20">
+                <div class="flex-1 overflow-y-auto p-6">
                     <div class="max-w-6xl mx-auto space-y-6">
                         <!-- 进行中的任务 -->
                         <div>
@@ -385,7 +354,7 @@
                                 <span class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span>
                                 进行中的任务
                             </h3>
-                            <div class="grid gap-4" id="active-tasks-list" class="pb-4">
+                            <div class="grid gap-4" id="active-tasks-list">
                                 <!-- 任务卡片将通过JS动态生成 -->
                             </div>
                         </div>
@@ -396,7 +365,7 @@
                                 <i data-lucide="check-circle" class="w-4 h-4 text-slate-400"></i>
                                 已完成任务
                             </h3>
-                            <div class="grid gap-4" id="completed-tasks-list" class="pb-4">
+                            <div class="grid gap-4" id="completed-tasks-list">
                                 <!-- 已完成任务卡片 -->
                             </div>
                         </div>
@@ -426,14 +395,20 @@
                 </header>
                 <div class="flex-1 overflow-y-auto p-6">
                     <div class="max-w-6xl mx-auto">
-                        <div class="grid grid-cols-1 lg:grid-cols-3 gap-4" id="leads-grid" class="pb-4">
+                        <div class="grid grid-cols-1 lg:grid-cols-3 gap-4" id="leads-grid">
                             <!-- 线索卡片将通过JS动态生成 -->
                         </div>
                     </div>
                 </div>
             </div>
             
-            
+            <!-- 获客任务视图 -->
+            <div id="view-tasks" class="hidden flex-1 flex-col bg-gradient-to-br from-slate-50 to-blue-50/30">
+                <header class="h-16 bg-white/80 backdrop-blur-md border-b border-slate-200 flex items-center justify-between px-6 z-10">
+                    <div class="flex items-center gap-4">
+                        <span class="text-lg font-semibold text-slate-800">获客任务</span>
+                        <span class="px-2 py-0.5 bg-blue-100 text-blue-700 text-xs rounded-full font-medium">3个进行中</span>
+                    </div>
                     <div class="flex items-center gap-3">
                         <button onclick="showNewTaskModal()" class="flex items-center gap-2 px-4 py-2 bg-accent text-white rounded-lg text-sm font-medium hover:bg-accent/90 transition-all">
                             <i data-lucide="plus" class="w-4 h-4"></i>
@@ -468,7 +443,13 @@
                 </div>
             </div>
             
-            
+            <!-- 线索中心视图 -->
+            <div id="view-leads" class="hidden flex-1 flex-col bg-gradient-to-br from-slate-50 to-blue-50/30">
+                <header class="h-16 bg-white/80 backdrop-blur-md border-b border-slate-200 flex items-center justify-between px-6 z-10">
+                    <div class="flex items-center gap-4">
+                        <span class="text-lg font-semibold text-slate-800">线索中心</span>
+                        <span class="px-2 py-0.5 bg-red-100 text-red-700 text-xs rounded-full font-medium animate-pulse">5条新线索</span>
+                    </div>
                     <div class="flex items-center gap-3">
                         <div class="flex items-center gap-2 bg-white border border-slate-200 rounded-lg px-3 py-2">
                             <i data-lucide="search" class="w-4 h-4 text-slate-400"></i>
