@@ -1,0 +1,933 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DealClaw - 数字员工团队</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        * { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+        .message-bubble { animation: fadeIn 0.3s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .typing-dot { animation: typing 1.4s infinite; }
+        .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes typing { 0%, 60%, 100% { transform: translateY(0); } 30% { transform: translateY(-4px); } }
+        .card-hover { transition: all 0.2s ease; }
+        .card-hover:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(99, 102, 241, 0.15); }
+        .agent-avatar { background: linear-gradient(135deg, #6366F1 0%, #818CF8 100%); }
+        .user-avatar { background: linear-gradient(135deg, #10B981 0%, #34D399 100%); }
+        .fade-in { animation: fadeIn 0.4s ease-out; }
+        .slide-in { animation: slideIn 0.3s ease-out; }
+        @keyframes slideIn { from { transform: translateX(20px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+    </style>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#6366F1',
+                        secondary: '#818CF8',
+                        cta: '#10B981',
+                        background: '#F5F3FF',
+                        'text-primary': '#1E1B4B',
+                        'text-secondary': '#4B5563',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gray-50 h-screen overflow-hidden">
+    <!-- 主布局 -->
+    <div class="flex h-full">
+        <!-- 左侧导航栏 -->
+        <aside class="w-64 bg-white border-r border-gray-200 flex flex-col">
+            <!-- Logo -->
+            <div class="p-4 border-b border-gray-100">
+                <div class="flex items-center gap-2">
+                    <div class="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
+                        <i data-lucide="bot" class="w-5 h-5 text-white"></i>
+                    </div>
+                    <span class="font-bold text-lg text-text-primary">DealClaw</span>
+                </div>
+                <p class="text-xs text-gray-500 mt-1">数字员工团队</p>
+            </div>
+            
+            <!-- 导航菜单 -->
+            <nav class="flex-1 overflow-y-auto py-4 px-3 space-y-1">
+                <button onclick="switchView('chat')" id="nav-chat" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium bg-primary/10 text-primary transition-colors">
+                    <i data-lucide="message-circle" class="w-5 h-5"></i>
+                    <span>当前对话</span>
+                </button>
+                
+                <button onclick="switchView('tasks')" id="nav-tasks" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors">
+                    <i data-lucide="clipboard-list" class="w-5 h-5"></i>
+                    <span>获客任务</span>
+                    <span class="ml-auto bg-orange-100 text-orange-600 text-xs px-2 py-0.5 rounded-full">3</span>
+                </button>
+                
+                <button onclick="switchView('leads')" id="nav-leads" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors">
+                    <i data-lucide="target" class="w-5 h-5"></i>
+                    <span>线索收件箱</span>
+                    <span class="ml-auto bg-red-100 text-red-600 text-xs px-2 py-0.5 rounded-full">23</span>
+                </button>
+                
+                <button onclick="switchView('dashboard')" id="nav-dashboard" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors">
+                    <i data-lucide="bar-chart-3" class="w-5 h-5"></i>
+                    <span>数据看板</span>
+                </button>
+                
+                <div class="pt-4 mt-4 border-t border-gray-100">
+                    <p class="px-3 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Agent团队</p>
+                    
+                    <button class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-gray-600 hover:bg-gray-50">
+                        <div class="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center">
+                            <i data-lucide="user-cog" class="w-3.5 h-3.5 text-primary"></i>
+                        </div>
+                        <span>主管Agent</span>
+                    </button>
+                    
+                    <button class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-gray-600 hover:bg-gray-50">
+                        <div class="w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center">
+                            <i data-lucide="search" class="w-3.5 h-3.5 text-blue-600"></i>
+                        </div>
+                        <span>SEO Agent</span>
+                        <span class="ml-auto text-xs text-green-600">●</span>
+                    </button>
+                    
+                    <button class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-gray-600 hover:bg-gray-50">
+                        <div class="w-6 h-6 rounded-full bg-purple-100 flex items-center justify-center">
+                            <i data-lucide="mail" class="w-3.5 h-3.5 text-purple-600"></i>
+                        </div>
+                        <span>Email Agent</span>
+                        <span class="ml-auto text-xs text-green-600">●</span>
+                    </button>
+                    
+                    <button class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-gray-600 hover:bg-gray-50 opacity-60">
+                        <div class="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center">
+                            <i data-lucide="message-square" class="w-3.5 h-3.5 text-gray-500"></i>
+                        </div>
+                        <span>WhatsApp Agent</span>
+                        <span class="ml-auto text-xs text-gray-400">即将上线</span>
+                    </button>
+                </div>
+            </nav>
+            
+            <!-- 底部设置 -->
+            <div class="p-4 border-t border-gray-100">
+                <button class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-gray-600 hover:bg-gray-50">
+                    <i data-lucide="settings" class="w-5 h-5"></i>
+                    <span>设置</span>
+                </button>
+            </div>
+        </aside>
+
+        <!-- 中间对话区域 -->
+        <main class="flex-1 flex flex-col bg-white">
+            <!-- 头部 -->
+            <header class="h-16 border-b border-gray-100 flex items-center justify-between px-6">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full agent-avatar flex items-center justify-center">
+                        <i data-lucide="bot" class="w-5 h-5 text-white"></i>
+                    </div>
+                    <div>
+                        <h1 class="font-semibold text-text-primary">数字员工团队主管</h1>
+                        <p class="text-xs text-green-600 flex items-center gap-1">
+                            <span class="w-1.5 h-1.5 bg-green-500 rounded-full"></span>
+                            在线
+                        </p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button onclick="resetDemo()" class="px-3 py-1.5 text-sm text-gray-600 hover:text-primary flex items-center gap-1.5">
+                        <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
+                        重置演示
+                    </button>
+                </div>
+            </header>
+            
+            <!-- 对话内容区 -->
+            <div id="chat-messages" class="flex-1 overflow-y-auto p-6 space-y-6 scrollbar-hide">
+                <!-- 消息将动态插入这里 -->
+            </div>
+            
+            <!-- 输入区 -->
+            <div class="p-4 border-t border-gray-100">
+                <div class="flex items-end gap-3 max-w-4xl mx-auto">
+                    <button class="p-2 text-gray-400 hover:text-gray-600 transition-colors">
+                        <i data-lucide="paperclip" class="w-5 h-5"></i>
+                    </button>
+                    <div class="flex-1 bg-gray-50 rounded-2xl border border-gray-200 focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20 transition-all">
+                        <textarea 
+                            id="message-input"
+                            rows="1"
+                            placeholder="有什么可以帮你的？"
+                            class="w-full bg-transparent px-4 py-3 resize-none outline-none text-sm max-h-32"
+                            onkeydown="handleKeyDown(event)"
+                        ></textarea>
+                    </div>
+                    <button onclick="sendMessage()" class="p-3 bg-primary text-white rounded-xl hover:bg-primary/90 transition-colors shadow-lg shadow-primary/30">
+                        <i data-lucide="send" class="w-5 h-5"></i>
+                    </button>
+                </div>
+                <p class="text-center text-xs text-gray-400 mt-2">按 Enter 发送，Shift + Enter 换行</p>
+            </div>
+        </main>
+
+        <!-- 右侧面板 -->
+        <aside id="right-panel" class="w-80 bg-gray-50 border-l border-gray-200 overflow-y-auto scrollbar-hide">
+            <!-- 动态内容将根据对话上下文切换 -->
+            <div id="panel-content" class="p-4">
+                <!-- 默认显示任务状态 -->
+            </div>
+        </aside>
+    </div>
+
+    <!-- JavaScript 逻辑 -->
+    <script>
+        // 初始化图标
+        lucide.createIcons();
+
+        // 状态管理
+        const state = {
+            currentStep: 'onboarding', // onboarding, task-created, task-running
+            messages: [],
+            userProfile: {
+                company: '',
+                products: [],
+                advantages: [],
+                markets: [],
+                step: 0
+            },
+            task: {
+                status: 'idle', // idle, running, paused, completed
+                leads: 0,
+                emails: 0,
+                seoArticles: 0
+            },
+            mockLeads: [
+                { name: 'Sarah Lee', company: 'OutdoorGear Inc', role: '采购总监', score: 94, time: '2分钟前', source: 'LinkedIn互动', message: '"Great product! Can you send me a quote for 500 units?"' },
+                { name: 'Mike Johnson', company: 'Camping World', role: '采购经理', score: 87, time: '15分钟前', source: '邮件回复', message: '"Interested in your tent catalog"' },
+                { name: 'Emma Wilson', company: 'Adventure Co', role: '创始人', score: 82, time: '1小时前', source: 'SEO转化', message: '"Looking for wholesale partner"' }
+            ]
+        };
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', () => {
+            showOnboardingWelcome();
+            updateRightPanel('welcome');
+        });
+
+        // 显示Onboarding欢迎
+        function showOnboardingWelcome() {
+            const welcomeMsg = {
+                type: 'agent',
+                content: `你好！我是您的<span class="font-semibold text-primary">数字员工团队主管</span>。
+
+我将为您协调<span class="font-medium">SEO、邮件</span>等专业Agent，帮您获取海外客户。
+
+首先让我了解您的企业，这样我才能更精准地为您服务。`,
+                actions: [
+                    { label: '📝 对话回答', value: 'chat' },
+                    { label: '📎 上传资料', value: 'upload' },
+                    { label: '🔄 两者结合', value: 'both' }
+                ]
+            };
+            addMessage(welcomeMsg);
+        }
+
+        // 添加消息到对话区
+        function addMessage(msg) {
+            const container = document.getElementById('chat-messages');
+            const isAgent = msg.type === 'agent';
+            
+            const msgHTML = `
+                <div class="message-bubble flex gap-4 ${isAgent ? '' : 'flex-row-reverse'}">
+                    <div class="w-10 h-10 rounded-full flex-shrink-0 ${isAgent ? 'agent-avatar' : 'user-avatar'} flex items-center justify-center">
+                        <i data-lucide="${isAgent ? 'bot' : 'user'}" class="w-5 h-5 text-white"></i>
+                    </div>
+                    <div class="max-w-[70%]">
+                        <div class="${isAgent ? 'bg-white border border-gray-100' : 'bg-primary text-white'} rounded-2xl px-5 py-3 shadow-sm">
+                            <p class="text-sm leading-relaxed">${msg.content}</p>
+                        </div>
+                        ${msg.actions ? `
+                            <div class="flex flex-wrap gap-2 mt-3">
+                                ${msg.actions.map((action, idx) => `
+                                    <button onclick="handleAction('${action.value}')" 
+                                        class="px-4 py-2 bg-white border border-gray-200 rounded-xl text-sm text-gray-700 hover:border-primary hover:text-primary transition-all card-hover">
+                                        ${action.label}
+                                    </button>
+                                `).join('')}
+                            </div>
+                        ` : ''}
+                        ${msg.card ? renderCard(msg.card) : ''}
+                    </div>
+                </div>
+            `;
+            
+            container.insertAdjacentHTML('beforeend', msgHTML);
+            container.scrollTop = container.scrollHeight;
+            lucide.createIcons();
+        }
+
+        // 渲染富媒体卡片
+        function renderCard(card) {
+            if (card.type === 'company-profile') {
+                return `
+                    <div class="mt-4 bg-white border border-gray-200 rounded-xl p-4 shadow-sm card-hover">
+                        <h3 class="font-semibold text-text-primary mb-3 flex items-center gap-2">
+                            <i data-lucide="building-2" class="w-4 h-4 text-primary"></i>
+                            企业画像 - AI理解确认
+                        </h3>
+                        <div class="space-y-2 text-sm">
+                            <div class="flex gap-2">
+                                <span class="text-gray-500 w-20">产品类别:</span>
+                                <span class="text-gray-800">${card.data.products}</span>
+                            </div>
+                            <div class="flex gap-2">
+                                <span class="text-gray-500 w-20">核心优势:</span>
+                                <span class="text-gray-800">${card.data.advantages}</span>
+                            </div>
+                            <div class="flex gap-2">
+                                <span class="text-gray-500 w-20">主营市场:</span>
+                                <span class="text-gray-800">${card.data.markets}</span>
+                            </div>
+                        </div>
+                        <div class="flex gap-2 mt-4">
+                            <button onclick="handleAction('edit-profile')" class="flex-1 py-2 border border-gray-200 rounded-lg text-sm text-gray-600 hover:bg-gray-50">✏️ 编辑修改</button>
+                            <button onclick="handleAction('confirm-profile')" class="flex-1 py-2 bg-primary text-white rounded-lg text-sm hover:bg-primary/90">✅ 确认无误</button>
+                        </div>
+                    </div>
+                `;
+            } else if (card.type === 'target-profile') {
+                return `
+                    <div class="mt-4 bg-white border border-gray-200 rounded-xl p-4 shadow-sm card-hover">
+                        <h3 class="font-semibold text-text-primary mb-3 flex items-center gap-2">
+                            <i data-lucide="target" class="w-4 h-4 text-primary"></i>
+                            目标客户画像
+                        </h3>
+                        <div class="space-y-2 text-sm">
+                            ${Object.entries(card.data).map(([key, value]) => `
+                                <div class="flex gap-2">
+                                    <span class="text-gray-500 w-20">${key}:</span>
+                                    <span class="text-gray-800">${value}</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                        <div class="flex gap-2 mt-4">
+                            <button onclick="handleAction('edit-target')" class="flex-1 py-2 border border-gray-200 rounded-lg text-sm text-gray-600 hover:bg-gray-50">✏️ 编辑</button>
+                            <button onclick="handleAction('confirm-target')" class="flex-1 py-2 bg-primary text-white rounded-lg text-sm hover:bg-primary/90">✅ 确认无误</button>
+                        </div>
+                    </div>
+                `;
+            } else if (card.type === 'strategy') {
+                return `
+                    <div class="mt-4 bg-white border border-gray-200 rounded-xl p-4 shadow-sm card-hover">
+                        <h3 class="font-semibold text-text-primary mb-3 flex items-center gap-2">
+                            <i data-lucide="clipboard-list" class="w-4 h-4 text-primary"></i>
+                            获客方案 - 多渠道整合
+                        </h3>
+                        <div class="space-y-4">
+                            ${card.data.channels.map(channel => `
+                                <div class="border-l-4 ${channel.color} pl-3 py-2 bg-gray-50 rounded-r-lg">
+                                    <div class="flex items-center gap-2 mb-1">
+                                        <i data-lucide="${channel.icon}" class="w-4 h-4"></i>
+                                        <span class="font-medium text-sm">${channel.name}</span>
+                                    </div>
+                                    <p class="text-xs text-gray-600">${channel.desc}</p>
+                                    <p class="text-xs text-gray-500 mt-1">预期: ${channel.expected}</p>
+                                </div>
+                            `).join('')}
+                            <div class="pt-3 border-t border-gray-100">
+                                <p class="text-sm font-medium text-gray-700 mb-2">📊 整体预期</p>
+                                <div class="grid grid-cols-3 gap-2 text-center">
+                                    <div class="bg-gray-50 rounded-lg p-2">
+                                        <p class="text-xs text-gray-500">获客周期</p>
+                                        <p class="text-sm font-semibold text-text-primary">${card.data.timeline}</p>
+                                    </div>
+                                    <div class="bg-gray-50 rounded-lg p-2">
+                                        <p class="text-xs text-gray-500">总线索数</p>
+                                        <p class="text-sm font-semibold text-text-primary">${card.data.leads}</p>
+                                    </div>
+                                    <div class="bg-gray-50 rounded-lg p-2">
+                                        <p class="text-xs text-gray-500">预估成本</p>
+                                        <p class="text-sm font-semibold text-text-primary">${card.data.cost}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex gap-2 mt-4">
+                            <button onclick="handleAction('adjust-strategy')" class="flex-1 py-2 border border-gray-200 rounded-lg text-sm text-gray-600 hover:bg-gray-50">🔧 调整配置</button>
+                            <button onclick="handleAction('execute-strategy')" class="flex-1 py-2 bg-cta text-white rounded-lg text-sm hover:bg-cta/90">✅ 确认执行</button>
+                        </div>
+                    </div>
+                `;
+            } else if (card.type === 'lead') {
+                return `
+                    <div class="mt-4 bg-gradient-to-r from-orange-50 to-red-50 border border-orange-200 rounded-xl p-4 shadow-sm card-hover">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="flex items-center gap-2">
+                                <span class="text-2xl">🔥</span>
+                                <div>
+                                    <h3 class="font-semibold text-text-primary">${card.data.name}</h3>
+                                    <p class="text-xs text-gray-600">${card.data.role} @ ${card.data.company}</p>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <span class="text-2xl font-bold text-orange-600">${card.data.score}</span>
+                                <span class="text-xs text-gray-500 block">AI评分</span>
+                            </div>
+                        </div>
+                        <div class="bg-white/60 rounded-lg p-3 mb-3">
+                            <p class="text-sm text-gray-700 italic">"${card.data.message}"</p>
+                        </div>
+                        <div class="flex items-center gap-4 text-xs text-gray-500 mb-3">
+                            <span class="flex items-center gap-1">
+                                <i data-lucide="map-pin" class="w-3 h-3"></i>
+                                ${card.data.location}
+                            </span>
+                            <span class="flex items-center gap-1">
+                                <i data-lucide="clock" class="w-3 h-3"></i>
+                                ${card.data.time}
+                            </span>
+                            <span class="flex items-center gap-1">
+                                <i data-lucide="source" class="w-3 h-3"></i>
+                                ${card.data.source}
+                            </span>
+                        </div>
+                        <div class="flex gap-2">
+                            <button onclick="handleAction('view-lead-${card.data.id}')" class="flex-1 py-2 bg-white border border-gray-200 rounded-lg text-sm text-gray-700 hover:bg-gray-50">👤 查看详情</button>
+                            <button onclick="handleAction('reply-lead-${card.data.id}')" class="flex-1 py-2 bg-primary text-white rounded-lg text-sm hover:bg-primary/90">✍️ AI生成回复</button>
+                        </div>
+                    </div>
+                `;
+            } else if (card.type === 'dashboard') {
+                return `
+                    <div class="mt-4 bg-white border border-gray-200 rounded-xl p-4 shadow-sm card-hover">
+                        <h3 class="font-semibold text-text-primary mb-3 flex items-center gap-2">
+                            <i data-lucide="bar-chart-3" class="w-4 h-4 text-primary"></i>
+                            本周获客效果
+                        </h3>
+                        <div class="grid grid-cols-3 gap-3 mb-4">
+                            ${card.data.metrics.map(m => `
+                                <div class="text-center p-2 bg-gray-50 rounded-lg">
+                                    <p class="text-lg font-bold text-text-primary">${m.value}</p>
+                                    <p class="text-xs text-gray-500">${m.label}</p>
+                                    <span class="text-xs ${m.trend > 0 ? 'text-green-600' : 'text-red-600'}">${m.trend > 0 ? '↑' : '↓'} ${Math.abs(m.trend)}%</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                        <div class="space-y-2">
+                            <p class="text-xs font-medium text-gray-700">📈 渠道效果对比</p>
+                            ${card.data.channels.map(c => `
+                                <div class="flex items-center gap-2">
+                                    <span class="text-xs text-gray-600 w-16">${c.name}</span>
+                                    <div class="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden">
+                                        <div class="h-full ${c.color} rounded-full" style="width: ${c.percent}%"></div>
+                                    </div>
+                                    <span class="text-xs text-gray-700">${c.leads}条 (${c.percent}%)</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+            return '';
+        }
+
+        // 处理用户输入
+        function handleKeyDown(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('message-input');
+            const text = input.value.trim();
+            if (!text) return;
+
+            // 添加用户消息
+            addMessage({ type: 'user', content: text });
+            input.value = '';
+
+            // 模拟Agent响应
+            showTyping();
+            setTimeout(() => {
+                hideTyping();
+                handleUserMessage(text);
+            }, 1000);
+        }
+
+        // 显示输入中状态
+        function showTyping() {
+            const container = document.getElementById('chat-messages');
+            const typingHTML = `
+                <div id="typing-indicator" class="message-bubble flex gap-4">
+                    <div class="w-10 h-10 rounded-full agent-avatar flex items-center justify-center">
+                        <i data-lucide="bot" class="w-5 h-5 text-white"></i>
+                    </div>
+                    <div class="bg-white border border-gray-100 rounded-2xl px-4 py-3 shadow-sm flex items-center gap-1">
+                        <span class="w-2 h-2 bg-gray-400 rounded-full typing-dot"></span>
+                        <span class="w-2 h-2 bg-gray-400 rounded-full typing-dot"></span>
+                        <span class="w-2 h-2 bg-gray-400 rounded-full typing-dot"></span>
+                    </div>
+                </div>
+            `;
+            container.insertAdjacentHTML('beforeend', typingHTML);
+            container.scrollTop = container.scrollHeight;
+            lucide.createIcons();
+        }
+
+        function hideTyping() {
+            const typing = document.getElementById('typing-indicator');
+            if (typing) typing.remove();
+        }
+
+        // 处理用户消息逻辑
+        function handleUserMessage(text) {
+            const lower = text.toLowerCase();
+            
+            if (state.currentStep === 'onboarding') {
+                handleOnboarding(text);
+            } else if (lower.includes('获客') || lower.includes('找客户') || lower.includes('批发商')) {
+                handleCreateTask(text);
+            } else if (lower.includes('进展') || lower.includes('进度') || lower.includes('效果')) {
+                handleCheckProgress();
+            } else if (lower.includes('线索')) {
+                handleShowLeads();
+            } else {
+                // 默认回复
+                addMessage({
+                    type: 'agent',
+                    content: `收到！我已记录了您的需求。
+
+您可以问我：
+• "帮我找美国户外用品批发商" - 创建获客任务
+• "我的任务进展如何？" - 查看执行状态
+• "今天有什么新线索？" - 查看最新线索
+• "本周获客效果如何？" - 查看数据报告`
+                });
+            }
+        }
+
+        // Onboarding流程
+        function handleOnboarding(text) {
+            const step = state.userProfile.step;
+            
+            if (step === 0) {
+                // 选择输入方式后的第一个问题
+                addMessage({
+                    type: 'agent',
+                    content: '好的！让我们通过几个问题来了解您的企业：',
+                    actions: []
+                });
+                setTimeout(() => {
+                    addMessage({
+                        type: 'agent',
+                        content: '<strong>Q1/5:</strong> 您的主营产品是什么？<br><span class="text-gray-500">例如：户外用品、电子产品、服装配饰...</span>'
+                    });
+                }, 500);
+                state.userProfile.step = 1;
+            } else if (step === 1) {
+                state.userProfile.products = text;
+                addMessage({
+                    type: 'agent',
+                    content: `<strong>Q2/5:</strong> 您的产品核心优势是什么？`,
+                    actions: [
+                        { label: '自有工厂/OEM', value: 'oem' },
+                        { label: '价格优势', value: 'price' },
+                        { label: '质量认证', value: 'cert' },
+                        { label: '设计研发', value: 'design' }
+                    ]
+                });
+                state.userProfile.step = 2;
+            } else if (step === 2) {
+                state.userProfile.advantages.push(text);
+                addMessage({
+                    type: 'agent',
+                    content: `<strong>Q3/5:</strong> 您的主要出口市场是哪些？<br><span class="text-gray-500">例如：北美、欧洲、东南亚...</span>`
+                });
+                state.userProfile.step = 3;
+            } else if (step === 3) {
+                state.userProfile.markets = text;
+                // 生成企业画像卡片
+                addMessage({
+                    type: 'agent',
+                    content: '基于您的回答，我为您生成了企业画像：',
+                    card: {
+                        type: 'company-profile',
+                        data: {
+                            products: state.userProfile.products,
+                            advantages: state.userProfile.advantages.join('、'),
+                            markets: state.userProfile.markets
+                        }
+                    }
+                });
+                state.userProfile.step = 4;
+            }
+        }
+
+        // 创建获客任务
+        function handleCreateTask(text) {
+            if (state.currentStep !== 'task-created') {
+                // 第一步：理解需求
+                addMessage({
+                    type: 'agent',
+                    content: `收到！我来为您创建获客任务。
+
+基于您的企业档案（${state.userProfile.products || '户外用品'}出口商）：
+• 目标地区：<span class="font-medium">美国</span>
+• 行业：<span class="font-medium">${state.userProfile.products || '户外用品'}</span>
+• 客户类型：<span class="font-medium">批发商</span>
+
+让我确认几个细节：`,
+                    actions: []
+                });
+                
+                setTimeout(() => {
+                    addMessage({
+                        type: 'agent',
+                        content: '<strong>Q1:</strong> 目标客户年采购额大概？',
+                        actions: [
+                            { label: '<50万美元', value: 'small' },
+                            { label: '50-200万', value: 'medium' },
+                            { label: '200-500万', value: 'large' },
+                            { label: '>500万', value: 'xlarge' }
+                        ]
+                    });
+                }, 800);
+                
+                state.currentStep = 'task-confirming';
+            } else {
+                // 显示获客方案
+                addMessage({
+                    type: 'agent',
+                    content: '正在协调数字员工团队制定获客方案...',
+                    actions: []
+                });
+                
+                setTimeout(() => {
+                    addMessage({
+                        type: 'agent',
+                        content: '已为您制定多渠道获客方案：',
+                        card: {
+                            type: 'strategy',
+                            data: {
+                                channels: [
+                                    { name: 'SEO Agent 内容获客', icon: 'search', color: 'border-blue-500', desc: '核心关键词：wholesale camping tents USA', expected: '8-12条线索/月' },
+                                    { name: 'Email Agent 外联获客', icon: 'mail', color: 'border-purple-500', desc: '精准筛选800家企业，每日30封', expected: '15-20条线索/月' }
+                                ],
+                                timeline: '4-6周',
+                                leads: '23-32条',
+                                cost: '¥85-110/条'
+                            }
+                        }
+                    });
+                    state.currentStep = 'task-ready';
+                    updateRightPanel('task-running');
+                }, 1500);
+            }
+        }
+
+        // 查看进度
+        function handleCheckProgress() {
+            if (state.task.status === 'running') {
+                addMessage({
+                    type: 'agent',
+                    content: '📊 <strong>获客任务实时进展</strong>\n\n各Agent工作状态：',
+                    actions: []
+                });
+                
+                setTimeout(() => {
+                    addMessage({
+                        type: 'agent',
+                        content: `🔍 <strong>SEO Agent</strong>\n├─ 状态：🟢 正在生成文章...\n├─ 今日发布：1篇\n└─ 累计发布：12篇\n\n✉️ <strong>Email Agent</strong>\n├─ 状态：🟢 正在发送邮件...\n├─ 今日发送：28封\n├─ 已发送：245/800封\n└─ 回复率：4.2%（高于行业平均3倍）`
+                    });
+                }, 600);
+            } else {
+                addMessage({
+                    type: 'agent',
+                    content: '您当前没有正在执行的获客任务。',
+                    actions: [
+                        { label: '创建新任务', value: 'create-task' }
+                    ]
+                });
+            }
+        }
+
+        // 显示线索
+        function handleShowLeads() {
+            const lead = state.mockLeads[0];
+            addMessage({
+                type: 'agent',
+                content: '🔔 <strong>今日新线索提醒！</strong>\n\n您有3条新线索待查看，其中1条高意向：',
+                card: {
+                    type: 'lead',
+                    data: { ...lead, id: 1 }
+                }
+            });
+            updateRightPanel('leads');
+        }
+
+        // 处理按钮动作
+        function handleAction(value) {
+            if (value === 'chat' || value === 'upload' || value === 'both') {
+                handleOnboarding('start');
+            } else if (value === 'confirm-profile') {
+                addMessage({
+                    type: 'agent',
+                    content: '✅ 企业画像已确认！接下来让我了解您的获客需求...',
+                    actions: []
+                });
+                state.currentStep = 'ready';
+                updateRightPanel('welcome');
+            } else if (value === 'confirm-target') {
+                state.currentStep = 'task-created';
+                handleCreateTask('confirm');
+            } else if (value === 'execute-strategy') {
+                state.task.status = 'running';
+                addMessage({
+                    type: 'agent',
+                    content: `✅ <strong>获客任务已启动！</strong>
+
+📋 任务名称：美国户外用品批发商获客
+📅 执行周期：2026-03-27 至 2026-04-27
+
+🤖 数字员工团队工作状态：
+├─ 🔍 SEO Agent：正在生成首篇SEO文章...
+├─ ✉️ Email Agent：正在筛选目标客户...
+└─ 📊 线索中心：等待线索录入...
+
+💡 我会实时监控各Agent工作状态，有新线索立即推送给您。
+📢 每日18:00发送获客简报。`
+                });
+                updateRightPanel('task-running');
+                
+                // 模拟3秒后推送线索
+                setTimeout(() => {
+                    handleShowLeads();
+                }, 5000);
+            } else if (value === 'create-task') {
+                handleCreateTask('创建任务');
+            } else if (value.startsWith('view-lead-')) {
+                const id = value.split('-')[2];
+                const lead = state.mockLeads.find(l => l.id == id) || state.mockLeads[0];
+                showLeadDetail(lead);
+            } else if (value === 'show-dashboard') {
+                addMessage({
+                    type: 'agent',
+                    content: '📊 <strong>本周获客数据报告</strong>\n统计周期：3月20日 - 3月26日',
+                    card: {
+                        type: 'dashboard',
+                        data: {
+                            metrics: [
+                                { label: '总线索数', value: '23', trend: 15 },
+                                { label: '高意向', value: '8', trend: 33 },
+                                { label: '转化率', value: '12.5%', trend: 2.1 }
+                            ],
+                            channels: [
+                                { name: 'SEO', leads: 8, percent: 35, color: 'bg-blue-500' },
+                                { name: '邮件', leads: 10, percent: 43, color: 'bg-purple-500' },
+                                { name: '社媒', leads: 5, percent: 22, color: 'bg-orange-500' }
+                            ]
+                        }
+                    }
+                });
+            }
+        }
+
+        // 更新右侧面板
+        function updateRightPanel(type) {
+            const panel = document.getElementById('panel-content');
+            
+            if (type === 'welcome') {
+                panel.innerHTML = `
+                    <div class="text-center py-8">
+                        <div class="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
+                            <i data-lucide="sparkles" class="w-8 h-8 text-primary"></i>
+                        </div>
+                        <h3 class="font-semibold text-text-primary mb-2">欢迎使用 DealClaw</h3>
+                        <p class="text-sm text-gray-600">您的数字员工团队已就绪</p>
+                    </div>
+                    <div class="space-y-3">
+                        <div class="bg-white rounded-lg p-3 border border-gray-100">
+                            <p class="text-xs text-gray-500 mb-1">快速开始</p>
+                            <p class="text-sm text-gray-700">💬 在左侧对话区与主管Agent交流</p>
+                        </div>
+                        <div class="bg-white rounded-lg p-3 border border-gray-100">
+                            <p class="text-xs text-gray-500 mb-1">可以尝试说</p>
+                            <div class="space-y-1 text-sm text-gray-600">
+                                <p>"帮我找美国户外用品批发商"</p>
+                                <p>"我的任务进展如何？"</p>
+                                <p>"今天有什么新线索？"</p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else if (type === 'task-running') {
+                panel.innerHTML = `
+                    <div class="space-y-4">
+                        <div class="bg-white rounded-xl p-4 border border-gray-100">
+                            <h3 class="font-semibold text-text-primary mb-3 flex items-center gap-2">
+                                <i data-lucide="activity" class="w-4 h-4 text-green-600"></i>
+                                任务状态
+                            </h3>
+                            <div class="space-y-3">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-sm text-gray-600">SEO Agent</span>
+                                    <span class="text-xs px-2 py-1 bg-green-100 text-green-700 rounded-full">运行中</span>
+                                </div>
+                                <div class="h-2 bg-gray-100 rounded-full overflow-hidden">
+                                    <div class="h-full bg-blue-500 rounded-full transition-all duration-500" style="width: 65%"></div>
+                                </div>
+                                
+                                <div class="flex items-center justify-between">
+                                    <span class="text-sm text-gray-600">Email Agent</span>
+                                    <span class="text-xs px-2 py-1 bg-green-100 text-green-700 rounded-full">运行中</span>
+                                </div>
+                                <div class="h-2 bg-gray-100 rounded-full overflow-hidden">
+                                    <div class="h-full bg-purple-500 rounded-full transition-all duration-500" style="width: 42%"></div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-white rounded-xl p-4 border border-gray-100">
+                            <h3 class="font-semibold text-text-primary mb-3">今日数据</h3>
+                            <div class="grid grid-cols-2 gap-3">
+                                <div class="text-center p-3 bg-gray-50 rounded-lg">
+                                    <p class="text-2xl font-bold text-text-primary">${state.task.leads || 3}</p>
+                                    <p class="text-xs text-gray-500">新线索</p>
+                                </div>
+                                <div class="text-center p-3 bg-gray-50 rounded-lg">
+                                    <p class="text-2xl font-bold text-text-primary">28</p>
+                                    <p class="text-xs text-gray-500">邮件发送</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else if (type === 'leads') {
+                panel.innerHTML = `
+                    <div class="space-y-3">
+                        <h3 class="font-semibold text-text-primary">高意向线索</h3>
+                        ${state.mockLeads.slice(0, 3).map((lead, idx) => `
+                            <div class="bg-white rounded-lg p-3 border border-gray-100 cursor-pointer hover:border-primary transition-colors" onclick="showLeadDetail(state.mockLeads[${idx}])">
+                                <div class="flex items-start justify-between">
+                                    <div>
+                                        <p class="font-medium text-sm text-text-primary">${lead.name}</p>
+                                        <p class="text-xs text-gray-500">${lead.role} @ ${lead.company}</p>
+                                    </div>
+                                    <span class="text-lg font-bold text-orange-600">${lead.score}</span>
+                                </div>
+                                <p class="text-xs text-gray-600 mt-2 line-clamp-2">"${lead.message}"</p>
+                            </div>
+                        `).join('')}
+                        <button onclick="handleAction('show-dashboard')" class="w-full py-2 text-sm text-primary hover:bg-primary/5 rounded-lg transition-colors">
+                            查看全部线索 →
+                        </button>
+                    </div>
+                `;
+            }
+            
+            lucide.createIcons();
+        }
+
+        // 显示线索详情
+        function showLeadDetail(lead) {
+            const panel = document.getElementById('panel-content');
+            panel.innerHTML = `
+                <div class="space-y-4">
+                    <button onclick="updateRightPanel('leads')" class="text-sm text-gray-500 flex items-center gap-1 hover:text-gray-700">
+                        <i data-lucide="arrow-left" class="w-4 h-4"></i>
+                        返回线索列表
+                    </button>
+                    
+                    <div class="bg-gradient-to-r from-orange-50 to-red-50 rounded-xl p-4 border border-orange-200">
+                        <div class="flex items-center gap-3 mb-3">
+                            <div class="w-12 h-12 rounded-full bg-orange-100 flex items-center justify-center text-xl">
+                                👩‍💼
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-text-primary">${lead.name}</h3>
+                                <p class="text-sm text-gray-600">${lead.role}</p>
+                            </div>
+                        </div>
+                        <div class="text-center py-2">
+                            <span class="text-3xl font-bold text-orange-600">${lead.score}</span>
+                            <p class="text-xs text-gray-500">AI意向评分</p>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white rounded-xl p-4 border border-gray-100">
+                        <h4 class="font-medium text-sm text-gray-700 mb-3">公司信息</h4>
+                        <div class="space-y-2 text-sm">
+                            <div class="flex justify-between">
+                                <span class="text-gray-500">公司</span>
+                                <span class="text-gray-800">${lead.company}</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-500">地区</span>
+                                <span class="text-gray-800">${lead.location || '美国 · 加州'}</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-500">来源</span>
+                                <span class="text-gray-800">${lead.source}</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white rounded-xl p-4 border border-gray-100">
+                        <h4 class="font-medium text-sm text-gray-700 mb-2">客户留言</h4>
+                        <p class="text-sm text-gray-600 italic">"${lead.message}"</p>
+                    </div>
+                    
+                    <div class="flex gap-2">
+                        <button class="flex-1 py-2 bg-primary text-white rounded-lg text-sm hover:bg-primary/90">
+                            ✍️ AI生成回复
+                        </button>
+                        <button class="flex-1 py-2 border border-gray-200 rounded-lg text-sm text-gray-700 hover:bg-gray-50">
+                            📤 分配销售
+                        </button>
+                    </div>
+                </div>
+            `;
+            lucide.createIcons();
+        }
+
+        // 切换视图
+        function switchView(view) {
+            // 更新导航状态
+            document.querySelectorAll('.nav-item').forEach(el => {
+                el.classList.remove('bg-primary/10', 'text-primary');
+                el.classList.add('text-gray-600');
+            });
+            document.getElementById(`nav-${view}`).classList.add('bg-primary/10', 'text-primary');
+            document.getElementById(`nav-${view}`).classList.remove('text-gray-600');
+            
+            // 根据不同视图更新内容
+            if (view === 'leads') {
+                updateRightPanel('leads');
+            } else if (view === 'dashboard') {
+                handleAction('show-dashboard');
+            }
+        }
+
+        // 重置演示
+        function resetDemo() {
+            state.currentStep = 'onboarding';
+            state.userProfile = { company: '', products: [], advantages: [], markets: [], step: 0 };
+            state.task = { status: 'idle', leads: 0, emails: 0, seoArticles: 0 };
+            document.getElementById('chat-messages').innerHTML = '';
+            showOnboardingWelcome();
+            updateRightPanel('welcome');
+        }
+    </script>
+</body>
+</html>
