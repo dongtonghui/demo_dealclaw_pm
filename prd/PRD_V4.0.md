@@ -2811,6 +2811,156 @@ sequenceDiagram
 └─────────────────────────────────────────────────────────────┘
 ```
 
+**SEO三种模式配置泳道图**
+
+**模式一：商家独立站自引流**
+
+```mermaid
+sequenceDiagram
+    actor U as 外贸业务员
+    participant UI as 对话界面
+    participant SEO as SEO Agent
+    participant WP as WordPress/Shopify
+    participant Audit as 站点诊断
+    
+    U->>UI: 选择"已有独立站"模式
+    UI->>SEO: 启动站点接入流程
+    
+    SEO->>UI: 请求站点信息
+    UI->>U: "请输入站点URL"
+    U->>UI: 输入 https://mycompany.com
+    
+    alt WordPress站点
+        UI->>U: "请输入Application Password"
+        U->>UI: 输入授权码
+        SEO->>WP: API验证连接
+        WP-->>SEO: 返回验证成功
+    else Shopify站点
+        UI->>U: "请输入Store API Token"
+        U->>UI: 输入Token
+        SEO->>WP: API验证连接
+        WP-->>SEO: 返回验证成功
+    end
+    
+    SEO->>UI: 展示连接成功
+    UI->>U: "✅ 站点连接成功"
+    
+    SEO->>Audit: 启动站点诊断
+    Audit->>WP: 抓取站点数据
+    WP-->>Audit: 返回页面/Meta/速度数据
+    Audit->>Audit: 分析SEO评分
+    Audit->>SEO: 返回诊断报告
+    
+    SEO->>UI: 推送诊断报告
+    UI->>U: 展示SEO评分和优化建议
+    
+    U->>UI: 确认开始内容优化
+    UI->>SEO: 启动SEO运营
+    SEO->>SEO: 生成内容计划
+    SEO->>UI: 推送首篇文章任务
+    UI->>U: "已开始SEO运营，首篇文章生成中..."
+```
+
+**模式二：AI搭建独立站**
+
+```mermaid
+sequenceDiagram
+    actor U as 外贸业务员
+    participant UI as 对话界面
+    participant SEO as SEO Agent
+    participant KB as 企业知识库
+    participant Site as 站点生成器
+    
+    U->>UI: 选择"AI搭建独立站"模式
+    UI->>SEO: 启动建站流程
+    
+    SEO->>KB: 查询企业信息
+    KB-->>SEO: 返回企业画像
+    
+    SEO->>UI: 展示建站选项
+    UI->>U: "请选择域名方式"
+    
+    alt 使用子域名
+        U->>UI: 选择"使用子域名"
+        UI->>U: "company.dealclaw.com"
+        U->>UI: 确认域名
+    else 绑定自有域名
+        U->>UI: 选择"绑定自有域名"
+        UI->>U: "请输入您的域名"
+        U->>UI: 输入 mycompany.com
+        SEO->>UI: 展示DNS配置指南
+        UI->>U: "请添加CNAME记录..."
+        U->>UI: 完成DNS配置
+    end
+    
+    SEO->>UI: 请求选择模板
+    UI->>U: 展示外贸模板库
+    U->>UI: 选择B2B展示模板
+    
+    SEO->>Site: 创建站点
+    Site->>KB: 获取企业资料
+    KB-->>Site: 返回产品/介绍
+    
+    Site->>Site: 生成页面结构
+    Site->>Site: AI生成基础内容
+    Site->>Site: 配置SEO架构
+    
+    Site-->>SEO: 站点创建完成
+    SEO->>UI: 推送站点预览
+    UI->>U: 展示新站点预览
+    
+    U->>UI: 确认发布站点
+    UI->>SEO: 正式发布
+    SEO->>Site: 启用站点
+    
+    SEO->>UI: 推送发布成功
+    UI->>U: "🎉 站点已上线！开始SEO运营..."
+```
+
+**模式三：垂直行业平台引流**
+
+```mermaid
+sequenceDiagram
+    actor U as 外贸业务员
+    participant UI as 对话界面
+    participant SEO as SEO Agent
+    participant KB as 企业知识库
+    participant MP as 行业平台
+    
+    U->>UI: 选择"平台引流"模式
+    UI->>SEO: 启动入驻流程
+    
+    SEO->>KB: 查询企业信息
+    KB-->>SEO: 返回企业画像
+    
+    SEO->>UI: 展示平台信息
+    UI->>U: "入驻 outdoor-dealclaw.com"
+    
+    U->>UI: 查看入驻权益
+    UI->>U: 展示权益详情
+    
+    U->>UI: 确认入驻
+    UI->>MP: 创建商家账号
+    
+    MP->>KB: 同步企业资料
+    KB-->>MP: 返回公司/产品信息
+    
+    MP->>MP: 生成公司主页
+    MP->>MP: 配置产品展示
+    
+    MP-->>SEO: 入驻完成
+    SEO->>UI: 推送入驻成功
+    UI->>U: "✅ 已入驻平台"
+    
+    SEO->>UI: 展示流量分配机制
+    UI->>U: 说明搜索词匹配/地域分配规则
+    
+    U->>UI: 查看平台效果数据
+    UI->>MP: 查询曝光/点击/询盘
+    MP-->>UI: 返回数据统计
+    UI->>U: 展示平台效果看板
+```
+
 ### 9.2 邮件系统完整配置
 
 ```
