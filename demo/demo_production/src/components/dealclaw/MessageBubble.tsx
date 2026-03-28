@@ -6,6 +6,13 @@ import { CustomerPersonaEditCard } from "./cards/CustomerPersonaEditCard";
 import { AcquisitionPlanCard } from "./cards/AcquisitionPlanCard";
 import { SEOStrategyCard } from "./cards/SEOStrategyCard";
 import { SEOArticleCard } from "./cards/SEOArticleCard";
+import { SEOArticleEditCard } from "./cards/SEOArticleEditCard";
+import { SiteConnectionCard } from "./cards/SiteConnectionCard";
+import { ArticleAnalyticsCard } from "./cards/ArticleAnalyticsCard";
+import { CompetitorAnalysisCard } from "./cards/CompetitorAnalysisCard";
+import { SiteGeneratorCard } from "./cards/SiteGeneratorCard";
+import { SEOHealthCard } from "./cards/SEOHealthCard";
+import { KeywordRecommendCard } from "./cards/KeywordRecommendCard";
 import { CustomerListCard } from "./cards/CustomerListCard";
 import { EmailPreviewCard } from "./cards/EmailPreviewCard";
 import { LeadSummaryCard } from "./cards/LeadSummaryCard";
@@ -85,6 +92,27 @@ export function MessageBubble({ message, onCardAction }: MessageBubbleProps) {
             )}
             {message.card.type === "seo-article" && (
               <SEOArticleCard card={message.card} onAction={onCardAction} />
+            )}
+            {message.card.type === "seo-article-edit" && (
+              <SEOArticleEditCard card={message.card} onAction={onCardAction} />
+            )}
+            {message.card.type === "site-connection" && (
+              <SiteConnectionCard card={message.card} onAction={onCardAction} />
+            )}
+            {message.card.type === "article-analytics" && (
+              <ArticleAnalyticsCard card={message.card} onAction={onCardAction} />
+            )}
+            {message.card.type === "competitor-analysis" && (
+              <CompetitorAnalysisCard card={message.card} onAction={onCardAction} />
+            )}
+            {message.card.type === "site-generator" && (
+              <SiteGeneratorCard card={message.card} onAction={onCardAction} />
+            )}
+            {message.card.type === "seo-health" && (
+              <SEOHealthCard card={message.card} onAction={onCardAction} />
+            )}
+            {message.card.type === "keyword-recommend" && (
+              <KeywordRecommendCard card={message.card} onAction={onCardAction} />
             )}
             {message.card.type === "customer-list" && (
               <CustomerListCard card={message.card} onAction={onCardAction} />

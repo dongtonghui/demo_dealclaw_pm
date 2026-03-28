@@ -11,6 +11,13 @@ export type CardType =
   | "acquisition-plan-edit"
   | "seo-strategy"
   | "seo-article"
+  | "seo-article-edit"
+  | "site-connection"
+  | "article-analytics"
+  | "competitor-analysis"
+  | "site-generator"
+  | "seo-health"
+  | "keyword-recommend"
   | "email-preview"
   | "customer-list"
   | "lead-summary"
@@ -98,6 +105,13 @@ type IntentType =
   | 'SEO_KEYWORDS'
   | 'SEO_ARTICLE'
   | 'SEO_PUBLISH'
+  | 'SEO_EDIT'
+  | 'SEO_ANALYTICS'
+  | 'SEO_COMPETITOR'
+  | 'SEO_GENERATE_SITE'
+  | 'SEO_HEALTH'
+  | 'SEO_KEYWORD_RECOMMEND'
+  | 'SEO_SITE_CONNECTION'
   | 'EMAIL_CUSTOMERS'
   | 'EMAIL_PREVIEW'
   | 'EMAIL_SEND'
@@ -157,6 +171,10 @@ The wholesalers who adapt quickly to these trends and build strong supplier rela
   originality: 96,
   readability: "good",
   aiScore: "low",
+  metaDescription: "探索2024年露营装备市场最新趋势，了解批发商如何把握机遇，获取高质量潜在客户。",
+  keywords: ["wholesale camping gear", "outdoor equipment", "camping tents bulk", "sleeping bags wholesale"],
+  wordCount: 1850,
+  lastModified: new Date().toISOString(),
 };
 
 const MOCK_CUSTOMERS = [
@@ -340,8 +358,29 @@ const recognizeIntent = (text: string, context: {
     if (lowerText.includes('文章') || lowerText.includes('article') || lowerText.includes('生成') || lowerText.includes('内容')) {
       return { type: 'SEO_ARTICLE', confidence: 0.9 };
     }
-    if (lowerText.includes('发布') || lowerText.includes('publish')) {
+    if (lowerText.includes('发布') || lowerText.includes('publish') || lowerText.includes('上线')) {
       return { type: 'SEO_PUBLISH', confidence: 0.9 };
+    }
+    if (lowerText.includes('编辑') || lowerText.includes('修改') || lowerText.includes('edit')) {
+      return { type: 'SEO_EDIT', confidence: 0.9 };
+    }
+    if (lowerText.includes('数据') || lowerText.includes('效果') || lowerText.includes('分析') || lowerText.includes('analytics')) {
+      return { type: 'SEO_ANALYTICS', confidence: 0.9 };
+    }
+    if (lowerText.includes('竞品') || lowerText.includes('竞争') || lowerText.includes('competitor')) {
+      return { type: 'SEO_COMPETITOR', confidence: 0.9 };
+    }
+    if (lowerText.includes('建站') || lowerText.includes('网站') || lowerText.includes('生成站点') || lowerText.includes('site')) {
+      return { type: 'SEO_GENERATE_SITE', confidence: 0.9 };
+    }
+    if (lowerText.includes('健康') || lowerText.includes('监控') || lowerText.includes('health') || lowerText.includes('check')) {
+      return { type: 'SEO_HEALTH', confidence: 0.9 };
+    }
+    if (lowerText.includes('推荐') || lowerText.includes('选词') || lowerText.includes('recommend')) {
+      return { type: 'SEO_KEYWORD_RECOMMEND', confidence: 0.9 };
+    }
+    if (lowerText.includes('连接') || lowerText.includes('绑定') || lowerText.includes('绑定站点') || lowerText.includes('wordpress') || lowerText.includes('shopify')) {
+      return { type: 'SEO_SITE_CONNECTION', confidence: 0.9 };
     }
   }
   
@@ -484,6 +523,27 @@ export function useChatState() {
         break;
       case 'SEO_PUBLISH':
         handleSEOPublish();
+        break;
+      case 'SEO_EDIT':
+        handleSEOEdit();
+        break;
+      case 'SEO_ANALYTICS':
+        handleSEOAnalytics();
+        break;
+      case 'SEO_COMPETITOR':
+        handleSEOCompetitor();
+        break;
+      case 'SEO_GENERATE_SITE':
+        handleSEOGenerateSite();
+        break;
+      case 'SEO_HEALTH':
+        handleSEOHealth();
+        break;
+      case 'SEO_KEYWORD_RECOMMEND':
+        handleSEOKeywordRecommend();
+        break;
+      case 'SEO_SITE_CONNECTION':
+        handleSEOSiteConnection();
         break;
       case 'EMAIL_CUSTOMERS':
         handleEmailCustomers();
@@ -900,6 +960,342 @@ export function useChatState() {
     setIsTyping(false);
   };
 
+  const handleSEOEdit = () => {
+    setTimeout(() => {
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: `agent-${Date.now()}`,
+          role: "agent",
+          agent: "seo",
+          content: "请编辑您的SEO文章：",
+          card: {
+            type: "seo-article-edit",
+            data: { article: MOCK_ARTICLE },
+          },
+          timestamp: new Date(),
+        },
+      ]);
+      setIsTyping(false);
+    }, 800);
+  };
+
+  const handleSEOAnalytics = () => {
+    setTimeout(() => {
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: `agent-${Date.now()}`,
+          role: "agent",
+          agent: "seo",
+          content: "📊 以下是您最近发布文章的效果数据：",
+          card: {
+            type: "article-analytics",
+            data: {
+              articles: [
+                {
+                  id: "1",
+                  title: "2024年露营装备市场趋势：批发商如何把握机遇",
+                  publishDate: "2026-03-25",
+                  totalViews: 1247,
+                  totalClicks: 89,
+                  ctr: 7.1,
+                  avgTime: "3:24",
+                  ranking: 8,
+                  keywords: ["wholesale camping gear", "camping equipment bulk", "outdoor gear wholesale"],
+                  weeklyData: [
+                    { date: "2026-03-21", views: 120, clicks: 8, avgTime: 180, bounceRate: 35 },
+                    { date: "2026-03-22", views: 156, clicks: 12, avgTime: 195, bounceRate: 32 },
+                    { date: "2026-03-23", views: 189, clicks: 14, avgTime: 210, bounceRate: 28 },
+                    { date: "2026-03-24", views: 234, clicks: 18, avgTime: 204, bounceRate: 30 },
+                    { date: "2026-03-25", views: 267, clicks: 19, avgTime: 215, bounceRate: 26 },
+                    { date: "2026-03-26", views: 156, clicks: 10, avgTime: 190, bounceRate: 34 },
+                    { date: "2026-03-27", views: 125, clicks: 8, avgTime: 185, bounceRate: 36 },
+                  ],
+                },
+                {
+                  id: "2",
+                  title: "如何选择可靠的户外用品供应商",
+                  publishDate: "2026-03-20",
+                  totalViews: 892,
+                  totalClicks: 56,
+                  ctr: 6.3,
+                  avgTime: "2:48",
+                  ranking: 12,
+                  keywords: ["outdoor gear supplier", "camping equipment manufacturer", "wholesale outdoor products"],
+                  weeklyData: [
+                    { date: "2026-03-21", views: 98, clicks: 6, avgTime: 160, bounceRate: 38 },
+                    { date: "2026-03-22", views: 112, clicks: 7, avgTime: 165, bounceRate: 36 },
+                    { date: "2026-03-23", views: 134, clicks: 8, avgTime: 170, bounceRate: 35 },
+                    { date: "2026-03-24", views: 145, clicks: 9, avgTime: 168, bounceRate: 37 },
+                    { date: "2026-03-25", views: 156, clicks: 10, avgTime: 172, bounceRate: 34 },
+                    { date: "2026-03-26", views: 134, clicks: 8, avgTime: 165, bounceRate: 36 },
+                    { date: "2026-03-27", views: 113, clicks: 8, avgTime: 162, bounceRate: 38 },
+                  ],
+                },
+              ],
+              timeRange: "7d",
+            },
+            actions: [
+              { label: "导出报告", id: "export-analytics", variant: "secondary" },
+              { label: "优化文章", id: "optimize-articles", variant: "primary" },
+            ],
+          },
+          timestamp: new Date(),
+        },
+      ]);
+      setIsTyping(false);
+    }, 1000);
+  };
+
+  const handleSEOCompetitor = () => {
+    setTimeout(() => {
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: `agent-${Date.now()}`,
+          role: "agent",
+          agent: "seo",
+          content: "🕵️ 竞品SEO分析完成！以下是您的竞争对手情报：",
+          card: {
+            type: "competitor-analysis",
+            data: {
+              competitors: [
+                {
+                  id: "1",
+                  domain: "outdoorwholesale.com",
+                  domainAuthority: 42,
+                  backlinkCount: 2850,
+                  topKeywords: ["wholesale camping gear", "bulk outdoor equipment", "camping supplies distributor"],
+                  monthlyTraffic: "45K",
+                  contentStrategy: "每周发布3-4篇长文，重点覆盖产品对比和选购指南",
+                  weaknesses: ["移动端体验一般", "页面加载速度较慢", "缺乏视频内容"],
+                  opportunities: ["加强视频营销", "优化移动端体验", "开发长尾关键词"],
+                },
+                {
+                  id: "2",
+                  domain: "campingsupplypro.com",
+                  domainAuthority: 38,
+                  backlinkCount: 1920,
+                  topKeywords: ["camping gear wholesale", "outdoor gear bulk", "tent wholesale supplier"],
+                  monthlyTraffic: "32K",
+                  contentStrategy: "专注产品评测和技术指南，内容深度较高",
+                  weaknesses: ["社交信号弱", "内容更新频率低", "内链结构混乱"],
+                  opportunities: ["增加社交媒体推广", "提高内容更新频率", "重建内链结构"],
+                },
+              ],
+              keywordGaps: [
+                { keyword: "eco-friendly camping gear wholesale", ourRank: null, competitorRank: 5, searchVolume: "720", difficulty: "medium", opportunity: "high" },
+                { keyword: "lightweight tent bulk order", ourRank: 15, competitorRank: 3, searchVolume: "480", difficulty: "easy", opportunity: "high" },
+                { keyword: "camping equipment dropshipping", ourRank: 22, competitorRank: 8, searchVolume: "1.2K", difficulty: "medium", opportunity: "medium" },
+                { keyword: "custom branded outdoor gear", ourRank: null, competitorRank: 6, searchVolume: "890", difficulty: "hard", opportunity: "medium" },
+                { keyword: "family camping package wholesale", ourRank: 18, competitorRank: 4, searchVolume: "650", difficulty: "easy", opportunity: "high" },
+              ],
+              industry: "Outdoor Gear & Camping Equipment",
+              analyzedAt: new Date().toISOString(),
+            },
+            actions: [
+              { label: "导出报告", id: "export-competitor-report", variant: "secondary" },
+              { label: "生成应对策略", id: "generate-strategy", variant: "primary" },
+            ],
+          },
+          timestamp: new Date(),
+        },
+      ]);
+      setIsTyping(false);
+    }, 1200);
+  };
+
+  const handleSEOGenerateSite = () => {
+    setTimeout(() => {
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: `agent-${Date.now()}`,
+          role: "agent",
+          agent: "seo",
+          content: "🚀 让我为您一键生成专业的营销独立站：",
+          card: {
+            type: "site-generator",
+            data: { companyProfile },
+          },
+          timestamp: new Date(),
+        },
+      ]);
+      setIsTyping(false);
+    }, 800);
+  };
+
+  const handleSEOHealth = () => {
+    setTimeout(() => {
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: `agent-${Date.now()}`,
+          role: "agent",
+          agent: "seo",
+          content: "🏥 SEO健康检查报告：",
+          card: {
+            type: "seo-health",
+            data: {
+              siteHealth: {
+                overallScore: 78,
+                status: "needs_attention",
+                lastScan: new Date().toISOString(),
+                checks: [
+                  {
+                    id: "ssl",
+                    name: "SSL证书",
+                    category: "technical",
+                    status: "passed",
+                    score: 100,
+                    issues: [],
+                  },
+                  {
+                    id: "sitemap",
+                    name: "网站地图",
+                    category: "technical",
+                    status: "passed",
+                    score: 95,
+                    issues: [],
+                  },
+                  {
+                    id: "mobile",
+                    name: "移动适配",
+                    category: "technical",
+                    status: "warning",
+                    score: 75,
+                    issues: [
+                      { type: "warning", message: "部分页面在移动设备上字体过小", recommendation: "调整字体大小至至少16px" },
+                    ],
+                  },
+                  {
+                    id: "speed",
+                    name: "页面速度",
+                    category: "performance",
+                    status: "warning",
+                    score: 68,
+                    issues: [
+                      { type: "warning", message: "首页加载时间2.8秒", recommendation: "优化图片大小和启用CDN" },
+                      { type: "info", message: "可以启用浏览器缓存", recommendation: "配置缓存策略" },
+                    ],
+                  },
+                  {
+                    id: "meta",
+                    name: "Meta标签",
+                    category: "content",
+                    status: "failed",
+                    score: 45,
+                    issues: [
+                      { type: "critical", message: "3个页面缺少Meta描述", recommendation: "为所有页面添加描述性Meta标签" },
+                      { type: "warning", message: "部分标题超过60字符", recommendation: "缩短标题至50-60字符" },
+                    ],
+                  },
+                  {
+                    id: "links",
+                    name: "内外链健康",
+                    category: "links",
+                    status: "passed",
+                    score: 85,
+                    issues: [
+                      { type: "info", message: "发现2个外部链接失效", recommendation: "更新或移除失效链接" },
+                    ],
+                  },
+                ],
+                metrics: {
+                  crawlablePages: 45,
+                  indexedPages: 42,
+                  brokenLinks: 2,
+                  duplicateContent: 1,
+                  missingMeta: 3,
+                  slowPages: 4,
+                },
+              },
+            },
+            actions: [
+              { label: "详细报告", id: "view-detailed-health", variant: "secondary" },
+              { label: "一键修复", id: "fix-all-issues", variant: "primary" },
+            ],
+          },
+          timestamp: new Date(),
+        },
+      ]);
+      setIsTyping(false);
+    }, 1000);
+  };
+
+  const handleSEOKeywordRecommend = () => {
+    setTimeout(() => {
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: `agent-${Date.now()}`,
+          role: "agent",
+          agent: "seo",
+          content: "🔍 基于您的产品和行业，我为您推荐了以下关键词：",
+          card: {
+            type: "keyword-recommend",
+            data: {
+              topic: "wholesale outdoor camping gear",
+              keywords: [
+                { id: "1", term: "wholesale camping tents", volume: "1,300", difficulty: "medium", cpc: "$2.50", intent: "commercial", competition: "medium", trend: "up", relevance: 95, relatedTerms: ["bulk camping tents", "camping tent wholesale supplier", "wholesale tent manufacturer"] },
+                { id: "2", term: "bulk sleeping bags", volume: "890", difficulty: "easy", cpc: "$1.80", intent: "transactional", competition: "low", trend: "up", relevance: 92, relatedTerms: ["sleeping bag wholesale", "bulk sleeping bag order", "sleeping bag distributor"] },
+                { id: "3", term: "outdoor gear distributor", volume: "720", difficulty: "medium", cpc: "$3.20", intent: "commercial", competition: "medium", trend: "stable", relevance: 88, relatedTerms: ["camping gear distributor", "outdoor equipment supplier", "camping supplies wholesale"] },
+                { id: "4", term: "camping equipment wholesale", volume: "2,100", difficulty: "hard", cpc: "$4.50", intent: "commercial", competition: "high", trend: "up", relevance: 90, relatedTerms: ["wholesale camping equipment", "camping gear bulk", "camping equipment supplier"] },
+                { id: "5", term: "custom branded camping gear", volume: "480", difficulty: "easy", cpc: "$2.10", intent: "transactional", competition: "low", trend: "up", relevance: 85, relatedTerms: ["custom camping gear wholesale", "branded outdoor equipment", "OEM camping gear"] },
+                { id: "6", term: "eco friendly camping products wholesale", volume: "650", difficulty: "medium", cpc: "$2.80", intent: "commercial", competition: "low", trend: "up", relevance: 87, relatedTerms: ["sustainable camping gear wholesale", "eco camping equipment", "green outdoor gear bulk"] },
+                { id: "7", term: "family camping package wholesale", volume: "380", difficulty: "easy", cpc: "$1.90", intent: "transactional", competition: "low", trend: "up", relevance: 82, relatedTerms: ["camping bundle wholesale", "family tent package", "complete camping kit bulk"] },
+                { id: "8", term: "lightweight camping gear wholesale", volume: "920", difficulty: "medium", cpc: "$2.40", intent: "commercial", competition: "medium", trend: "up", relevance: 89, relatedTerms: ["ultralight camping equipment", "lightweight tent wholesale", "portable camping gear"] },
+              ],
+              generatedAt: new Date().toISOString(),
+            },
+            actions: [
+              { label: "导出关键词", id: "export-keywords", variant: "secondary" },
+              { label: "生成内容", id: "generate-content-keywords", variant: "primary" },
+            ],
+          },
+          timestamp: new Date(),
+        },
+      ]);
+      setIsTyping(false);
+    }, 1200);
+  };
+
+  const handleSEOSiteConnection = () => {
+    setTimeout(() => {
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: `agent-${Date.now()}`,
+          role: "agent",
+          agent: "seo",
+          content: "🔗 管理您的独立站连接：",
+          card: {
+            type: "site-connection",
+            data: {
+              sites: [
+                {
+                  id: "1",
+                  platform: "wordpress",
+                  name: "Camping Gear Wholesale",
+                  url: "https://campinggearwholesale.com",
+                  status: "connected",
+                  lastSync: "2026-03-27T10:30:00Z",
+                  autoPublish: true,
+                },
+              ],
+            },
+            actions: [
+              { label: "添加站点", id: "add-site", variant: "primary" },
+            ],
+          },
+          timestamp: new Date(),
+        },
+      ]);
+      setIsTyping(false);
+    }, 800);
+  };
+
   const handleEmailCustomers = () => {
     setTimeout(() => {
       setMessages((prev) => [
@@ -1002,7 +1398,7 @@ export function useChatState() {
           id: `agent-${Date.now()}`,
           role: "agent",
           agent: "supervisor",
-          content: "我可以帮您完成以下任务：\n\n📋 **获客任务**\n• 「帮我找美国户外用品批发商」创建获客任务\n• 「任务进展如何」查看实时状态\n• 「查看线索」查看已获得的线索\n• 「本周效果如何」查看数据看板\n\n🔍 **SEO Agent**\n• 「@SEO Agent 关键词」查看关键词策略\n• 「@SEO Agent 生成文章」生成SEO文章\n\n✉️ **Email Agent**\n• 「@Email Agent 客户」筛选目标客户\n• 「@Email Agent 预览邮件」预览开发信\n\n有什么可以帮您的吗？",
+          content: "我可以帮您完成以下任务：\n\n📋 **获客任务**\n• 「帮我找美国户外用品批发商」创建获客任务\n• 「任务进展如何」查看实时状态\n• 「查看线索」查看已获得的线索\n• 「本周效果如何」查看数据看板\n\n🔍 **SEO Agent**\n• 「@SEO Agent 关键词」查看关键词策略\n• 「@SEO Agent 生成文章」生成SEO文章\n• 「@SEO Agent 编辑文章」编辑SEO文章\n• 「@SEO Agent 绑定站点」连接WordPress/Shopify\n• 「@SEO Agent 文章数据」查看文章效果\n• 「@SEO Agent 竞品分析」分析竞争对手\n• 「@SEO Agent 生成站点」一键建站\n• 「@SEO Agent 健康检查」SEO健康监控\n• 「@SEO Agent 推荐关键词」获取关键词推荐\n\n✉️ **Email Agent**\n• 「@Email Agent 客户」筛选目标客户\n• 「@Email Agent 预览邮件」预览开发信\n\n有什么可以帮您的吗？",
           timestamp: new Date(),
         },
       ]);
@@ -1018,7 +1414,7 @@ export function useChatState() {
           id: `agent-${Date.now()}`,
           role: "agent",
           agent: "supervisor",
-          content: "收到您的消息。您可以尝试以下指令：\n• 「任务进展如何」查看实时状态\n• 「查看线索」查看已获得的线索\n• 「本周效果如何」查看数据看板\n• 「@SEO Agent 生成文章」操作SEO任务\n• 「@Email Agent 查看客户」操作邮件任务\n\n或者输入「帮助」查看所有可用指令。",
+          content: "收到您的消息。您可以尝试以下指令：\n• 「任务进展如何」查看实时状态\n• 「查看线索」查看已获得的线索\n• 「本周效果如何」查看数据看板\n• 「@SEO Agent 生成文章」生成SEO文章\n• 「@SEO Agent 编辑文章」编辑文章\n• 「@SEO Agent 绑定站点」连接独立站\n• 「@SEO Agent 文章数据」查看效果数据\n• 「@SEO Agent 竞品分析」分析竞品\n• 「@SEO Agent 生成站点」一键建站\n• 「@SEO Agent 健康检查」SEO监控\n• 「@Email Agent 查看客户」操作邮件任务\n\n或者输入「帮助」查看所有可用指令。",
           timestamp: new Date(),
         },
       ]);
@@ -1241,9 +1637,176 @@ export function useChatState() {
           handleSEOArticle();
           break;
 
+        case "edit-article":
+          handleSEOEdit();
+          break;
+
+        case "save-article": {
+          setMessages((prev) => [
+            ...prev,
+            {
+              id: `agent-${Date.now()}`,
+              role: "agent",
+              agent: "seo",
+              content: "✅ 文章已保存！\n\n您的修改已保存到草稿。您可以随时继续编辑或发布。",
+              timestamp: new Date(),
+            },
+          ]);
+          break;
+        }
+
         case "publish-article":
           handleSEOPublish();
           break;
+
+        case "site-connected":
+        case "site-updated":
+        case "site-disconnected":
+        case "test-connection": {
+          const actionMsg = actionId === "site-connected" ? "✅ 站点连接成功！" :
+                           actionId === "site-updated" ? "✅ 站点设置已更新！" :
+                           actionId === "site-disconnected" ? "✅ 站点已断开连接！" :
+                           "🔄 正在测试连接...";
+          setMessages((prev) => [
+            ...prev,
+            {
+              id: `agent-${Date.now()}`,
+              role: "agent",
+              agent: "seo",
+              content: actionMsg,
+              timestamp: new Date(),
+            },
+          ]);
+          break;
+        }
+
+        case "view-detailed-analytics":
+        case "optimize-article":
+        case "share-report": {
+          setMessages((prev) => [
+            ...prev,
+            {
+              id: `agent-${Date.now()}`,
+              role: "agent",
+              agent: "seo",
+              content: `正在处理您的请求：${actionId}...`,
+              timestamp: new Date(),
+            },
+          ]);
+          break;
+        }
+
+        case "export-competitor-report":
+        case "generate-strategy":
+        case "refresh-analysis": {
+          setMessages((prev) => [
+            ...prev,
+            {
+              id: `agent-${Date.now()}`,
+              role: "agent",
+              agent: "seo",
+              content: actionId === "generate-strategy" ? 
+                "🎯 基于竞品分析，为您生成以下应对策略：\n\n1. 重点布局关键词：eco-friendly camping gear wholesale、family camping package wholesale\n2. 内容策略：创建产品对比文章，突出您的优势\n3. 技术优化：改善移动端体验，预计可超越竞品\n4. 链接建设：针对competitor的弱链接进行定向外链建设" :
+                `✅ 操作完成：${actionId}`,
+              timestamp: new Date(),
+            },
+          ]);
+          break;
+        }
+
+        case "deploy-site":
+        case "download-source": {
+          setMessages((prev) => [
+            ...prev,
+            {
+              id: `agent-${Date.now()}`,
+              role: "agent",
+              agent: "seo",
+              content: actionId === "deploy-site" ?
+                "🚀 站点正在部署中...\n\n• 域名解析配置中\n• SSL证书申请中\n• CDN加速配置中\n\n预计5-10分钟后完成，完成后我会通知您！" :
+                "📦 源码已打包下载！\n\n包含：\n• 完整的HTML/CSS/JS源码\n• SEO优化配置文件\n• 部署说明文档",
+              timestamp: new Date(),
+            },
+          ]);
+          break;
+        }
+
+        case "view-detailed-health":
+        case "fix-all-issues": {
+          setMessages((prev) => [
+            ...prev,
+            {
+              id: `agent-${Date.now()}`,
+              role: "agent",
+              agent: "seo",
+              content: actionId === "fix-all-issues" ?
+                "🔧 正在自动修复SEO问题...\n\n✅ 已修复：为3个页面添加Meta描述\n✅ 已修复：缩短过长的标题标签\n✅ 已优化：启用图片懒加载\n✅ 已优化：添加浏览器缓存配置\n\n整体SEO评分已提升至 89分！" :
+                "📊 正在生成详细报告...",
+              timestamp: new Date(),
+            },
+          ]);
+          break;
+        }
+
+        case "scan-complete": {
+          setMessages((prev) => [
+            ...prev,
+            {
+              id: `agent-${Date.now()}`,
+              role: "agent",
+              agent: "seo",
+              content: "✅ 扫描完成！已更新SEO健康状态。",
+              timestamp: new Date(),
+            },
+          ]);
+          break;
+        }
+
+        case "add-to-strategy":
+        case "generate-content": {
+          setMessages((prev) => [
+            ...prev,
+            {
+              id: `agent-${Date.now()}`,
+              role: "agent",
+              agent: "seo",
+              content: actionId === "add-to-strategy" ?
+                "✅ 关键词已添加到您的SEO策略！\n\n我会根据这些关键词为您规划后续的内容创作。" :
+                "📝 正在为选中的关键词生成内容大纲...",
+              timestamp: new Date(),
+            },
+          ]);
+          break;
+        }
+
+        case "export-keywords": {
+          setMessages((prev) => [
+            ...prev,
+            {
+              id: `agent-${Date.now()}`,
+              role: "agent",
+              agent: "seo",
+              content: "📥 关键词列表已导出！",
+              timestamp: new Date(),
+            },
+          ]);
+          break;
+        }
+
+        case "view-all-keywords":
+        case "view-all-sites": {
+          setMessages((prev) => [
+            ...prev,
+            {
+              id: `agent-${Date.now()}`,
+              role: "agent",
+              agent: "seo",
+              content: "📋 正在加载完整列表...",
+              timestamp: new Date(),
+            },
+          ]);
+          break;
+        }
 
         // Email actions
         case "preview-email":

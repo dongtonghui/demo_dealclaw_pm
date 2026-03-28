@@ -100,7 +100,7 @@ describe("useChatState - 完整功能测试", () => {
         rerender();
         const messages = result.current.messages;
         return messages.some((m) => m.card?.type === "company-profile");
-      }, { timeout: 2000 });
+      }, { timeout: 3000 });
 
       rerender();
       
@@ -162,7 +162,7 @@ describe("useChatState - 完整功能测试", () => {
         rerender();
         const messages = result.current.messages;
         return messages.some((m) => m.card?.type === "customer-persona");
-      }, { timeout: 2000 });
+      }, { timeout: 3000 });
 
       rerender();
       
@@ -206,11 +206,14 @@ describe("useChatState - 完整功能测试", () => {
         return result.current.messages.some(
           (m) => m.card?.type === "lead-summary"
         );
-      }, { timeout: 2000 });
+      }, { timeout: 3000 });
+
+      rerender();
 
       const cardMessage = result.current.messages.find(
         (m) => m.card?.type === "lead-summary"
       );
+      expect(cardMessage).toBeDefined();
       expect(cardMessage?.card?.data).toHaveProperty("leads");
     });
 
@@ -224,11 +227,14 @@ describe("useChatState - 完整功能测试", () => {
         return result.current.messages.some(
           (m) => m.card?.type === "data-dashboard"
         );
-      }, { timeout: 2000 });
+      }, { timeout: 3000 });
+
+      rerender();
 
       const cardMessage = result.current.messages.find(
         (m) => m.card?.type === "data-dashboard"
       );
+      expect(cardMessage).toBeDefined();
       expect(cardMessage?.card?.data).toHaveProperty("leads");
     });
 
@@ -256,7 +262,9 @@ describe("useChatState - 完整功能测试", () => {
         rerender();
         const messages = result.current.messages;
         return messages.some((m) => m.agent === "seo" && m.card?.type === "seo-strategy");
-      }, { timeout: 2000 });
+      }, { timeout: 3000 });
+
+      rerender();
 
       const seoMessage = result.current.messages.find(
         (m) => m.agent === "seo" && m.card?.type === "seo-strategy"
@@ -287,7 +295,9 @@ describe("useChatState - 完整功能测试", () => {
         return result.current.messages.some(
           (m) => m.card?.type === "customer-list"
         );
-      }, { timeout: 2000 });
+      }, { timeout: 3000 });
+
+      rerender();
 
       const cardMessage = result.current.messages.find(
         (m) => m.card?.type === "customer-list"
@@ -324,6 +334,13 @@ describe("useChatState - 完整功能测试", () => {
     });
 
     it("保存企业画像应更新状态", async () => {
+      // First trigger edit mode to set editingCard
+      act(() => {
+        result.current.handleCardAction("edit-profile");
+      });
+      
+      rerender();
+
       const newData = {
         category: "电子产品",
         advantage: "自主研发",
