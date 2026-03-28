@@ -7,7 +7,6 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
-    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
     <style>
         * { font-family: 'Plus Jakarta Sans', sans-serif; }
         
@@ -55,67 +54,6 @@
         /* Progress bar animation */
         .progress-bar {
             transition: width 0.5s ease;
-        }
-        
-        /* Mermaid Diagram Styles */
-        .mermaid-container {
-            background: #0d1117;
-            border-radius: 12px;
-            overflow: hidden;
-        }
-        
-        .mermaid-toolbar {
-            background: #161b22;
-            border-bottom: 1px solid #30363d;
-            padding: 8px 12px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        .mermaid-canvas {
-            padding: 24px;
-            overflow: auto;
-            min-height: 200px;
-            max-height: 500px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: 
-                radial-gradient(circle at 1px 1px, #21262d 1px, transparent 0);
-            background-size: 20px 20px;
-        }
-        
-        .mermaid-canvas .mermaid {
-            transform-origin: center;
-        }
-        
-        .mermaid-code-panel {
-            background: #161b22;
-            border-top: 1px solid #30363d;
-            padding: 12px;
-        }
-        
-        .mermaid code {
-            font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
-            font-size: 12px;
-            line-height: 1.5;
-        }
-        
-        /* Mermaid theme overrides for dark mode */
-        .mermaid .node rect,
-        .mermaid .node circle,
-        .mermaid .node ellipse,
-        .mermaid .node polygon {
-            stroke-width: 2px;
-        }
-        
-        .mermaid .edgePath .path {
-            stroke-width: 2px;
-        }
-        
-        .mermaid .label {
-            font-family: 'Plus Jakarta Sans', sans-serif;
         }
     </style>
     <script>
@@ -444,7 +382,7 @@
                         <i data-lucide="${isAgent ? 'bot' : 'user'}" class="w-5 h-5 text-white"></i>
                     </div>
                     <div class="max-w-[70%]">
-                        <div class="${isAgent ? 'bg-chat-bg border border-border-dark text-text-primary' : 'bg-user-msg text-text-primary'} rounded-2xl px-5 py-3 shadow-sm">
+                        <div class="${isAgent ? 'bg-white border border-gray-100' : 'bg-primary text-white'} rounded-2xl px-5 py-3 shadow-sm">
                             <div class="text-sm leading-relaxed">${content}</div>
                         </div>
                         ${actions.length ? this.renderActions(actions) : ''}
@@ -469,7 +407,7 @@
                 <div class="flex flex-wrap gap-2 mt-3">
                     ${actions.map(action => `
                         <button onclick="window.handleAction('${action.value}')" 
-                            class="px-4 py-2 bg-chat-bg border border-border-dark rounded-xl text-sm text-text-primary hover:border-primary hover:text-primary transition-all card-hover">
+                            class="px-4 py-2 bg-white border border-gray-200 rounded-xl text-sm text-gray-700 hover:border-primary hover:text-primary transition-all card-hover">
                             ${action.label}
                         </button>
                     `).join('')}
@@ -494,18 +432,18 @@
 
         renderCompanyProfileCard(data) {
             return `
-                <div class="mt-4 bg-chat-bg border border-border-dark rounded-xl p-4 shadow-sm card-hover slide-in text-text-primary">
+                <div class="mt-4 bg-white border border-gray-200 rounded-xl p-4 shadow-sm card-hover slide-in">
                     <h3 class="font-semibold text-text-primary mb-3 flex items-center gap-2">
                         <i data-lucide="building-2" class="w-4 h-4 text-primary"></i>
                         企业画像 - AI理解确认
                     </h3>
                     <div class="space-y-2 text-sm">
-                        <div class="flex gap-2"><span class="text-text-secondary w-20 flex-shrink-0">产品类别:</span><span class="text-text-primary">${data.products}</span></div>
-                        <div class="flex gap-2"><span class="text-text-secondary w-20 flex-shrink-0">核心优势:</span><span class="text-text-primary">${Array.isArray(data.advantages) ? data.advantages.join('、') : data.advantages}</span></div>
-                        <div class="flex gap-2"><span class="text-text-secondary w-20 flex-shrink-0">主营市场:</span><span class="text-text-primary">${data.markets}</span></div>
+                        <div class="flex gap-2"><span class="text-gray-500 w-20 flex-shrink-0">产品类别:</span><span class="text-gray-800">${data.products}</span></div>
+                        <div class="flex gap-2"><span class="text-gray-500 w-20 flex-shrink-0">核心优势:</span><span class="text-gray-800">${Array.isArray(data.advantages) ? data.advantages.join('、') : data.advantages}</span></div>
+                        <div class="flex gap-2"><span class="text-gray-500 w-20 flex-shrink-0">主营市场:</span><span class="text-gray-800">${data.markets}</span></div>
                     </div>
                     <div class="flex gap-2 mt-4">
-                        <button onclick="window.openProfileEditor()" class="flex-1 py-2 border border-border-dark rounded-lg text-sm text-text-secondary hover:bg-sidebar transition-colors">✏️ 编辑修改</button>
+                        <button onclick="window.openProfileEditor()" class="flex-1 py-2 border border-gray-200 rounded-lg text-sm text-gray-600 hover:bg-gray-50 transition-colors">✏️ 编辑修改</button>
                         <button onclick="window.handleAction('confirm-profile')" class="flex-1 py-2 bg-primary text-white rounded-lg text-sm hover:bg-primary/90 transition-colors">✅ 确认无误</button>
                     </div>
                 </div>
@@ -514,19 +452,19 @@
 
         renderTargetProfileCard(data) {
             return `
-                <div class="mt-4 bg-chat-bg border border-border-dark rounded-xl p-4 shadow-sm card-hover slide-in text-text-primary">
+                <div class="mt-4 bg-white border border-gray-200 rounded-xl p-4 shadow-sm card-hover slide-in">
                     <h3 class="font-semibold text-text-primary mb-3 flex items-center gap-2">
                         <i data-lucide="target" class="w-4 h-4 text-primary"></i>
                         目标客户画像
                     </h3>
                     <div class="space-y-2 text-sm">
-                        <div class="flex gap-2"><span class="text-text-secondary w-20">地区:</span><span class="text-text-primary">${data.region}</span></div>
-                        <div class="flex gap-2"><span class="text-text-secondary w-20">行业:</span><span class="text-text-primary">${data.industry}</span></div>
-                        <div class="flex gap-2"><span class="text-text-secondary w-20">规模:</span><span class="text-text-primary">${data.size}</span></div>
-                        <div class="flex gap-2"><span class="text-text-secondary w-20">年采购:</span><span class="text-text-primary">${data.budget}</span></div>
+                        <div class="flex gap-2"><span class="text-gray-500 w-20">地区:</span><span class="text-gray-800">${data.region}</span></div>
+                        <div class="flex gap-2"><span class="text-gray-500 w-20">行业:</span><span class="text-gray-800">${data.industry}</span></div>
+                        <div class="flex gap-2"><span class="text-gray-500 w-20">规模:</span><span class="text-gray-800">${data.size}</span></div>
+                        <div class="flex gap-2"><span class="text-gray-500 w-20">年采购:</span><span class="text-gray-800">${data.budget}</span></div>
                     </div>
                     <div class="flex gap-2 mt-4">
-                        <button onclick="window.handleAction('edit-target')" class="flex-1 py-2 border border-border-dark rounded-lg text-sm text-text-secondary hover:bg-sidebar">✏️ 编辑</button>
+                        <button onclick="window.handleAction('edit-target')" class="flex-1 py-2 border border-gray-200 rounded-lg text-sm text-gray-600 hover:bg-gray-50">✏️ 编辑</button>
                         <button onclick="window.handleAction('confirm-target')" class="flex-1 py-2 bg-primary text-white rounded-lg text-sm hover:bg-primary/90">✅ 确认无误</button>
                     </div>
                 </div>
@@ -535,33 +473,33 @@
 
         renderStrategyCard(data) {
             return `
-                <div class="mt-4 bg-chat-bg border border-border-dark rounded-xl p-4 shadow-sm card-hover slide-in text-text-primary">
+                <div class="mt-4 bg-white border border-gray-200 rounded-xl p-4 shadow-sm card-hover slide-in">
                     <h3 class="font-semibold text-text-primary mb-3 flex items-center gap-2">
                         <i data-lucide="clipboard-list" class="w-4 h-4 text-primary"></i>
                         获客方案 - 多渠道整合
                     </h3>
                     <div class="space-y-4">
                         ${data.channels.map(channel => `
-                            <div class="border-l-4 ${channel.agent === 'SEO' ? 'border-blue-500' : 'border-purple-500'} pl-3 py-2 bg-sidebar rounded-r-lg">
+                            <div class="border-l-4 ${channel.agent === 'SEO' ? 'border-blue-500' : 'border-purple-500'} pl-3 py-2 bg-gray-50 rounded-r-lg">
                                 <div class="flex items-center gap-2 mb-1">
                                     <i data-lucide="${channel.agent === 'SEO' ? 'search' : 'mail'}" class="w-4 h-4"></i>
                                     <span class="font-medium text-sm">${channel.agent} Agent ${channel.strategy}</span>
                                 </div>
-                                <p class="text-xs text-text-secondary">${channel.details}</p>
-                                <p class="text-xs text-text-secondary mt-1">预期: ${channel.expectedLeads}条线索/月</p>
+                                <p class="text-xs text-gray-600">${channel.details}</p>
+                                <p class="text-xs text-gray-500 mt-1">预期: ${channel.expectedLeads}条线索/月</p>
                             </div>
                         `).join('')}
-                        <div class="pt-3 border-t border-border-dark">
-                            <p class="text-sm font-medium text-text-primary mb-2">📊 整体预期</p>
+                        <div class="pt-3 border-t border-gray-100">
+                            <p class="text-sm font-medium text-gray-700 mb-2">📊 整体预期</p>
                             <div class="grid grid-cols-3 gap-2 text-center">
-                                <div class="bg-sidebar rounded-lg p-2"><p class="text-xs text-text-secondary">获客周期</p><p class="text-sm font-semibold text-text-primary">${data.timeline}</p></div>
-                                <div class="bg-sidebar rounded-lg p-2"><p class="text-xs text-text-secondary">总线索数</p><p class="text-sm font-semibold text-text-primary">${data.totalExpected}</p></div>
-                                <div class="bg-sidebar rounded-lg p-2"><p class="text-xs text-text-secondary">预估成本</p><p class="text-sm font-semibold text-text-primary">${data.estimatedCost}</p></div>
+                                <div class="bg-gray-50 rounded-lg p-2"><p class="text-xs text-gray-500">获客周期</p><p class="text-sm font-semibold text-text-primary">${data.timeline}</p></div>
+                                <div class="bg-gray-50 rounded-lg p-2"><p class="text-xs text-gray-500">总线索数</p><p class="text-sm font-semibold text-text-primary">${data.totalExpected}</p></div>
+                                <div class="bg-gray-50 rounded-lg p-2"><p class="text-xs text-gray-500">预估成本</p><p class="text-sm font-semibold text-text-primary">${data.estimatedCost}</p></div>
                             </div>
                         </div>
                     </div>
                     <div class="flex gap-2 mt-4">
-                        <button onclick="window.handleAction('adjust-strategy')" class="flex-1 py-2 border border-border-dark rounded-lg text-sm text-text-secondary hover:bg-sidebar">🔧 调整配置</button>
+                        <button onclick="window.handleAction('adjust-strategy')" class="flex-1 py-2 border border-gray-200 rounded-lg text-sm text-gray-600 hover:bg-gray-50">🔧 调整配置</button>
                         <button onclick="window.handleAction('execute-strategy')" class="flex-1 py-2 bg-cta text-white rounded-lg text-sm hover:bg-cta/90">✅ 确认执行</button>
                     </div>
                 </div>
@@ -570,22 +508,22 @@
 
         renderLeadCard(data) {
             return `
-                <div class="mt-4 bg-gradient-to-r from-orange-900/30 to-red-900/30 border border-orange-700/50 rounded-xl p-4 shadow-sm card-hover slide-in">
+                <div class="mt-4 bg-gradient-to-r from-orange-50 to-red-50 border border-orange-200 rounded-xl p-4 shadow-sm card-hover slide-in">
                     <div class="flex items-center justify-between mb-3">
                         <div class="flex items-center gap-2">
                             <span class="text-2xl">🔥</span>
-                            <div><h3 class="font-semibold text-text-primary">${data.name}</h3><p class="text-xs text-text-secondary">${data.role} @ ${data.company}</p></div>
+                            <div><h3 class="font-semibold text-text-primary">${data.name}</h3><p class="text-xs text-gray-600">${data.role} @ ${data.company}</p></div>
                         </div>
-                        <div class="text-right"><span class="text-2xl font-bold text-orange-600">${data.score}</span><span class="text-xs text-text-secondary block">AI评分</span></div>
+                        <div class="text-right"><span class="text-2xl font-bold text-orange-600">${data.score}</span><span class="text-xs text-gray-500 block">AI评分</span></div>
                     </div>
-                    <div class="bg-chat-bg/60 rounded-lg p-3 mb-3"><p class="text-sm text-text-primary italic">"${data.message}"</p></div>
-                    <div class="flex items-center gap-4 text-xs text-text-secondary mb-3">
+                    <div class="bg-white/60 rounded-lg p-3 mb-3"><p class="text-sm text-gray-700 italic">"${data.message}"</p></div>
+                    <div class="flex items-center gap-4 text-xs text-gray-500 mb-3">
                         <span class="flex items-center gap-1"><i data-lucide="map-pin" class="w-3 h-3"></i>${data.location}</span>
                         <span class="flex items-center gap-1"><i data-lucide="clock" class="w-3 h-3"></i>${data.time}</span>
                         <span class="flex items-center gap-1"><i data-lucide="source" class="w-3 h-3"></i>${data.source}</span>
                     </div>
                     <div class="flex gap-2">
-                        <button onclick="window.handleAction('view-lead-${data.id}')" class="flex-1 py-2 bg-chat-bg border border-border-dark rounded-lg text-sm text-text-primary hover:bg-sidebar">👤 查看详情</button>
+                        <button onclick="window.handleAction('view-lead-${data.id}')" class="flex-1 py-2 bg-white border border-gray-200 rounded-lg text-sm text-gray-700 hover:bg-gray-50">👤 查看详情</button>
                         <button onclick="window.handleAction('reply-lead-${data.id}')" class="flex-1 py-2 bg-primary text-white rounded-lg text-sm hover:bg-primary/90">✍️ AI生成回复</button>
                     </div>
                 </div>
@@ -594,29 +532,29 @@
 
         renderDashboardCard(data) {
             return `
-                <div class="mt-4 bg-chat-bg border border-border-dark rounded-xl p-4 shadow-sm card-hover slide-in text-text-primary">
+                <div class="mt-4 bg-white border border-gray-200 rounded-xl p-4 shadow-sm card-hover slide-in">
                     <h3 class="font-semibold text-text-primary mb-3 flex items-center gap-2">
                         <i data-lucide="bar-chart-3" class="w-4 h-4 text-primary"></i>
                         本周获客效果
                     </h3>
                     <div class="grid grid-cols-3 gap-3 mb-4">
                         ${data.metrics.map(m => `
-                            <div class="text-center p-2 bg-sidebar rounded-lg">
+                            <div class="text-center p-2 bg-gray-50 rounded-lg">
                                 <p class="text-lg font-bold text-text-primary">${m.value}</p>
-                                <p class="text-xs text-text-secondary">${m.label}</p>
+                                <p class="text-xs text-gray-500">${m.label}</p>
                                 <span class="text-xs ${m.trend > 0 ? 'text-green-600' : 'text-red-600'}">${m.trend > 0 ? '↑' : '↓'} ${Math.abs(m.trend)}%</span>
                             </div>
                         `).join('')}
                     </div>
                     <div class="space-y-2">
-                        <p class="text-xs font-medium text-text-primary">📈 渠道效果对比</p>
+                        <p class="text-xs font-medium text-gray-700">📈 渠道效果对比</p>
                         ${data.channels.map(c => `
                             <div class="flex items-center gap-2">
-                                <span class="text-xs text-text-secondary w-16">${c.name}</span>
-                                <div class="flex-1 h-2 bg-input-bg rounded-full overflow-hidden">
+                                <span class="text-xs text-gray-600 w-16">${c.name}</span>
+                                <div class="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden">
                                     <div class="h-full ${c.color} rounded-full progress-bar" style="width: ${c.percent}%"></div>
                                 </div>
-                                <span class="text-xs text-text-primary">${c.leads}条 (${c.percent}%)</span>
+                                <span class="text-xs text-gray-700">${c.leads}条 (${c.percent}%)</span>
                             </div>
                         `).join('')}
                     </div>
@@ -626,16 +564,16 @@
 
         renderSEOArticleCard(data) {
             return `
-                <div class="mt-4 bg-chat-bg border border-border-dark rounded-xl p-4 shadow-sm card-hover slide-in text-text-primary">
+                <div class="mt-4 bg-white border border-gray-200 rounded-xl p-4 shadow-sm card-hover slide-in">
                     <h3 class="font-semibold text-text-primary mb-3">📝 SEO文章预览</h3>
-                    <div class="bg-sidebar rounded-lg p-3 mb-3">
-                        <p class="text-sm font-medium text-text-primary">${data.title}</p>
-                        <p class="text-xs text-text-secondary mt-1">关键词: ${data.keywords.join(', ')}</p>
+                    <div class="bg-gray-50 rounded-lg p-3 mb-3">
+                        <p class="text-sm font-medium text-gray-800">${data.title}</p>
+                        <p class="text-xs text-gray-500 mt-1">关键词: ${data.keywords.join(', ')}</p>
                     </div>
-                    <div class="text-sm text-text-secondary line-clamp-3">${data.preview}</div>
+                    <div class="text-sm text-gray-600 line-clamp-3">${data.preview}</div>
                     <div class="flex gap-2 mt-4">
-                        <button onclick="window.handleAction('edit-article')" class="flex-1 py-2 border border-border-dark rounded-lg text-sm text-text-secondary hover:bg-sidebar">✏️ 编辑</button>
-                        <button onclick="window.handleAction('preview-article')" class="flex-1 py-2 border border-border-dark rounded-lg text-sm text-text-secondary hover:bg-sidebar">👁️ 预览</button>
+                        <button onclick="window.handleAction('edit-article')" class="flex-1 py-2 border border-gray-200 rounded-lg text-sm text-gray-600 hover:bg-gray-50">✏️ 编辑</button>
+                        <button onclick="window.handleAction('preview-article')" class="flex-1 py-2 border border-gray-200 rounded-lg text-sm text-gray-600 hover:bg-gray-50">👁️ 预览</button>
                         <button onclick="window.handleAction('publish-article')" class="flex-1 py-2 bg-primary text-white rounded-lg text-sm hover:bg-primary/90">📤 发布</button>
                     </div>
                 </div>
@@ -644,15 +582,15 @@
 
         renderEmailPreviewCard(data) {
             return `
-                <div class="mt-4 bg-chat-bg border border-border-dark rounded-xl p-4 shadow-sm card-hover slide-in text-text-primary">
+                <div class="mt-4 bg-white border border-gray-200 rounded-xl p-4 shadow-sm card-hover slide-in">
                     <h3 class="font-semibold text-text-primary mb-3">✉️ 邮件预览</h3>
-                    <div class="bg-sidebar rounded-lg p-3 mb-3 text-sm">
-                        <p class="text-text-secondary"><span class="font-medium">收件人:</span> ${data.recipient}</p>
-                        <p class="text-text-secondary"><span class="font-medium">主题:</span> ${data.subject}</p>
+                    <div class="bg-gray-50 rounded-lg p-3 mb-3 text-sm">
+                        <p class="text-gray-600"><span class="font-medium">收件人:</span> ${data.recipient}</p>
+                        <p class="text-gray-600"><span class="font-medium">主题:</span> ${data.subject}</p>
                     </div>
-                    <div class="border border-border-dark rounded-lg p-3 bg-chat-bg text-sm whitespace-pre-wrap">${data.body}</div>
+                    <div class="border border-gray-200 rounded-lg p-3 bg-white text-sm whitespace-pre-wrap">${data.body}</div>
                     <div class="flex gap-2 mt-4">
-                        <button onclick="window.handleAction('edit-email')" class="flex-1 py-2 border border-border-dark rounded-lg text-sm text-text-secondary hover:bg-sidebar">✏️ 编辑</button>
+                        <button onclick="window.handleAction('edit-email')" class="flex-1 py-2 border border-gray-200 rounded-lg text-sm text-gray-600 hover:bg-gray-50">✏️ 编辑</button>
                         <button onclick="window.handleAction('send-email')" class="flex-1 py-2 bg-primary text-white rounded-lg text-sm hover:bg-primary/90">📤 发送</button>
                     </div>
                 </div>
@@ -665,10 +603,10 @@
                     <div class="w-10 h-10 rounded-full agent-avatar flex items-center justify-center">
                         <i data-lucide="bot" class="w-5 h-5 text-white"></i>
                     </div>
-                    <div class="bg-chat-bg border border-border-dark rounded-2xl px-4 py-3 shadow-sm flex items-center gap-1">
-                        <span class="w-2 h-2 bg-text-secondary rounded-full typing-dot"></span>
-                        <span class="w-2 h-2 bg-text-secondary rounded-full typing-dot"></span>
-                        <span class="w-2 h-2 bg-text-secondary rounded-full typing-dot"></span>
+                    <div class="bg-white border border-gray-100 rounded-2xl px-4 py-3 shadow-sm flex items-center gap-1">
+                        <span class="w-2 h-2 bg-gray-400 rounded-full typing-dot"></span>
+                        <span class="w-2 h-2 bg-gray-400 rounded-full typing-dot"></span>
+                        <span class="w-2 h-2 bg-gray-400 rounded-full typing-dot"></span>
                     </div>
                 </div>
             `;
@@ -727,16 +665,16 @@
                             <i data-lucide="sparkles" class="w-8 h-8 text-primary"></i>
                         </div>
                         <h3 class="font-semibold text-text-primary mb-2">欢迎使用 DealClaw</h3>
-                        <p class="text-sm text-text-secondary">您的数字员工团队已就绪</p>
+                        <p class="text-sm text-gray-600">您的数字员工团队已就绪</p>
                     </div>
                     <div class="space-y-3">
-                        <div class="bg-chat-bg rounded-lg p-3 border border-border-dark">
-                            <p class="text-xs text-text-secondary mb-1">快速开始</p>
-                            <p class="text-sm text-text-primary">💬 在左侧对话区与主管Agent交流</p>
+                        <div class="bg-white rounded-lg p-3 border border-gray-100">
+                            <p class="text-xs text-gray-500 mb-1">快速开始</p>
+                            <p class="text-sm text-gray-700">💬 在左侧对话区与主管Agent交流</p>
                         </div>
-                        <div class="bg-chat-bg rounded-lg p-3 border border-border-dark">
-                            <p class="text-xs text-text-secondary mb-1">可以尝试说</p>
-                            <div class="space-y-1 text-sm text-text-secondary">
+                        <div class="bg-white rounded-lg p-3 border border-gray-100">
+                            <p class="text-xs text-gray-500 mb-1">可以尝试说</p>
+                            <div class="space-y-1 text-sm text-gray-600">
                                 <p class="cursor-pointer hover:text-primary transition-colors" onclick="window.sendExample('帮我找美国户外用品批发商')">"帮我找美国户外用品批发商"</p>
                                 <p class="cursor-pointer hover:text-primary transition-colors" onclick="window.sendExample('我的任务进展如何？')">"我的任务进展如何？"</p>
                                 <p class="cursor-pointer hover:text-primary transition-colors" onclick="window.sendExample('今天有什么新线索？')">"今天有什么新线索？"</p>
@@ -751,7 +689,7 @@
             const progress = data?.progress || 42;
             return `
                 <div class="p-4 space-y-4">
-                    <div class="bg-chat-bg rounded-xl p-4 border border-border-dark">
+                    <div class="bg-white rounded-xl p-4 border border-gray-100">
                         <h3 class="font-semibold text-text-primary mb-3 flex items-center gap-2">
                             <i data-lucide="activity" class="w-4 h-4 text-green-600"></i>
                             任务状态
@@ -759,34 +697,34 @@
                         <div class="space-y-3">
                             <div>
                                 <div class="flex items-center justify-between mb-1">
-                                    <span class="text-sm text-text-secondary">SEO Agent</span>
-                                    <span class="text-xs px-2 py-1 bg-green-900/50 text-green-400 rounded-full">运行中</span>
+                                    <span class="text-sm text-gray-600">SEO Agent</span>
+                                    <span class="text-xs px-2 py-1 bg-green-100 text-green-700 rounded-full">运行中</span>
                                 </div>
-                                <div class="h-2 bg-input-bg rounded-full overflow-hidden">
+                                <div class="h-2 bg-gray-100 rounded-full overflow-hidden">
                                     <div class="h-full bg-blue-500 rounded-full progress-bar" style="width: 65%"></div>
                                 </div>
                             </div>
                             <div>
                                 <div class="flex items-center justify-between mb-1">
-                                    <span class="text-sm text-text-secondary">Email Agent</span>
-                                    <span class="text-xs px-2 py-1 bg-green-900/50 text-green-400 rounded-full">运行中</span>
+                                    <span class="text-sm text-gray-600">Email Agent</span>
+                                    <span class="text-xs px-2 py-1 bg-green-100 text-green-700 rounded-full">运行中</span>
                                 </div>
-                                <div class="h-2 bg-input-bg rounded-full overflow-hidden">
+                                <div class="h-2 bg-gray-100 rounded-full overflow-hidden">
                                     <div class="h-full bg-purple-500 rounded-full progress-bar" style="width: ${progress}%"></div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div class="bg-chat-bg rounded-xl p-4 border border-border-dark">
+                    <div class="bg-white rounded-xl p-4 border border-gray-100">
                         <h3 class="font-semibold text-text-primary mb-3">今日数据</h3>
                         <div class="grid grid-cols-2 gap-3">
-                            <div class="text-center p-3 bg-sidebar rounded-lg">
+                            <div class="text-center p-3 bg-gray-50 rounded-lg">
                                 <p class="text-2xl font-bold text-text-primary" id="today-leads">${data?.leads || 3}</p>
-                                <p class="text-xs text-text-secondary">新线索</p>
+                                <p class="text-xs text-gray-500">新线索</p>
                             </div>
-                            <div class="text-center p-3 bg-sidebar rounded-lg">
+                            <div class="text-center p-3 bg-gray-50 rounded-lg">
                                 <p class="text-2xl font-bold text-text-primary">${data?.emails || 28}</p>
-                                <p class="text-xs text-text-secondary">邮件发送</p>
+                                <p class="text-xs text-gray-500">邮件发送</p>
                             </div>
                         </div>
                     </div>
@@ -800,15 +738,15 @@
                 <div class="p-4 space-y-3">
                     <h3 class="font-semibold text-text-primary">高意向线索</h3>
                     ${leads.map((lead, idx) => `
-                        <div class="bg-chat-bg rounded-lg p-3 border border-border-dark cursor-pointer hover:border-primary transition-colors" onclick="window.handleAction('view-lead-${lead.id}')">
+                        <div class="bg-white rounded-lg p-3 border border-gray-100 cursor-pointer hover:border-primary transition-colors" onclick="window.handleAction('view-lead-${lead.id}')">
                             <div class="flex items-start justify-between">
                                 <div>
                                     <p class="font-medium text-sm text-text-primary">${lead.name}</p>
-                                    <p class="text-xs text-text-secondary">${lead.role} @ ${lead.company}</p>
+                                    <p class="text-xs text-gray-500">${lead.role} @ ${lead.company}</p>
                                 </div>
                                 <span class="text-lg font-bold text-orange-600">${lead.score}</span>
                             </div>
-                            <p class="text-xs text-text-secondary mt-2 line-clamp-2">"${lead.message}"</p>
+                            <p class="text-xs text-gray-600 mt-2 line-clamp-2">"${lead.message}"</p>
                         </div>
                     `).join('')}
                     <button onclick="window.handleAction('show-dashboard')" class="w-full py-2 text-sm text-primary hover:bg-primary/5 rounded-lg transition-colors">
@@ -821,38 +759,38 @@
         renderLeadDetail(lead) {
             return `
                 <div class="p-4 space-y-4">
-                    <button onclick="window.handleAction('back-to-leads')" class="text-sm text-text-secondary flex items-center gap-1 hover:text-text-primary transition-colors">
+                    <button onclick="window.handleAction('back-to-leads')" class="text-sm text-gray-500 flex items-center gap-1 hover:text-gray-700 transition-colors">
                         <i data-lucide="arrow-left" class="w-4 h-4"></i>
                         返回线索列表
                     </button>
                     <div class="bg-gradient-to-r from-orange-50 to-red-50 rounded-xl p-4 border border-orange-200">
                         <div class="flex items-center gap-3 mb-3">
-                            <div class="w-12 h-12 rounded-full bg-orange-900/50 flex items-center justify-center text-xl">👩‍💼</div>
+                            <div class="w-12 h-12 rounded-full bg-orange-100 flex items-center justify-center text-xl">👩‍💼</div>
                             <div>
                                 <h3 class="font-bold text-text-primary">${lead.name}</h3>
-                                <p class="text-sm text-text-secondary">${lead.role}</p>
+                                <p class="text-sm text-gray-600">${lead.role}</p>
                             </div>
                         </div>
                         <div class="text-center py-2">
                             <span class="text-3xl font-bold text-orange-600">${lead.score}</span>
-                            <p class="text-xs text-text-secondary">AI意向评分</p>
+                            <p class="text-xs text-gray-500">AI意向评分</p>
                         </div>
                     </div>
-                    <div class="bg-chat-bg rounded-xl p-4 border border-border-dark">
-                        <h4 class="font-medium text-sm text-text-primary mb-3">公司信息</h4>
+                    <div class="bg-white rounded-xl p-4 border border-gray-100">
+                        <h4 class="font-medium text-sm text-gray-700 mb-3">公司信息</h4>
                         <div class="space-y-2 text-sm">
-                            <div class="flex justify-between"><span class="text-text-secondary">公司</span><span class="text-text-primary">${lead.company}</span></div>
-                            <div class="flex justify-between"><span class="text-text-secondary">地区</span><span class="text-text-primary">${lead.location || '美国 · 加州'}</span></div>
-                            <div class="flex justify-between"><span class="text-text-secondary">来源</span><span class="text-text-primary">${lead.source}</span></div>
+                            <div class="flex justify-between"><span class="text-gray-500">公司</span><span class="text-gray-800">${lead.company}</span></div>
+                            <div class="flex justify-between"><span class="text-gray-500">地区</span><span class="text-gray-800">${lead.location || '美国 · 加州'}</span></div>
+                            <div class="flex justify-between"><span class="text-gray-500">来源</span><span class="text-gray-800">${lead.source}</span></div>
                         </div>
                     </div>
-                    <div class="bg-chat-bg rounded-xl p-4 border border-border-dark">
-                        <h4 class="font-medium text-sm text-text-primary mb-2">客户留言</h4>
-                        <p class="text-sm text-text-secondary italic">"${lead.message}"</p>
+                    <div class="bg-white rounded-xl p-4 border border-gray-100">
+                        <h4 class="font-medium text-sm text-gray-700 mb-2">客户留言</h4>
+                        <p class="text-sm text-gray-600 italic">"${lead.message}"</p>
                     </div>
                     <div class="flex gap-2">
                         <button onclick="window.handleAction('generate-reply-${lead.id}')" class="flex-1 py-2 bg-primary text-white rounded-lg text-sm hover:bg-primary/90 transition-colors">✍️ AI生成回复</button>
-                        <button onclick="window.handleAction('assign-lead-${lead.id}')" class="flex-1 py-2 border border-border-dark rounded-lg text-sm text-text-primary hover:bg-sidebar transition-colors">📤 分配销售</button>
+                        <button onclick="window.handleAction('assign-lead-${lead.id}')" class="flex-1 py-2 border border-gray-200 rounded-lg text-sm text-gray-700 hover:bg-gray-50 transition-colors">📤 分配销售</button>
                     </div>
                 </div>
             `;
@@ -862,20 +800,20 @@
             return `
                 <div class="p-4 space-y-4">
                     <h3 class="font-semibold text-text-primary">设置</h3>
-                    <div class="bg-chat-bg rounded-xl p-4 border border-border-dark">
-                        <h4 class="font-medium text-sm text-text-primary mb-3">渠道配置</h4>
+                    <div class="bg-white rounded-xl p-4 border border-gray-100">
+                        <h4 class="font-medium text-sm text-gray-700 mb-3">渠道配置</h4>
                         <div class="space-y-2">
-                            <button onclick="window.handleAction('config-email')" class="w-full flex items-center justify-between p-3 bg-sidebar rounded-lg hover:bg-input-bg transition-colors">
-                                <span class="text-sm text-text-primary">📧 邮件配置</span>
-                                <i data-lucide="chevron-right" class="w-4 h-4 text-text-secondary"></i>
+                            <button onclick="window.handleAction('config-email')" class="w-full flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                                <span class="text-sm text-gray-700">📧 邮件配置</span>
+                                <i data-lucide="chevron-right" class="w-4 h-4 text-gray-400"></i>
                             </button>
-                            <button onclick="window.handleAction('config-site')" class="w-full flex items-center justify-between p-3 bg-sidebar rounded-lg hover:bg-input-bg transition-colors">
-                                <span class="text-sm text-text-primary">🌐 站点配置</span>
-                                <i data-lucide="chevron-right" class="w-4 h-4 text-text-secondary"></i>
+                            <button onclick="window.handleAction('config-site')" class="w-full flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                                <span class="text-sm text-gray-700">🌐 站点配置</span>
+                                <i data-lucide="chevron-right" class="w-4 h-4 text-gray-400"></i>
                             </button>
                         </div>
                     </div>
-                    <button onclick="window.resetDemo()" class="w-full py-2 text-sm text-red-400 border border-red-900/50 rounded-lg hover:bg-red-900/30 transition-colors">
+                    <button onclick="window.resetDemo()" class="w-full py-2 text-sm text-red-600 border border-red-200 rounded-lg hover:bg-red-50 transition-colors">
                         🔄 重置演示数据
                     </button>
                 </div>
@@ -886,12 +824,12 @@
             return `
                 <div class="p-4 space-y-4">
                     <h3 class="font-semibold text-text-primary">SEO配置</h3>
-                    <div class="bg-chat-bg rounded-xl p-4 border border-border-dark">
-                        <h4 class="font-medium text-sm text-text-primary mb-3">选择SEO模式</h4>
+                    <div class="bg-white rounded-xl p-4 border border-gray-100">
+                        <h4 class="font-medium text-sm text-gray-700 mb-3">选择SEO模式</h4>
                         <div class="space-y-2">
                             ${['mode-self', 'mode-ai', 'mode-platform'].map(mode => `
-                                <button onclick="window.handleAction('select-seo-${mode}')" class="w-full p-3 border border-border-dark rounded-lg hover:border-primary transition-colors text-left">
-                                    <p class="font-medium text-sm text-text-primary">${mode === 'mode-self' ? '🏢 自引流' : mode === 'mode-ai' ? '🚀 AI建站' : '🏪 平台引流'}</p>
+                                <button onclick="window.handleAction('select-seo-${mode}')" class="w-full p-3 border border-gray-200 rounded-lg hover:border-primary transition-colors text-left">
+                                    <p class="font-medium text-sm text-gray-800">${mode === 'mode-self' ? '🏢 自引流' : mode === 'mode-ai' ? '🚀 AI建站' : '🏪 平台引流'}</p>
                                 </button>
                             `).join('')}
                         </div>
@@ -904,12 +842,12 @@
             return `
                 <div class="p-4 space-y-4">
                     <h3 class="font-semibold text-text-primary">邮件配置</h3>
-                    <div class="bg-chat-bg rounded-xl p-4 border border-border-dark">
-                        <h4 class="font-medium text-sm text-text-primary mb-3">发送渠道</h4>
+                    <div class="bg-white rounded-xl p-4 border border-gray-100">
+                        <h4 class="font-medium text-sm text-gray-700 mb-3">发送渠道</h4>
                         <div class="space-y-2">
                             ${['own', 'platform', 'service'].map(channel => `
-                                <button onclick="window.handleAction('select-email-${channel}')" class="w-full p-3 border border-border-dark rounded-lg hover:border-primary transition-colors text-left">
-                                    <p class="font-medium text-sm text-text-primary">${channel === 'own' ? '📧 自有邮箱' : channel === 'platform' ? '⚡ 平台代发' : '🔧 专业服务商'}</p>
+                                <button onclick="window.handleAction('select-email-${channel}')" class="w-full p-3 border border-gray-200 rounded-lg hover:border-primary transition-colors text-left">
+                                    <p class="font-medium text-sm text-gray-800">${channel === 'own' ? '📧 自有邮箱' : channel === 'platform' ? '⚡ 平台代发' : '🔧 专业服务商'}</p>
                                 </button>
                             `).join('')}
                         </div>
@@ -1085,7 +1023,7 @@
                     await this.delay(400);
                     this.chat.renderMessage({
                         type: 'agent',
-                        content: `<strong>Q1/5:</strong> 您的主营产品是什么？<br><span class="text-text-secondary">例如：户外用品、电子产品、服装配饰...</span>`
+                        content: `<strong>Q1/5:</strong> 您的主营产品是什么？<br><span class="text-gray-500">例如：户外用品、电子产品、服装配饰...</span>`
                     });
                 }
             }
@@ -1102,7 +1040,7 @@
                     this.state.set('user.profile.step', 3);
                     this.chat.renderMessage({
                         type: 'agent',
-                        content: `<strong>Q3/5:</strong> 您的主要出口市场是哪些？<br><span class="text-text-secondary">例如：北美、欧洲、东南亚...</span>`
+                        content: `<strong>Q3/5:</strong> 您的主要出口市场是哪些？<br><span class="text-gray-500">例如：北美、欧洲、东南亚...</span>`
                     });
                 }
                 else if (value === 'adv-more') {
@@ -1208,33 +1146,33 @@
             
             const modalHTML = `
                 <div id="profile-editor-modal" class="fixed inset-0 modal-overlay flex items-center justify-center z-50">
-                    <div class="bg-chat-bg rounded-2xl p-6 w-[500px] max-w-[90vw] max-h-[90vh] overflow-y-auto slide-in">
+                    <div class="bg-white rounded-2xl p-6 w-[500px] max-w-[90vw] max-h-[90vh] overflow-y-auto slide-in">
                         <div class="flex items-center justify-between mb-4">
                             <h3 class="text-lg font-semibold text-text-primary">编辑企业画像</h3>
-                            <button onclick="window.closeProfileEditor()" class="text-text-secondary hover:text-text-primary transition-colors">
+                            <button onclick="window.closeProfileEditor()" class="text-gray-400 hover:text-gray-600 transition-colors">
                                 <i data-lucide="x" class="w-5 h-5"></i>
                             </button>
                         </div>
                         <div class="space-y-4">
                             <div>
-                                <label class="block text-sm font-medium text-text-primary mb-1">主营产品</label>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">主营产品</label>
                                 <input type="text" id="edit-products" value="${profile.products}" 
-                                    class="w-full px-3 py-2 bg-sidebar border border-border-dark rounded-lg text-text-primary focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none">
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none">
                             </div>
                             <div>
-                                <label class="block text-sm font-medium text-text-primary mb-1">核心优势</label>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">核心优势</label>
                                 <input type="text" id="edit-advantages" value="${Array.isArray(profile.advantages) ? profile.advantages.join('、') : profile.advantages}" 
-                                    class="w-full px-3 py-2 bg-sidebar border border-border-dark rounded-lg text-text-primary focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none">
-                                <p class="text-xs text-text-secondary mt-1">多个优势请用顿号分隔</p>
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none">
+                                <p class="text-xs text-gray-500 mt-1">多个优势请用顿号分隔</p>
                             </div>
                             <div>
-                                <label class="block text-sm font-medium text-text-primary mb-1">主营市场</label>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">主营市场</label>
                                 <input type="text" id="edit-markets" value="${profile.markets}" 
-                                    class="w-full px-3 py-2 bg-sidebar border border-border-dark rounded-lg text-text-primary focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none">
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none">
                             </div>
                         </div>
                         <div class="flex gap-3 mt-6">
-                            <button onclick="window.closeProfileEditor()" class="flex-1 py-2 border border-border-dark rounded-lg text-text-primary hover:bg-sidebar transition-colors">取消</button>
+                            <button onclick="window.closeProfileEditor()" class="flex-1 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">取消</button>
                             <button onclick="window.saveProfileChanges()" class="flex-1 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors">保存修改</button>
                         </div>
                     </div>
@@ -1251,18 +1189,18 @@
             const card = document.querySelector('[data-field="products"]')?.closest('.card-hover, .slide-in');
             if (card) {
                 card.outerHTML = `
-                    <div class="mt-4 bg-chat-bg border border-border-dark rounded-xl p-4 shadow-sm card-hover slide-in text-text-primary">
+                    <div class="mt-4 bg-white border border-gray-200 rounded-xl p-4 shadow-sm card-hover slide-in">
                         <h3 class="font-semibold text-text-primary mb-3 flex items-center gap-2">
                             <i data-lucide="building-2" class="w-4 h-4 text-primary"></i>
                             企业画像 - AI理解确认
                         </h3>
                         <div class="space-y-2 text-sm">
-                            <div class="flex gap-2"><span class="text-text-secondary w-20 flex-shrink-0">产品类别:</span><span class="text-text-primary" data-field="products">${profile.products}</span></div>
-                            <div class="flex gap-2"><span class="text-text-secondary w-20 flex-shrink-0">核心优势:</span><span class="text-text-primary" data-field="advantages">${Array.isArray(profile.advantages) ? profile.advantages.join('、') : profile.advantages}</span></div>
-                            <div class="flex gap-2"><span class="text-text-secondary w-20 flex-shrink-0">主营市场:</span><span class="text-text-primary" data-field="markets">${profile.markets}</span></div>
+                            <div class="flex gap-2"><span class="text-gray-500 w-20 flex-shrink-0">产品类别:</span><span class="text-gray-800" data-field="products">${profile.products}</span></div>
+                            <div class="flex gap-2"><span class="text-gray-500 w-20 flex-shrink-0">核心优势:</span><span class="text-gray-800" data-field="advantages">${Array.isArray(profile.advantages) ? profile.advantages.join('、') : profile.advantages}</span></div>
+                            <div class="flex gap-2"><span class="text-gray-500 w-20 flex-shrink-0">主营市场:</span><span class="text-gray-800" data-field="markets">${profile.markets}</span></div>
                         </div>
                         <div class="flex gap-2 mt-4">
-                            <button onclick="window.openProfileEditor()" class="flex-1 py-2 border border-border-dark rounded-lg text-sm text-text-secondary hover:bg-sidebar transition-colors">✏️ 编辑修改</button>
+                            <button onclick="window.openProfileEditor()" class="flex-1 py-2 border border-gray-200 rounded-lg text-sm text-gray-600 hover:bg-gray-50 transition-colors">✏️ 编辑修改</button>
                             <button onclick="window.handleAction('confirm-profile')" class="flex-1 py-2 bg-primary text-white rounded-lg text-sm hover:bg-primary/90 transition-colors">✅ 确认无误</button>
                         </div>
                     </div>
@@ -1928,51 +1866,51 @@
 
         renderSidebar() {
             this.sidebar.innerHTML = `
-                <div class="p-4 border-b border-border-dark">
+                <div class="p-4 border-b border-gray-100">
                     <div class="flex items-center gap-2">
                         <div class="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
                             <i data-lucide="sparkles" class="w-5 h-5 text-white"></i>
                         </div>
                         <span class="font-bold text-text-primary">DealClaw</span>
                     </div>
-                    <p class="text-xs text-text-secondary mt-1">数字员工团队</p>
+                    <p class="text-xs text-gray-500 mt-1">数字员工团队</p>
                 </div>
                 
                 <nav class="flex-1 p-3 space-y-1 overflow-y-auto scrollbar-hide">
-                    <button onclick="window.handleAction('goto-home')" class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-text-primary hover:bg-sidebar transition-colors">
-                        <i data-lucide="home" class="w-4 h-4 text-text-secondary"></i>
+                    <button onclick="window.handleAction('goto-home')" class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-gray-700 hover:bg-gray-50 transition-colors">
+                        <i data-lucide="home" class="w-4 h-4 text-gray-400"></i>
                         首页
                     </button>
-                    <button onclick="window.handleAction('goto-tasks')" class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-text-primary hover:bg-sidebar transition-colors">
-                        <i data-lucide="check-square" class="w-4 h-4 text-text-secondary"></i>
+                    <button onclick="window.handleAction('goto-tasks')" class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-gray-700 hover:bg-gray-50 transition-colors">
+                        <i data-lucide="check-square" class="w-4 h-4 text-gray-400"></i>
                         获客任务
                     </button>
-                    <button onclick="window.handleAction('goto-leads')" class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-text-primary hover:bg-sidebar transition-colors">
-                        <i data-lucide="users" class="w-4 h-4 text-text-secondary"></i>
+                    <button onclick="window.handleAction('goto-leads')" class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-gray-700 hover:bg-gray-50 transition-colors">
+                        <i data-lucide="users" class="w-4 h-4 text-gray-400"></i>
                         线索中心
                     </button>
-                    <button onclick="window.handleAction('goto-seo')" class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-text-primary hover:bg-sidebar transition-colors">
-                        <i data-lucide="search" class="w-4 h-4 text-text-secondary"></i>
+                    <button onclick="window.handleAction('goto-seo')" class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-gray-700 hover:bg-gray-50 transition-colors">
+                        <i data-lucide="search" class="w-4 h-4 text-gray-400"></i>
                         SEO内容
                     </button>
-                    <button onclick="window.handleAction('goto-email')" class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-text-primary hover:bg-sidebar transition-colors">
-                        <i data-lucide="mail" class="w-4 h-4 text-text-secondary"></i>
+                    <button onclick="window.handleAction('goto-email')" class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-gray-700 hover:bg-gray-50 transition-colors">
+                        <i data-lucide="mail" class="w-4 h-4 text-gray-400"></i>
                         邮件外联
                     </button>
-                    <button onclick="window.handleAction('goto-analytics')" class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-text-primary hover:bg-sidebar transition-colors">
-                        <i data-lucide="bar-chart-2" class="w-4 h-4 text-text-secondary"></i>
+                    <button onclick="window.handleAction('goto-analytics')" class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-gray-700 hover:bg-gray-50 transition-colors">
+                        <i data-lucide="bar-chart-2" class="w-4 h-4 text-gray-400"></i>
                         数据分析
                     </button>
                 </nav>
                 
-                <div class="p-3 border-t border-border-dark">
+                <div class="p-3 border-t border-gray-100">
                     <div class="bg-gradient-to-r from-primary/10 to-cta/10 rounded-lg p-3 mb-3">
                         <p class="text-xs font-medium text-text-primary mb-1">AI智能升级</p>
-                        <p class="text-xs text-text-secondary mb-2">解锁更智能的获客分析</p>
+                        <p class="text-xs text-gray-600 mb-2">解锁更智能的获客分析</p>
                         <button class="w-full py-1.5 bg-primary text-white text-xs rounded-md hover:bg-primary/90 transition-colors">升级</button>
                     </div>
-                    <button onclick="window.handleAction('open-settings')" class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-text-primary hover:bg-sidebar transition-colors">
-                        <i data-lucide="settings" class="w-4 h-4 text-text-secondary"></i>
+                    <button onclick="window.handleAction('open-settings')" class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-gray-700 hover:bg-gray-50 transition-colors">
+                        <i data-lucide="settings" class="w-4 h-4 text-gray-400"></i>
                         设置
                     </button>
                 </div>
@@ -1981,41 +1919,41 @@
 
         renderChatArea() {
             this.chatArea.innerHTML = `
-                <div id="chat-header" class="flex items-center justify-between px-4 py-3 border-b border-border-dark bg-chat-bg">
+                <div id="chat-header" class="flex items-center justify-between px-4 py-3 border-b border-gray-100 bg-white">
                     <div class="flex items-center gap-3">
                         <div class="w-10 h-10 rounded-full agent-avatar flex items-center justify-center">
                             <i data-lucide="bot" class="w-5 h-5 text-white"></i>
                         </div>
                         <div>
                             <h2 class="font-semibold text-text-primary">Chief Agent</h2>
-                            <p class="text-xs text-text-secondary flex items-center gap-1">
+                            <p class="text-xs text-gray-500 flex items-center gap-1">
                                 <span class="w-2 h-2 bg-green-500 rounded-full"></span>
                                 在线
                             </p>
                         </div>
                     </div>
                     <div class="flex items-center gap-2">
-                        <button onclick="window.handleAction('refresh')" class="p-2 text-text-secondary hover:text-text-primary hover:bg-input-bg rounded-lg transition-colors">
+                        <button onclick="window.handleAction('refresh')" class="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors">
                             <i data-lucide="refresh-cw" class="w-4 h-4"></i>
                         </button>
-                        <button onclick="window.handleAction('more-options')" class="p-2 text-text-secondary hover:text-text-primary hover:bg-input-bg rounded-lg transition-colors">
+                        <button onclick="window.handleAction('more-options')" class="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors">
                             <i data-lucide="more-horizontal" class="w-4 h-4"></i>
                         </button>
                     </div>
                 </div>
                 
-                <div id="chat-messages" class="flex-1 overflow-y-auto p-4 bg-chat-bg scrollbar-hide">
+                <div id="chat-messages" class="flex-1 overflow-y-auto p-4 bg-gradient-to-b from-gray-50/50 to-white scrollbar-hide">
                     <!-- Messages will be rendered here -->
                 </div>
                 
-                <div id="chat-input" class="p-4 bg-chat-bg border-t border-border-dark">
+                <div id="chat-input" class="p-4 bg-white border-t border-gray-100">
                     <div class="flex items-end gap-3">
-                        <button onclick="window.handleAction('attach')" class="p-2 text-text-secondary hover:text-text-primary hover:bg-input-bg rounded-lg transition-colors flex-shrink-0">
+                        <button onclick="window.handleAction('attach')" class="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors flex-shrink-0">
                             <i data-lucide="paperclip" class="w-5 h-5"></i>
                         </button>
                         <div class="flex-1 relative">
                             <textarea id="message-input" 
-                                class="w-full min-h-[44px] max-h-[120px] px-4 py-2.5 pr-12 bg-sidebar border border-border-dark rounded-xl text-sm resize-none focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+                                class="w-full min-h-[44px] max-h-[120px] px-4 py-2.5 pr-12 bg-gray-50 border border-gray-200 rounded-xl text-sm resize-none focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
                                 placeholder="给 Chief Agent 发送消息..."
                                 rows="1"
                                 onkeydown="window.handleInputKeydown(event)"
@@ -2024,14 +1962,14 @@
                                 <i data-lucide="send" class="w-4 h-4"></i>
                             </button>
                         </div>
-                        <button onclick="window.handleAction('voice')" class="p-2 text-text-secondary hover:text-text-primary hover:bg-input-bg rounded-lg transition-colors flex-shrink-0">
+                        <button onclick="window.handleAction('voice')" class="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors flex-shrink-0">
                             <i data-lucide="mic" class="w-5 h-5"></i>
                         </button>
                     </div>
                     <div class="flex items-center justify-between mt-2">
-                        <p class="text-xs text-text-secondary">按 Enter 发送，Shift + Enter 换行</p>
+                        <p class="text-xs text-gray-400">按 Enter 发送，Shift + Enter 换行</p>
                         <div class="flex items-center gap-2">
-                            <span class="text-xs text-text-secondary">@ 提及其他 Agent</span>
+                            <span class="text-xs text-gray-400">@ 提及其他 Agent</span>
                         </div>
                     </div>
                 </div>
@@ -2086,17 +2024,17 @@
     window.showAgentMentionPopup = function() {
         const input = document.getElementById('message-input');
         const popupHTML = `
-            <div id="agent-mention-popup" class="absolute bottom-full left-0 mb-2 bg-chat-bg border border-border-dark rounded-xl shadow-lg p-2 min-w-[200px] z-50 slide-in">
-                <p class="text-xs text-text-secondary px-2 py-1">提及 Agent</p>
-                <button onclick="window.insertAgentMention('@SEO Agent ')" class="w-full flex items-center gap-2 px-2 py-2 rounded-lg hover:bg-sidebar text-left text-sm">
+            <div id="agent-mention-popup" class="absolute bottom-full left-0 mb-2 bg-white border border-gray-200 rounded-xl shadow-lg p-2 min-w-[200px] z-50 slide-in">
+                <p class="text-xs text-gray-500 px-2 py-1">提及 Agent</p>
+                <button onclick="window.insertAgentMention('@SEO Agent ')" class="w-full flex items-center gap-2 px-2 py-2 rounded-lg hover:bg-gray-50 text-left text-sm">
                     <span class="w-6 h-6 rounded-full bg-blue-500 flex items-center justify-center text-xs text-white">🔍</span>
                     <span>SEO Agent</span>
                 </button>
-                <button onclick="window.insertAgentMention('@Email Agent ')" class="w-full flex items-center gap-2 px-2 py-2 rounded-lg hover:bg-sidebar text-left text-sm">
+                <button onclick="window.insertAgentMention('@Email Agent ')" class="w-full flex items-center gap-2 px-2 py-2 rounded-lg hover:bg-gray-50 text-left text-sm">
                     <span class="w-6 h-6 rounded-full bg-purple-500 flex items-center justify-center text-xs text-white">✉️</span>
                     <span>Email Agent</span>
                 </button>
-                <button onclick="window.insertAgentMention('@WhatsApp Agent ')" class="w-full flex items-center gap-2 px-2 py-2 rounded-lg hover:bg-sidebar text-left text-sm">
+                <button onclick="window.insertAgentMention('@WhatsApp Agent ')" class="w-full flex items-center gap-2 px-2 py-2 rounded-lg hover:bg-gray-50 text-left text-sm">
                     <span class="w-6 h-6 rounded-full bg-green-500 flex items-center justify-center text-xs text-white">💬</span>
                     <span>WhatsApp Agent</span>
                 </button>
