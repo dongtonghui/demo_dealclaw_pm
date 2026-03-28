@@ -1,9 +1,10 @@
 # DealClaw 数字员工团队 - 产品需求文档 V4.0
 
 > 文档版本: V4.0（用户故事旅程详细版）  
-> 最后更新: 2026-03-27  
+> 最后更新: 2026-03-28  
 > 核心理念: **对话式AI数字团队**，外贸B2B的AI员工而非工具  
 > 产品形态: 主管Agent统一入口，多Agent协作执行，全程自然语言交互  
+> 🎮 **在线演示**: [https://dealclawdemo.vercel.app/](https://dealclawdemo.vercel.app/)  
 
 ---
 
