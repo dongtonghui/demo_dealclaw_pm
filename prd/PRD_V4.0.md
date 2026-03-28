@@ -223,6 +223,18 @@ DealClaw获客模式（双引擎）：
 
 *上图展示了 DealClaw 的核心产品界面：左侧为任务导航和数字员工团队管理，中间为主管 Agent 对话区域，右侧实时展示 Agent 工作状态、获客数据和企业知识库完整度*
 
+**获客方案生成与确认**
+
+![DealClaw 获客方案界面](images/product-ui-strategy.jpg)
+
+*主管 Agent 根据用户需求自动生成多渠道获客方案，以富媒体卡片形式展示 SEO Agent 和 Email Agent 的具体策略，用户可一键确认或调整配置*
+
+**任务执行与进度追踪**
+
+![DealClaw 任务执行界面](images/product-ui-execution.jpg)
+
+*任务启动后，主管 Agent 展示整体预期数据（获客周期、总线索数、预估成本、高意向占比），并实时汇报各 Agent 的执行进度，右侧面板同步更新工作状态*
+
 
 ---
 
