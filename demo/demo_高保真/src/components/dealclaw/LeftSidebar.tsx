@@ -1,4 +1,5 @@
-import { Search, Plus, MessageSquare, Target, Settings, ChevronDown, Zap } from "lucide-react";
+import { Search, Plus, MessageSquare, Target, Settings, ChevronDown, Zap, Users, BarChart3, Mail, FileText } from "lucide-react";
+import { useState } from "react";
 
 interface LeftSidebarProps {
   activeTask: string;
@@ -11,13 +12,38 @@ const tasks = [
 ];
 
 const agents = [
-  { id: "supervisor", name: "主管 Agent", emoji: "🤖", color: "text-agent-supervisor" },
-  { id: "seo", name: "SEO Agent", emoji: "🔍", color: "text-agent-seo" },
-  { id: "email", name: "Email Agent", emoji: "✉️", color: "text-agent-email" },
+  { id: "supervisor", name: "主管 Agent", emoji: "🤖", color: "text-agent-supervisor", status: "online" },
+  { id: "seo", name: "SEO Agent", emoji: "🔍", color: "text-agent-seo", status: "online" },
+  { id: "email", name: "Email Agent", emoji: "✉️", color: "text-agent-email", status: "online" },
   { id: "whatsapp", name: "WhatsApp Agent", emoji: "💬", color: "text-agent-whatsapp", locked: true },
 ];
 
+const futureAgents = [
+  { id: "logistics", name: "物流Agent", emoji: "🚢", desc: "报关/运输/跟踪" },
+  { id: "competitor", name: "竞对监控Agent", emoji: "📈", desc: "价格/产品/策略监控" },
+  { id: "pricing", name: "选品报价Agent", emoji: "💰", desc: "成本分析/智能定价" },
+  { id: "customer", name: "客服Agent", emoji: "🎧", desc: "售后支持/投诉处理" },
+];
+
+const navItems = [
+  { id: "leads", label: "线索收件箱", icon: Users, count: 23, alert: true },
+  { id: "dashboard", label: "数据看板", icon: BarChart3 },
+  { id: "emails", label: "邮件管理", icon: Mail, count: 450 },
+  { id: "content", label: "内容中心", icon: FileText, count: 6 },
+];
+
 export function LeftSidebar({ activeTask, onSelectTask }: LeftSidebarProps) {
+  const [expandedSections, setExpandedSections] = useState({
+    tasks: true,
+    agents: true,
+    future: false,
+    nav: true,
+  });
+
+  const toggleSection = (section: keyof typeof expandedSections) => {
+    setExpandedSections(prev => ({ ...prev, [section]: !prev[section] }));
+  };
+
   return (
     <aside className="w-64 shrink-0 border-r border-border bg-sidebar flex flex-col h-full">
       {/* Logo */}
@@ -37,63 +63,131 @@ export function LeftSidebar({ activeTask, onSelectTask }: LeftSidebarProps) {
         </button>
       </div>
 
+      {/* Navigation Items */}
+      <div className="px-3 mb-1">
+        <button 
+          onClick={() => toggleSection("nav")}
+          className="w-full flex items-center justify-between px-2 py-1.5 text-xs font-medium text-muted-foreground uppercase tracking-wider"
+        >
+          <div className="flex items-center gap-1">
+            <Target className="w-3 h-3" />
+            快捷导航
+          </div>
+          <ChevronDown className={`w-3 h-3 transition-transform ${expandedSections.nav ? "" : "-rotate-90"}`} />
+        </button>
+      </div>
+      {expandedSections.nav && (
+        <div className="px-3 space-y-0.5 mb-4">
+          {navItems.map((item) => (
+            <button
+              key={item.id}
+              className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-colors text-left hover:bg-sidebar-accent group"
+            >
+              <item.icon className="w-4 h-4 text-muted-foreground group-hover:text-foreground" />
+              <span className="truncate text-sidebar-foreground">{item.label}</span>
+              {item.count !== undefined && (
+                <span className={`ml-auto text-[10px] px-1.5 py-0.5 rounded font-mono ${item.alert ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"}`}>
+                  {item.count}
+                </span>
+              )}
+            </button>
+          ))}
+        </div>
+      )}
+
       {/* Tasks */}
       <div className="px-3 mb-1">
-        <div className="flex items-center gap-1 px-2 py-1.5 text-xs font-medium text-muted-foreground uppercase tracking-wider">
-          <MessageSquare className="w-3 h-3" />
-          任务列表
+        <button 
+          onClick={() => toggleSection("tasks")}
+          className="w-full flex items-center justify-between px-2 py-1.5 text-xs font-medium text-muted-foreground uppercase tracking-wider"
+        >
+          <div className="flex items-center gap-1">
+            <MessageSquare className="w-3 h-3" />
+            任务列表
+          </div>
+          <ChevronDown className={`w-3 h-3 transition-transform ${expandedSections.tasks ? "" : "-rotate-90"}`} />
+        </button>
+      </div>
+      {expandedSections.tasks && (
+        <div className="px-3 space-y-0.5">
+          {tasks.map((task) => (
+            <button
+              key={task.id}
+              onClick={() => onSelectTask(task.id)}
+              className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-colors text-left ${
+                activeTask === task.id
+                  ? "bg-sidebar-accent text-sidebar-accent-foreground"
+                  : "text-sidebar-foreground hover:bg-sidebar-accent/50"
+              }`}
+            >
+              <span>{task.icon}</span>
+              <span className="truncate">{task.label}</span>
+              {task.status === "active" && (
+                <span className="ml-auto w-1.5 h-1.5 rounded-full bg-primary" />
+              )}
+            </button>
+          ))}
         </div>
-      </div>
-      <div className="px-3 space-y-0.5">
-        {tasks.map((task) => (
-          <button
-            key={task.id}
-            onClick={() => onSelectTask(task.id)}
-            className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-colors text-left ${
-              activeTask === task.id
-                ? "bg-sidebar-accent text-sidebar-accent-foreground"
-                : "text-sidebar-foreground hover:bg-sidebar-accent/50"
-            }`}
-          >
-            <span>{task.icon}</span>
-            <span className="truncate">{task.label}</span>
-          </button>
-        ))}
-      </div>
+      )}
 
       {/* Agent Team */}
-      <div className="mt-6 px-3 mb-1">
-        <div className="flex items-center gap-1 px-2 py-1.5 text-xs font-medium text-muted-foreground uppercase tracking-wider">
-          <Target className="w-3 h-3" />
-          数字员工团队
-        </div>
-      </div>
-      <div className="px-3 space-y-0.5 flex-1">
-        {agents.map((agent) => (
-          <div
-            key={agent.id}
-            className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm ${
-              agent.locked ? "text-muted-foreground/50" : "text-sidebar-foreground"
-            }`}
-          >
-            <span>{agent.emoji}</span>
-            <span className="truncate">{agent.name}</span>
-            {agent.locked && (
-              <span className="ml-auto text-[10px] bg-muted text-muted-foreground px-1.5 py-0.5 rounded font-mono">
-                P1
-              </span>
-            )}
+      <div className="mt-4 px-3 mb-1">
+        <button 
+          onClick={() => toggleSection("agents")}
+          className="w-full flex items-center justify-between px-2 py-1.5 text-xs font-medium text-muted-foreground uppercase tracking-wider"
+        >
+          <div className="flex items-center gap-1">
+            <Users className="w-3 h-3" />
+            数字员工团队
           </div>
-        ))}
-
-        {/* Future agents */}
-        <div className="mt-3 mx-2 p-3 rounded-lg border border-dashed border-border">
-          <p className="text-[11px] text-muted-foreground leading-relaxed">
-            🚢 物流Agent · 📈 竞对监控 · 💰 选品报价
-          </p>
-          <p className="text-[10px] text-muted-foreground/60 mt-1">即将加入...</p>
-        </div>
+          <ChevronDown className={`w-3 h-3 transition-transform ${expandedSections.agents ? "" : "-rotate-90"}`} />
+        </button>
       </div>
+      {expandedSections.agents && (
+        <div className="px-3 space-y-0.5 flex-1 overflow-y-auto">
+          {agents.map((agent) => (
+            <div
+              key={agent.id}
+              className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm ${
+                agent.locked ? "text-muted-foreground/50" : "text-sidebar-foreground"
+              }`}
+            >
+              <span>{agent.emoji}</span>
+              <span className="truncate">{agent.name}</span>
+              {!agent.locked && (
+                <span className="ml-auto w-1.5 h-1.5 rounded-full bg-agent-seo" />
+              )}
+              {agent.locked && (
+                <span className="ml-auto text-[10px] bg-muted text-muted-foreground px-1.5 py-0.5 rounded font-mono">
+                  P1
+                </span>
+              )}
+            </div>
+          ))}
+
+          {/* Future agents */}
+          <button 
+            onClick={() => toggleSection("future")}
+            className="mt-3 mx-2 p-3 rounded-lg border border-dashed border-border w-full text-left"
+          >
+            <div className="flex items-center justify-between mb-1">
+              <p className="text-[11px] text-muted-foreground">即将加入...</p>
+              <ChevronDown className={`w-3 h-3 text-muted-foreground transition-transform ${expandedSections.future ? "" : "-rotate-90"}`} />
+            </div>
+            {expandedSections.future && (
+              <div className="space-y-1.5 mt-2">
+                {futureAgents.map((agent) => (
+                  <div key={agent.id} className="flex items-center gap-1.5 text-[11px] text-muted-foreground/70">
+                    <span>{agent.emoji}</span>
+                    <span>{agent.name}</span>
+                    <span className="text-muted-foreground/40">· {agent.desc}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </button>
+        </div>
+      )}
 
       {/* Settings */}
       <div className="p-3 border-t border-border">

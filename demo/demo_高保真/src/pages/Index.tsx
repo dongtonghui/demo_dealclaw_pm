@@ -25,6 +25,7 @@ const Index = () => {
         onToggle={() => setRightPanelOpen(!rightPanelOpen)}
         activeTask={chatState.activeTask}
         agentStatuses={chatState.agentStatuses}
+        leads={chatState.leads}
       />
     </div>
   );
