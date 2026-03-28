@@ -1,5 +1,5 @@
-import { useState, useRef, useEffect } from "react";
-import { Send, Paperclip, Mic, FileText, X, Upload } from "lucide-react";
+import { useState, useRef, useEffect, useCallback } from "react";
+import { Send, Paperclip, Mic, FileText, X, Upload, HelpCircle } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import type { ChatMessage } from "@/hooks/useChatState";
 import { MessageBubble } from "./MessageBubble";
@@ -7,7 +7,8 @@ import { MessageBubble } from "./MessageBubble";
 interface ChatPanelProps {
   messages: ChatMessage[];
   onSendMessage: (text: string) => void;
-  onCardAction: (actionId: string) => void;
+  onCardAction: (actionId: string, data?: Record<string, any>) => void;
+  onFileUpload?: (files: { name: string; size: string; type: string }[]) => void;
   isTyping: boolean;
 }
 
@@ -17,34 +18,88 @@ interface UploadedFile {
   type: string;
 }
 
-export function ChatPanel({ messages, onSendMessage, onCardAction, isTyping }: ChatPanelProps) {
+// Debounce hook for preventing rapid submissions
+function useDebounce<T extends (...args: any[]) => void>(
+  callback: T,
+  delay: number
+): T {
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  return useCallback(
+    (...args: Parameters<T>) => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+      timeoutRef.current = setTimeout(() => {
+        callback(...args);
+      }, delay);
+    },
+    [callback, delay]
+  ) as T;
+}
+
+export function ChatPanel({ 
+  messages, 
+  onSendMessage, 
+  onCardAction, 
+  onFileUpload,
+  isTyping 
+}: ChatPanelProps) {
   const [input, setInput] = useState("");
   const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
   const [isRecording, setIsRecording] = useState(false);
   const [showUploadZone, setShowUploadZone] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // Auto scroll to bottom
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
     }
   }, [messages, isTyping]);
 
+  // Debounced submit handler (BUG FIX-007: Debounce rapid submissions)
+  const debouncedSubmit = useDebounce((text: string) => {
+    onSendMessage(text);
+    setIsSubmitting(false);
+  }, 300);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!input.trim() && uploadedFiles.length === 0) return;
     
-    // If files are uploaded, include in message
-    let messageText = input.trim();
-    if (uploadedFiles.length > 0) {
+    // BUG FIX-001: Enhanced validation for empty messages
+    const trimmedInput = input.trim();
+    const hasValidInput = trimmedInput.length > 0;
+    const hasFiles = uploadedFiles.length > 0;
+    
+    if (!hasValidInput && !hasFiles) return;
+    if (isSubmitting) return; // Prevent duplicate submissions
+    
+    setIsSubmitting(true);
+    
+    // Build message text
+    let messageText = trimmedInput;
+    if (hasFiles) {
       const fileNames = uploadedFiles.map(f => `[${f.name}]`).join(" ");
-      messageText = messageText ? `${messageText} ${fileNames}` : `上传了文件: ${fileNames}`;
+      messageText = hasValidInput 
+        ? `${trimmedInput} ${fileNames}` 
+        : `上传了文件: ${fileNames}`;
     }
     
-    onSendMessage(messageText);
+    // Clear input immediately for better UX
     setInput("");
     setUploadedFiles([]);
+    setShowUploadZone(false);
+    
+    // Handle file upload if present
+    if (hasFiles && onFileUpload) {
+      onFileUpload(uploadedFiles);
+    } else {
+      // Use debounced submit
+      debouncedSubmit(messageText);
+    }
   };
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -83,12 +138,18 @@ export function ChatPanel({ messages, onSendMessage, onCardAction, isTyping }: C
     }
   };
 
+  const handleHelpClick = () => {
+    onSendMessage("帮助");
+  };
+
   const quickCommands = [
     { label: "查看线索", icon: "🎯", command: "查看线索" },
     { label: "任务进展", icon: "📊", command: "任务进展如何" },
     { label: "本周效果", icon: "📈", command: "本周效果如何" },
     { label: "生成文章", icon: "📝", command: "@SEO Agent 生成文章" },
   ];
+
+  const canSubmit = input.trim().length > 0 || uploadedFiles.length > 0;
 
   return (
     <div className="flex-1 flex flex-col min-w-0 bg-background">
@@ -99,7 +160,14 @@ export function ChatPanel({ messages, onSendMessage, onCardAction, isTyping }: C
           <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse-glow" />
           <span className="text-xs text-muted-foreground">在线</span>
         </div>
-        <div className="ml-auto flex items-center gap-2">
+        <div className="ml-auto flex items-center gap-3">
+          <button
+            onClick={handleHelpClick}
+            className="text-muted-foreground hover:text-foreground transition-colors"
+            title="查看帮助"
+          >
+            <HelpCircle className="w-4 h-4" />
+          </button>
           <span className="text-xs text-muted-foreground">按</span>
           <kbd className="px-1.5 py-0.5 bg-muted rounded text-[10px] text-muted-foreground">Enter</kbd>
           <span className="text-xs text-muted-foreground">发送</span>
@@ -152,7 +220,8 @@ export function ChatPanel({ messages, onSendMessage, onCardAction, isTyping }: C
                 <button
                   key={cmd.command}
                   onClick={() => onSendMessage(cmd.command)}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-muted text-xs text-muted-foreground hover:bg-muted/80 hover:text-foreground transition-colors"
+                  disabled={isSubmitting}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-muted text-xs text-muted-foreground hover:bg-muted/80 hover:text-foreground transition-colors disabled:opacity-50"
                 >
                   <span>{cmd.icon}</span>
                   <span>{cmd.label}</span>
@@ -231,7 +300,8 @@ export function ChatPanel({ messages, onSendMessage, onCardAction, isTyping }: C
             <button 
               type="button" 
               onClick={() => setShowUploadZone(!showUploadZone)}
-              className={`text-muted-foreground hover:text-foreground transition-colors ${showUploadZone ? "text-primary" : ""}`}
+              disabled={isSubmitting}
+              className={`text-muted-foreground hover:text-foreground transition-colors disabled:opacity-50 ${showUploadZone ? "text-primary" : ""}`}
             >
               <Paperclip className="w-4 h-4" />
             </button>
@@ -239,18 +309,20 @@ export function ChatPanel({ messages, onSendMessage, onCardAction, isTyping }: C
               value={input}
               onChange={(e) => setInput(e.target.value)}
               placeholder="有什么可以帮你的？"
-              className="flex-1 bg-transparent text-sm text-foreground placeholder:text-muted-foreground outline-none"
+              disabled={isSubmitting}
+              className="flex-1 bg-transparent text-sm text-foreground placeholder:text-muted-foreground outline-none disabled:opacity-50"
             />
             <button 
               type="button" 
               onClick={handleMicClick}
-              className={`transition-colors ${isRecording ? "text-red-500" : "text-muted-foreground hover:text-foreground"}`}
+              disabled={isSubmitting}
+              className={`transition-colors disabled:opacity-50 ${isRecording ? "text-red-500" : "text-muted-foreground hover:text-foreground"}`}
             >
               <Mic className="w-4 h-4" />
             </button>
             <button
               type="submit"
-              disabled={!input.trim() && uploadedFiles.length === 0}
+              disabled={!canSubmit || isSubmitting}
               className="w-8 h-8 rounded-lg bg-primary text-primary-foreground flex items-center justify-center disabled:opacity-30 hover:opacity-90 transition-opacity"
             >
               <Send className="w-4 h-4" />

@@ -18,6 +18,7 @@ const Index = () => {
         messages={chatState.messages}
         onSendMessage={chatState.sendMessage}
         onCardAction={chatState.handleCardAction}
+        onFileUpload={chatState.handleFileUpload}
         isTyping={chatState.isTyping}
       />
       <ContextPanel

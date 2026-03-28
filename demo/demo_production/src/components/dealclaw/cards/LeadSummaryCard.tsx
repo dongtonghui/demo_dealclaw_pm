@@ -1,10 +1,9 @@
 import type { RichCard, Lead } from "@/hooks/useChatState";
-import { useState } from "react";
-import { Mail, Search, MessageCircle } from "lucide-react";
+import { Mail, Search, MessageCircle, Eye } from "lucide-react";
 
 interface Props {
   card: RichCard;
-  onAction: (id: string) => void;
+  onAction: (id: string, data?: Record<string, any>) => void;
 }
 
 const SourceIcon = ({ source }: { source: string }) => {
@@ -37,81 +36,6 @@ const StatusBadge = ({ status }: { status: string }) => {
 
 export function LeadSummaryCard({ card, onAction }: Props) {
   const { total, new: newCount, highIntent, leads } = card.data;
-  const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
-
-  if (selectedLead) {
-    return (
-      <div className="rounded-xl border border-border bg-surface-elevated overflow-hidden">
-        <div className="px-4 py-3 border-b border-border flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <span>🎯</span>
-            <span className="text-sm font-medium text-foreground">线索详情</span>
-          </div>
-          <button 
-            onClick={() => setSelectedLead(null)}
-            className="text-xs text-muted-foreground hover:text-foreground"
-          >
-            ← 返回列表
-          </button>
-        </div>
-        
-        <div className="px-4 py-3 space-y-3">
-          <div className="flex items-start justify-between">
-            <div>
-              <div className="text-base font-medium text-foreground">{selectedLead.company}</div>
-              <div className="text-xs text-muted-foreground mt-0.5">
-                📍 {selectedLead.location} | 🏭 {selectedLead.industry} | 👥 {selectedLead.size}
-              </div>
-            </div>
-            <StatusBadge status={selectedLead.status} />
-          </div>
-
-          <div className="flex items-center gap-4 text-xs">
-            <div>
-              <span className="text-muted-foreground">评分: </span>
-              <span className={`font-medium ${selectedLead.score >= 80 ? "text-agent-seo" : "text-foreground"}`}>
-                {selectedLead.score}/100
-              </span>
-            </div>
-            <div className="flex items-center gap-1">
-              <SourceIcon source={selectedLead.source} />
-              <span className="text-muted-foreground capitalize">{selectedLead.source}</span>
-            </div>
-          </div>
-
-          {selectedLead.interactions && selectedLead.interactions.length > 0 && (
-            <div className="border-t border-border pt-3">
-              <div className="text-xs font-medium text-muted-foreground mb-2">💬 互动历史</div>
-              <div className="space-y-1.5">
-                {selectedLead.interactions.map((interaction, idx) => (
-                  <div key={idx} className="flex items-start gap-2 text-xs">
-                    <span className="text-muted-foreground shrink-0">
-                      {interaction.timestamp.split(" ")[0]}
-                    </span>
-                    <span className="text-secondary-foreground">
-                      {interaction.details}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          <div className="flex gap-2 pt-2">
-            <button className="flex-1 bg-primary text-primary-foreground text-xs py-2 rounded-lg hover:opacity-90">
-              💬 生成回复
-            </button>
-            <button className="flex-1 bg-muted text-muted-foreground text-xs py-2 rounded-lg hover:text-foreground">
-              📝 添加备注
-            </button>
-            <button className="flex-1 bg-muted text-muted-foreground text-xs py-2 rounded-lg hover:text-foreground">
-              ⏰ 稍后提醒
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="rounded-xl border border-border bg-surface-elevated overflow-hidden">
@@ -139,8 +63,7 @@ export function LeadSummaryCard({ card, onAction }: Props) {
           {leads.slice(0, 3).map((lead: Lead) => (
             <div 
               key={lead.id} 
-              onClick={() => setSelectedLead(lead)}
-              className="bg-muted rounded-lg p-3 cursor-pointer hover:bg-muted/80 transition-colors"
+              className="bg-muted rounded-lg p-3 hover:bg-muted/80 transition-colors group"
             >
               <div className="flex items-start justify-between">
                 <div className="flex items-center gap-2">
@@ -149,9 +72,19 @@ export function LeadSummaryCard({ card, onAction }: Props) {
                   )}
                   <span className="text-sm font-medium text-foreground">{lead.company}</span>
                 </div>
-                <span className={`text-xs font-medium ${lead.score >= 80 ? "text-agent-seo" : "text-muted-foreground"}`}>
-                  {lead.score}分
-                </span>
+                <div className="flex items-center gap-2">
+                  <span className={`text-xs font-medium ${lead.score >= 80 ? "text-agent-seo" : "text-muted-foreground"}`}>
+                    {lead.score}分
+                  </span>
+                  <button
+                    onClick={() => onAction("view-lead-detail", { leadId: lead.id })}
+                    className="opacity-0 group-hover:opacity-100 transition-opacity text-xs bg-primary/10 text-primary px-2 py-1 rounded flex items-center gap-1"
+                    title="查看详情"
+                  >
+                    <Eye className="w-3 h-3" />
+                    详情
+                  </button>
+                </div>
               </div>
               <div className="flex items-center gap-3 mt-1.5 text-xs text-muted-foreground">
                 <span className="flex items-center gap-1">

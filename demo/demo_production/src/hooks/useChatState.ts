@@ -4,13 +4,18 @@ export type MessageRole = "user" | "agent" | "system";
 export type AgentType = "supervisor" | "seo" | "email" | "whatsapp" | "lead";
 export type CardType = 
   | "company-profile" 
-  | "customer-persona" 
-  | "acquisition-plan" 
+  | "company-profile-edit"
+  | "customer-persona"
+  | "customer-persona-edit"
+  | "acquisition-plan"
+  | "acquisition-plan-edit"
   | "seo-strategy"
   | "seo-article"
   | "email-preview"
   | "customer-list"
   | "lead-summary"
+  | "lead-detail"
+  | "reply-suggestion"
   | "data-dashboard"
   | "task-progress"
   | "file-upload"
@@ -51,6 +56,7 @@ export interface Lead {
   lastContact?: string;
   contactName?: string;
   email?: string;
+  decisionMaker?: string;
   interactions?: Interaction[];
 }
 
@@ -58,6 +64,50 @@ export interface Interaction {
   type: "email_sent" | "email_opened" | "email_replied" | "site_visit" | "whatsapp";
   timestamp: string;
   details?: string;
+}
+
+export interface CompanyProfile {
+  category: string;
+  advantage: string;
+  market: string;
+  targetCustomer: string;
+  priceRange: string;
+}
+
+export interface CustomerPersona {
+  region: string;
+  industry: string;
+  scale: string;
+  purchaseVolume: string;
+  decisionMaker: string;
+  timeline: string;
+}
+
+// Intent Recognition Types
+type IntentType = 
+  | 'ONBOARDING_INDUSTRY'
+  | 'ONBOARDING_MARKET'
+  | 'CREATE_TASK'
+  | 'TASK_DETAIL'
+  | 'CONFIRM_PROFILE'
+  | 'CONFIRM_PERSONA'
+  | 'CONFIRM_PLAN'
+  | 'QUERY_PROGRESS'
+  | 'QUERY_LEADS'
+  | 'QUERY_DASHBOARD'
+  | 'SEO_KEYWORDS'
+  | 'SEO_ARTICLE'
+  | 'SEO_PUBLISH'
+  | 'EMAIL_CUSTOMERS'
+  | 'EMAIL_PREVIEW'
+  | 'EMAIL_SEND'
+  | 'HELP'
+  | 'UNKNOWN';
+
+interface Intent {
+  type: IntentType;
+  confidence: number;
+  data?: Record<string, any>;
 }
 
 const INITIAL_MESSAGES: ChatMessage[] = [
@@ -70,7 +120,7 @@ const INITIAL_MESSAGES: ChatMessage[] = [
   },
 ];
 
-// Mock data for SEO
+// Mock data
 const MOCK_KEYWORDS = [
   { keyword: "wholesale camping tents", volume: 1300, difficulty: "medium", priority: "high" },
   { keyword: "bulk outdoor sleeping bags", volume: 890, difficulty: "low", priority: "high" },
@@ -109,7 +159,6 @@ The wholesalers who adapt quickly to these trends and build strong supplier rela
   aiScore: "low",
 };
 
-// Mock data for Email
 const MOCK_CUSTOMERS = [
   { id: "1", company: "Outdoor Gear Co.", location: "California, USA", size: "120人", score: 92, industry: "户外零售" },
   { id: "2", company: "Summit Camping Supply", location: "Texas, USA", size: "85人", score: 88, industry: "装备批发" },
@@ -147,7 +196,6 @@ Export Manager
 P.S. We're currently offering 5% off first orders for new wholesale partners.`,
 };
 
-// Mock data for Leads
 const MOCK_LEADS: Lead[] = [
   {
     id: "L001",
@@ -205,7 +253,6 @@ const MOCK_LEADS: Lead[] = [
   },
 ];
 
-// Mock data for Dashboard
 const MOCK_DASHBOARD = {
   period: "本周 (3/20 - 3/27)",
   leads: { current: 28, last: 22, change: "+27%" },
@@ -213,11 +260,7 @@ const MOCK_DASHBOARD = {
   costPerLead: { current: "¥98", last: "¥105", change: "-7%" },
   replyRate: { current: "4.5%", last: "3.8%", change: "+18%" },
   traffic: { current: 520, last: 410, change: "+27%" },
-  sourceDistribution: {
-    email: 68,
-    seo: 25,
-    other: 7,
-  },
+  sourceDistribution: { email: 68, seo: 25, other: 7 },
   roi: "4.4x",
   highlights: [
     "邮件回复率创新高（4.5%），主题行优化效果显著",
@@ -229,160 +272,113 @@ const MOCK_DASHBOARD = {
   ],
 };
 
-const DEMO_FLOW: { trigger: string; responses: ChatMessage[] }[] = [
-  {
-    trigger: "户外",
-    responses: [
-      {
-        id: "3",
-        role: "agent",
-        agent: "supervisor",
-        content: "了解了！户外用品是个很好的出口领域。您主要出口哪些市场？目标客户类型是批发商还是品牌商？",
-        timestamp: new Date(),
-      },
-    ],
-  },
-  {
-    trigger: "美国",
-    responses: [
-      {
-        id: "5",
-        role: "agent",
-        agent: "supervisor",
-        content: "好的！基于我们的对话，以下是我对贵公司的理解：",
-        card: {
-          type: "company-profile",
-          data: {
-            category: "户外用品（帐篷/睡袋/登山装备）",
-            advantage: "自有工厂、OEM定制、通过ISO认证",
-            market: "北美、欧洲",
-            targetCustomer: "批发商、品牌商",
-            priceRange: "中高端",
-          },
-          actions: [
-            { label: "编辑修改", id: "edit-profile", variant: "secondary" },
-            { label: "✓ 确认无误", id: "confirm-profile", variant: "primary" },
-          ],
-        },
-        timestamp: new Date(),
-      },
-    ],
-  },
-  {
-    trigger: "confirm-profile",
-    responses: [
-      {
-        id: "6",
-        role: "agent",
-        agent: "supervisor",
-        content: "已了解您的企业！现在您可以告诉我您的获客目标。\n\n例如：「帮我找美国户外用品批发商」",
-        timestamp: new Date(),
-      },
-    ],
-  },
-  {
-    trigger: "找",
-    responses: [
-      {
-        id: "8",
-        role: "agent",
-        agent: "supervisor",
-        content: "收到！让我确认几个细节：\n1. 目标客户年采购额大概？\n2. 期望多长时间看到效果？",
-        timestamp: new Date(),
-      },
-    ],
-  },
-  {
-    trigger: "万",
-    responses: [
-      {
-        id: "10",
-        role: "agent",
-        agent: "supervisor",
-        content: "了解了！这是您的目标客户画像：",
-        card: {
-          type: "customer-persona",
-          data: {
-            region: "美国",
-            industry: "户外用品批发",
-            scale: "中型（50-200人）",
-            purchaseVolume: "100万-500万美元/年",
-            decisionMaker: "采购经理/采购总监",
-            timeline: "3个月内",
-          },
-          actions: [
-            { label: "编辑", id: "edit-persona", variant: "secondary" },
-            { label: "✓ 确认无误", id: "confirm-persona", variant: "primary" },
-          ],
-        },
-        timestamp: new Date(),
-      },
-    ],
-  },
-  {
-    trigger: "confirm-persona",
-    responses: [
-      {
-        id: "11",
-        role: "system",
-        content: "正在协调 SEO Agent 和 Email Agent 制定方案...",
-        timestamp: new Date(),
-      },
-      {
-        id: "12",
-        role: "agent",
-        agent: "supervisor",
-        content: "方案已生成！这是为您定制的获客方案：",
-        card: {
-          type: "acquisition-plan",
-          data: {
-            seo: {
-              mode: "AI建站（推荐）",
-              keywords: "wholesale camping gear",
-              contentPlan: "每周2篇行业文章",
-              expectedLeads: "8条/月",
-            },
-            email: {
-              channel: "平台代发（高送达率）",
-              targetCustomers: "800家精准企业",
-              sendPlan: "每日30封，持续4周",
-              expectedLeads: "15条/月",
-            },
-            summary: {
-              cycle: "4-6周",
-              totalLeads: "23-32条",
-              costPerLead: "¥85-110/条",
-              highIntent: "40-50%",
-            },
-          },
-          actions: [
-            { label: "调整配置", id: "adjust-plan", variant: "secondary" },
-            { label: "🚀 确认执行", id: "confirm-plan", variant: "primary" },
-          ],
-        },
-        timestamp: new Date(),
-      },
-    ],
-  },
-  {
-    trigger: "confirm-plan",
-    responses: [
-      {
-        id: "13",
-        role: "agent",
-        agent: "supervisor",
-        content: "✅ 获客任务已启动！\n\n• SEO Agent：正在生成首篇 SEO 文章...\n• Email Agent：正在筛选目标客户...\n\n我会每天 18:00 向您汇报进展。\n\n您可以随时问我：\n- 「任务进展如何」查看实时状态\n- 「查看线索」查看已获得的线索\n- 「@SEO Agent 生成文章」直接操作SEO任务",
-        timestamp: new Date(),
-      },
-    ],
-  },
-];
+// Intent Recognition Functions
+const recognizeIntent = (text: string, context: {
+  hasCompanyProfile: boolean;
+  hasCustomerPersona: boolean;
+  hasActiveTask: boolean;
+}): Intent => {
+  const lowerText = text.toLowerCase().trim();
+  
+  // Confirmation actions
+  if (lowerText === 'confirm-profile' || lowerText.includes('确认无误') || lowerText.includes('确认画像')) {
+    return { type: 'CONFIRM_PROFILE', confidence: 0.95 };
+  }
+  
+  if (lowerText === 'confirm-persona' || lowerText.includes('确认客户') || (lowerText.includes('确认') && context.hasCompanyProfile && !context.hasCustomerPersona)) {
+    return { type: 'CONFIRM_PERSONA', confidence: 0.9 };
+  }
+  
+  if (lowerText === 'confirm-plan' || lowerText.includes('确认执行') || lowerText.includes('启动')) {
+    return { type: 'CONFIRM_PLAN', confidence: 0.95 };
+  }
+  
+  // Onboarding intents
+  if (!context.hasCompanyProfile) {
+    if (lowerText.includes('户外') || lowerText.includes('电子') || lowerText.includes('服装') || 
+        lowerText.includes('机械') || lowerText.includes('家居') || lowerText.includes('做')) {
+      return { type: 'ONBOARDING_INDUSTRY', confidence: 0.85 };
+    }
+    if (lowerText.includes('美国') || lowerText.includes('北美') || lowerText.includes('欧洲') || 
+        lowerText.includes('日本') || lowerText.includes('东南亚') || lowerText.includes('出口')) {
+      return { type: 'ONBOARDING_MARKET', confidence: 0.85 };
+    }
+  }
+  
+  // Task creation intents
+  if (lowerText.includes('找') || lowerText.includes('搜索') || lowerText.includes('获客') || 
+      lowerText.includes('开发') || lowerText.includes('寻找')) {
+    return { type: 'CREATE_TASK', confidence: 0.9 };
+  }
+  
+  if (lowerText.includes('万') || lowerText.includes('采购') || lowerText.includes('预算') || 
+      lowerText.includes('美元') || lowerText.includes('规模')) {
+    return { type: 'TASK_DETAIL', confidence: 0.8 };
+  }
+  
+  // Query intents
+  if (lowerText.includes('进展') || lowerText.includes('进度') || lowerText.includes('status') || 
+      lowerText.includes('如何') || lowerText.includes('怎么样')) {
+    return { type: 'QUERY_PROGRESS', confidence: 0.95 };
+  }
+  
+  if (lowerText.includes('线索') || lowerText.includes('lead') || lowerText.includes('客户') || 
+      lowerText.includes('商机')) {
+    return { type: 'QUERY_LEADS', confidence: 0.95 };
+  }
+  
+  if (lowerText.includes('效果') || lowerText.includes('数据') || lowerText.includes('dashboard') || 
+      lowerText.includes('统计') || lowerText.includes('本周') || lowerText.includes('本月')) {
+    return { type: 'QUERY_DASHBOARD', confidence: 0.9 };
+  }
+  
+  // SEO Agent commands
+  if (lowerText.includes('@seo') || lowerText.includes('seo agent')) {
+    if (lowerText.includes('关键词') || lowerText.includes('keyword') || lowerText.includes('策略')) {
+      return { type: 'SEO_KEYWORDS', confidence: 0.9 };
+    }
+    if (lowerText.includes('文章') || lowerText.includes('article') || lowerText.includes('生成') || lowerText.includes('内容')) {
+      return { type: 'SEO_ARTICLE', confidence: 0.9 };
+    }
+    if (lowerText.includes('发布') || lowerText.includes('publish')) {
+      return { type: 'SEO_PUBLISH', confidence: 0.9 };
+    }
+  }
+  
+  // Email Agent commands
+  if (lowerText.includes('@email') || lowerText.includes('email agent')) {
+    if (lowerText.includes('客户') || lowerText.includes('列表') || lowerText.includes('customer') || 
+        lowerText.includes('筛选') || lowerText.includes('目标')) {
+      return { type: 'EMAIL_CUSTOMERS', confidence: 0.9 };
+    }
+    if (lowerText.includes('邮件') || lowerText.includes('预览') || lowerText.includes('preview') || 
+        lowerText.includes('开发信')) {
+      return { type: 'EMAIL_PREVIEW', confidence: 0.9 };
+    }
+    if (lowerText.includes('发送') || lowerText.includes('启动')) {
+      return { type: 'EMAIL_SEND', confidence: 0.9 };
+    }
+  }
+  
+  // Help
+  if (lowerText.includes('帮助') || lowerText.includes('help') || lowerText.includes('怎么用') || 
+      lowerText.includes('指令') || lowerText.includes('功能')) {
+    return { type: 'HELP', confidence: 0.9 };
+  }
+  
+  return { type: 'UNKNOWN', confidence: 0 };
+};
 
 export function useChatState() {
   const [messages, setMessages] = useState<ChatMessage[]>(INITIAL_MESSAGES);
   const [isTyping, setIsTyping] = useState(false);
   const [activeTask, setActiveTask] = useState<string>("onboarding");
   const [leads, setLeads] = useState<Lead[]>(MOCK_LEADS);
+  const [companyProfile, setCompanyProfile] = useState<CompanyProfile | null>(null);
+  const [customerPersona, setCustomerPersona] = useState<CustomerPersona | null>(null);
+  const [editingCard, setEditingCard] = useState<{ type: CardType; data: Record<string, any> } | null>(null);
+  const [taskStarted, setTaskStarted] = useState(false);
+  
   const [agentStatuses, setAgentStatuses] = useState<AgentStatus[]>([
     { agent: "supervisor", name: "主管 Agent", status: "working", task: "Onboarding", progress: 35 },
     { agent: "seo", name: "SEO Agent", status: "idle", progress: 0 },
@@ -390,7 +386,9 @@ export function useChatState() {
     { agent: "whatsapp", name: "WhatsApp Agent", status: "idle", progress: 0 },
     { agent: "lead", name: "线索 Agent", status: "idle", progress: 0 },
   ]);
+  
   const flowIndex = useRef(0);
+  const processingRef = useRef(false);
 
   const addMessages = useCallback((newMsgs: ChatMessage[]) => {
     let delay = 0;
@@ -403,452 +401,1041 @@ export function useChatState() {
     });
   }, []);
 
+  const addSingleMessage = useCallback((msg: ChatMessage, delay: number = 1000) => {
+    setIsTyping(true);
+    setTimeout(() => {
+      setMessages((prev) => [...prev, { ...msg, timestamp: new Date() }]);
+      setIsTyping(false);
+    }, delay);
+  }, []);
+
+  // BUG FIX-001: Validate empty messages
   const sendMessage = useCallback(
     (text: string) => {
+      // Validate empty or whitespace-only messages
+      const trimmedText = text.trim();
+      if (!trimmedText) {
+        return; // Reject empty messages
+      }
+
+      // Prevent duplicate processing
+      if (processingRef.current) return;
+      processingRef.current = true;
+      setTimeout(() => { processingRef.current = false; }, 500);
+
       const userMsg: ChatMessage = {
         id: `user-${Date.now()}`,
         role: "user",
-        content: text,
+        content: trimmedText,
         timestamp: new Date(),
       };
       setMessages((prev) => [...prev, userMsg]);
       setIsTyping(true);
 
-      // Special commands
-      const lowerText = text.toLowerCase();
-      
-      // Check for progress query
-      if (lowerText.includes("进展") || lowerText.includes("进度") || lowerText.includes("status")) {
-        setTimeout(() => {
-          setMessages((prev) => [
-            ...prev,
-            {
-              id: `agent-${Date.now()}`,
-              role: "agent",
-              agent: "supervisor",
-              content: "以下是您的获客任务进展（美国户外用品批发商）：",
-              card: {
-                type: "task-progress",
-                data: {
-                  taskName: "美国户外用品批发商",
-                  status: "执行中",
-                  daysRunning: 15,
-                  seo: {
-                    articlesPublished: 6,
-                    keywordsRanked: 3,
-                    traffic: 320,
-                    growth: "+25%",
-                    progress: 45,
-                  },
-                  email: {
-                    sent: 450,
-                    delivered: 96,
-                    opened: 28,
-                    replied: 4.2,
-                    progress: 60,
-                  },
-                  leads: {
-                    total: 23,
-                    target: 30,
-                    highIntent: 8,
-                    percentage: 77,
-                  },
-                  suggestion: "Email打开率良好，建议优化主题行以提升回复率",
-                },
-                actions: [
-                  { label: "查看详情", id: "view-details", variant: "secondary" },
-                  { label: "导出报表", id: "export-report", variant: "primary" },
-                ],
-              },
-              timestamp: new Date(),
-            },
-          ]);
-          setIsTyping(false);
-        }, 1500);
-        return;
-      }
+      // Intent recognition
+      const intent = recognizeIntent(trimmedText, {
+        hasCompanyProfile: !!companyProfile,
+        hasCustomerPersona: !!customerPersona,
+        hasActiveTask: taskStarted,
+      });
 
-      // Check for leads query
-      if (lowerText.includes("线索") || lowerText.includes("lead") || lowerText.includes("客户")) {
-        setTimeout(() => {
-          setMessages((prev) => [
-            ...prev,
-            {
-              id: `agent-${Date.now()}`,
-              role: "agent",
-              agent: "supervisor",
-              content: "🔥 发现新的高意向线索！以下是您的线索收件箱：",
-              card: {
-                type: "lead-summary",
-                data: {
-                  total: leads.length,
-                  new: leads.filter(l => l.status === "new").length,
-                  highIntent: leads.filter(l => l.score >= 80).length,
-                  leads: leads,
-                },
-                actions: [
-                  { label: "查看全部", id: "view-all-leads", variant: "secondary" },
-                  { label: "导出Excel", id: "export-leads", variant: "primary" },
-                ],
-              },
-              timestamp: new Date(),
-            },
-          ]);
-          setIsTyping(false);
-        }, 1500);
-        return;
-      }
-
-      // Check for dashboard/effect query
-      if (lowerText.includes("效果") || lowerText.includes("数据") || lowerText.includes("dashboard") || lowerText.includes("本周")) {
-        setTimeout(() => {
-          setMessages((prev) => [
-            ...prev,
-            {
-              id: `agent-${Date.now()}`,
-              role: "agent",
-              agent: "supervisor",
-              content: `以下是${MOCK_DASHBOARD.period}的获客效果数据：`,
-              card: {
-                type: "data-dashboard",
-                data: MOCK_DASHBOARD,
-                actions: [
-                  { label: "查看上月对比", id: "compare-last-month", variant: "secondary" },
-                  { label: "导出报表", id: "export-dashboard", variant: "primary" },
-                ],
-              },
-              timestamp: new Date(),
-            },
-          ]);
-          setIsTyping(false);
-        }, 1500);
-        return;
-      }
-
-      // Check for @Agent commands
-      if (lowerText.includes("@seo") || lowerText.includes("seo agent")) {
-        handleSEOCommand(text);
-        return;
-      }
-
-      if (lowerText.includes("@email") || lowerText.includes("email agent")) {
-        handleEmailCommand(text);
-        return;
-      }
-
-      // Find matching flow
-      const currentFlow = DEMO_FLOW[flowIndex.current];
-      if (currentFlow && text.includes(currentFlow.trigger)) {
-        flowIndex.current++;
-        addMessages(currentFlow.responses);
-
-        // Update agent statuses based on flow
-        if (flowIndex.current >= 5) {
-          setAgentStatuses((prev) =>
-            prev.map((a) =>
-              a.agent === "seo" ? { ...a, status: "working", task: "制定内容策略", progress: 30 } :
-              a.agent === "email" ? { ...a, status: "working", task: "筛选目标客户", progress: 40 } : a
-            )
-          );
-          setActiveTask("acquisition");
-        }
-      } else {
-        // Default response
-        setTimeout(() => {
-          setMessages((prev) => [
-            ...prev,
-            {
-              id: `agent-${Date.now()}`,
-              role: "agent",
-              agent: "supervisor",
-              content: "收到您的消息。您可以尝试以下指令：\n• 「任务进展如何」查看实时状态\n• 「查看线索」查看已获得的线索\n• 「本周效果如何」查看数据看板\n• 「@SEO Agent 生成文章」操作SEO任务\n• 「@Email Agent 查看客户」操作邮件任务",
-              timestamp: new Date(),
-            },
-          ]);
-          setIsTyping(false);
-        }, 1000);
-      }
+      handleIntent(intent, trimmedText);
     },
-    [addMessages, leads]
+    [companyProfile, customerPersona, taskStarted]
   );
 
-  const handleSEOCommand = (text: string) => {
+  const handleIntent = useCallback((intent: Intent, text: string) => {
+    switch (intent.type) {
+      case 'ONBOARDING_INDUSTRY':
+        handleOnboardingIndustry(text);
+        break;
+      case 'ONBOARDING_MARKET':
+        handleOnboardingMarket(text);
+        break;
+      case 'CONFIRM_PROFILE':
+        handleConfirmProfile();
+        break;
+      case 'CREATE_TASK':
+        handleCreateTask(text);
+        break;
+      case 'TASK_DETAIL':
+        handleTaskDetail(text);
+        break;
+      case 'CONFIRM_PERSONA':
+        handleConfirmPersona();
+        break;
+      case 'CONFIRM_PLAN':
+        handleConfirmPlan();
+        break;
+      case 'QUERY_PROGRESS':
+        handleQueryProgress();
+        break;
+      case 'QUERY_LEADS':
+        handleQueryLeads();
+        break;
+      case 'QUERY_DASHBOARD':
+        handleQueryDashboard();
+        break;
+      case 'SEO_KEYWORDS':
+        handleSEOKeywords();
+        break;
+      case 'SEO_ARTICLE':
+        handleSEOArticle();
+        break;
+      case 'SEO_PUBLISH':
+        handleSEOPublish();
+        break;
+      case 'EMAIL_CUSTOMERS':
+        handleEmailCustomers();
+        break;
+      case 'EMAIL_PREVIEW':
+        handleEmailPreview();
+        break;
+      case 'EMAIL_SEND':
+        handleEmailSend();
+        break;
+      case 'HELP':
+        handleHelp();
+        break;
+      default:
+        handleDefaultResponse();
+    }
+  }, [companyProfile, customerPersona, taskStarted, leads]);
+
+  // Handlers
+  const handleOnboardingIndustry = (text: string) => {
     setTimeout(() => {
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: `agent-${Date.now()}`,
+          role: "agent",
+          agent: "supervisor",
+          content: "了解了！户外用品是个很好的出口领域。您主要出口哪些市场？目标客户类型是批发商还是品牌商？",
+          timestamp: new Date(),
+        },
+      ]);
       setIsTyping(false);
-      
-      if (text.includes("关键词") || text.includes("keyword")) {
-        setMessages((prev) => [
-          ...prev,
-          {
-            id: `agent-${Date.now()}-seo`,
-            role: "agent",
-            agent: "seo",
-            content: "已为您分析目标关键词（基于您的产品和市场）：",
-            card: {
-              type: "seo-strategy",
-              data: {
-                keywords: MOCK_KEYWORDS,
-                contentPlan: [
-                  { week: 1, topic: "2024年露营装备市场趋势", status: "已生成" },
-                  { week: 2, topic: "如何选择可靠的户外用品供应商", status: "待生成" },
-                  { week: 3, topic: "批发露营帐篷的5个关键考量因素", status: "待生成" },
-                  { week: 4, topic: "OEM定制睡袋的生产流程详解", status: "待生成" },
-                ],
-                expectations: {
-                  ranking: "3个月内目标关键词进入前20页",
-                  traffic: "月均自然流量：500-800访客",
-                  leads: "月均转化线索：5-8条",
-                },
+    }, 1000);
+  };
+
+  const handleOnboardingMarket = (text: string) => {
+    // Extract market info
+    const hasUS = text.includes('美国') || text.includes('北美');
+    const hasEU = text.includes('欧洲');
+    const market = hasUS && hasEU ? '北美、欧洲' : hasUS ? '北美' : hasEU ? '欧洲' : '全球';
+    
+    const profile: CompanyProfile = {
+      category: "户外用品（帐篷/睡袋/登山装备）",
+      advantage: "自有工厂、OEM定制、通过ISO认证",
+      market: market,
+      targetCustomer: "批发商、品牌商",
+      priceRange: "中高端",
+    };
+    
+    setCompanyProfile(profile);
+    
+    setTimeout(() => {
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: `agent-${Date.now()}`,
+          role: "agent",
+          agent: "supervisor",
+          content: "好的！基于我们的对话，以下是我对贵公司的理解：",
+          card: {
+            type: "company-profile",
+            data: profile,
+            actions: [
+              { label: "编辑修改", id: "edit-profile", variant: "secondary" },
+              { label: "✓ 确认无误", id: "confirm-profile", variant: "primary" },
+            ],
+          },
+          timestamp: new Date(),
+        },
+      ]);
+      setIsTyping(false);
+    }, 1000);
+  };
+
+  const handleConfirmProfile = () => {
+    setTimeout(() => {
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: `agent-${Date.now()}`,
+          role: "agent",
+          agent: "supervisor",
+          content: "已了解您的企业！现在您可以告诉我您的获客目标。\n\n例如：「帮我找美国户外用品批发商」",
+          timestamp: new Date(),
+        },
+      ]);
+      setAgentStatuses((prev) =>
+        prev.map((a) =>
+          a.agent === "supervisor" ? { ...a, status: "idle" as const, task: undefined, progress: 100 } : a
+        )
+      );
+      setIsTyping(false);
+    }, 500);
+  };
+
+  const handleCreateTask = (text: string) => {
+    setTimeout(() => {
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: `agent-${Date.now()}`,
+          role: "agent",
+          agent: "supervisor",
+          content: "收到！我来为您创建获客任务。\n\n基于您的企业画像（户外用品出口商）：\n• 目标地区：美国\n• 行业：户外用品\n• 客户类型：批发商\n\n让我确认几个细节：\n1. 目标客户年采购额大概？\n2. 期望多长时间看到效果？",
+          timestamp: new Date(),
+        },
+      ]);
+      setIsTyping(false);
+    }, 1000);
+  };
+
+  const handleTaskDetail = (text: string) => {
+    // Extract volume
+    const volumeMatch = text.match(/(\d+)[\s-]*(\d+)*\s*[万]/);
+    const volume = volumeMatch ? (volumeMatch[2] ? `${volumeMatch[1]}-${volumeMatch[2]}万` : `${volumeMatch[1]}万`) : "100-500万";
+    
+    const timeline = text.includes('3') ? '3个月内' : text.includes('6') ? '6个月内' : '3个月内';
+    
+    const persona: CustomerPersona = {
+      region: "美国",
+      industry: "户外用品批发",
+      scale: "中型（50-200人）",
+      purchaseVolume: `${volume}美元/年`,
+      decisionMaker: "采购经理/采购总监",
+      timeline: timeline,
+    };
+    
+    setCustomerPersona(persona);
+    
+    setTimeout(() => {
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: `agent-${Date.now()}`,
+          role: "agent",
+          agent: "supervisor",
+          content: "了解了！这是您的目标客户画像：",
+          card: {
+            type: "customer-persona",
+            data: persona,
+            actions: [
+              { label: "编辑", id: "edit-persona", variant: "secondary" },
+              { label: "✓ 确认无误", id: "confirm-persona", variant: "primary" },
+            ],
+          },
+          timestamp: new Date(),
+        },
+      ]);
+      setIsTyping(false);
+    }, 1000);
+  };
+
+  const handleConfirmPersona = () => {
+    addSingleMessage({
+      id: `system-${Date.now()}`,
+      role: "system",
+      content: "正在协调 SEO Agent 和 Email Agent 制定方案...",
+      timestamp: new Date(),
+    }, 800);
+    
+    setTimeout(() => {
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: `agent-${Date.now()}`,
+          role: "agent",
+          agent: "supervisor",
+          content: "方案已生成！这是为您定制的获客方案：",
+          card: {
+            type: "acquisition-plan",
+            data: {
+              seo: {
+                mode: "AI建站（推荐）",
+                keywords: "wholesale camping gear",
+                contentPlan: "每周2篇行业文章",
+                expectedLeads: "8条/月",
               },
-              actions: [
-                { label: "调整策略", id: "adjust-seo", variant: "secondary" },
-                { label: "📝 查看首篇文章", id: "view-article", variant: "primary" },
-              ],
+              email: {
+                channel: "平台代发（高送达率）",
+                targetCustomers: "800家精准企业",
+                sendPlan: "每日30封，持续4周",
+                expectedLeads: "15条/月",
+              },
+              summary: {
+                cycle: "4-6周",
+                totalLeads: "23-32条",
+                costPerLead: "¥85-110/条",
+                highIntent: "40-50%",
+              },
             },
-            timestamp: new Date(),
+            actions: [
+              { label: "调整配置", id: "adjust-plan", variant: "secondary" },
+              { label: "🚀 确认执行", id: "confirm-plan", variant: "primary" },
+            ],
           },
-        ]);
-      } else if (text.includes("文章") || text.includes("article") || text.includes("生成")) {
-        setMessages((prev) => [
-          ...prev,
-          {
-            id: `agent-${Date.now()}-seo-article`,
-            role: "agent",
-            agent: "seo",
-            content: "已为您生成首篇SEO文章：",
-            card: {
-              type: "seo-article",
-              data: MOCK_ARTICLE,
-              actions: [
-                { label: "✏️ 编辑", id: "edit-article", variant: "secondary" },
-                { label: "👁️ 预览", id: "preview-article", variant: "secondary" },
-                { label: "🚀 发布", id: "publish-article", variant: "primary" },
-              ],
+          timestamp: new Date(),
+        },
+      ]);
+      setIsTyping(false);
+    }, 2500);
+  };
+
+  const handleConfirmPlan = () => {
+    setTaskStarted(true);
+    setActiveTask("acquisition");
+    
+    setAgentStatuses((prev) =>
+      prev.map((a) =>
+        a.agent === "seo" ? { ...a, status: "working" as const, task: "制定内容策略", progress: 30 } :
+        a.agent === "email" ? { ...a, status: "working" as const, task: "筛选目标客户", progress: 40 } : a
+      )
+    );
+    
+    setTimeout(() => {
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: `agent-${Date.now()}`,
+          role: "agent",
+          agent: "supervisor",
+          content: "✅ 获客任务已启动！\n\n• SEO Agent：正在生成首篇 SEO 文章...\n• Email Agent：正在筛选目标客户...\n\n我会每天 18:00 向您汇报进展。\n\n您可以随时问我：\n- 「任务进展如何」查看实时状态\n- 「查看线索」查看已获得的线索\n- 「@SEO Agent 生成文章」直接操作SEO任务",
+          timestamp: new Date(),
+        },
+      ]);
+      setIsTyping(false);
+    }, 1000);
+  };
+
+  const handleQueryProgress = () => {
+    setTimeout(() => {
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: `agent-${Date.now()}`,
+          role: "agent",
+          agent: "supervisor",
+          content: "以下是您的获客任务进展（美国户外用品批发商）：",
+          card: {
+            type: "task-progress",
+            data: {
+              taskName: "美国户外用品批发商",
+              status: "执行中",
+              daysRunning: 15,
+              seo: {
+                articlesPublished: 6,
+                keywordsRanked: 3,
+                traffic: 320,
+                growth: "+25%",
+                progress: 45,
+              },
+              email: {
+                sent: 450,
+                delivered: 96,
+                opened: 28,
+                replied: 4.2,
+                progress: 60,
+              },
+              leads: {
+                total: 23,
+                target: 30,
+                highIntent: 8,
+                percentage: 77,
+              },
+              suggestion: "Email打开率良好，建议优化主题行以提升回复率",
             },
-            timestamp: new Date(),
+            actions: [
+              { label: "查看详情", id: "view-details", variant: "secondary" },
+              { label: "导出报表", id: "export-report", variant: "primary" },
+            ],
           },
-        ]);
-        setAgentStatuses((prev) =>
-          prev.map((a) =>
-            a.agent === "seo" ? { ...a, status: "working", task: "生成SEO文章", progress: 65 } : a
-          )
-        );
-      } else {
-        setMessages((prev) => [
-          ...prev,
-          {
-            id: `agent-${Date.now()}-seo-help`,
-            role: "agent",
-            agent: "seo",
-            content: "我是 SEO Agent，可以帮助您：\n• 生成内容策略和关键词建议\n• 创建SEO优化文章\n• 发布到您的独立站\n\n请告诉我您需要什么帮助？",
-            timestamp: new Date(),
+          timestamp: new Date(),
+        },
+      ]);
+      setIsTyping(false);
+    }, 1500);
+  };
+
+  const handleQueryLeads = () => {
+    setTimeout(() => {
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: `agent-${Date.now()}`,
+          role: "agent",
+          agent: "supervisor",
+          content: "🔥 发现新的高意向线索！以下是您的线索收件箱：",
+          card: {
+            type: "lead-summary",
+            data: {
+              total: leads.length,
+              new: leads.filter(l => l.status === "new").length,
+              highIntent: leads.filter(l => l.score >= 80).length,
+              leads: leads,
+            },
+            actions: [
+              { label: "查看全部", id: "view-all-leads", variant: "secondary" },
+              { label: "导出Excel", id: "export-leads", variant: "primary" },
+            ],
           },
-        ]);
-      }
+          timestamp: new Date(),
+        },
+      ]);
+      setIsTyping(false);
+    }, 1500);
+  };
+
+  const handleQueryDashboard = () => {
+    setTimeout(() => {
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: `agent-${Date.now()}`,
+          role: "agent",
+          agent: "supervisor",
+          content: `以下是${MOCK_DASHBOARD.period}的获客效果数据：`,
+          card: {
+            type: "data-dashboard",
+            data: MOCK_DASHBOARD,
+            actions: [
+              { label: "查看上月对比", id: "compare-last-month", variant: "secondary" },
+              { label: "导出报表", id: "export-dashboard", variant: "primary" },
+            ],
+          },
+          timestamp: new Date(),
+        },
+      ]);
+      setIsTyping(false);
+    }, 1500);
+  };
+
+  const handleSEOKeywords = () => {
+    setTimeout(() => {
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: `agent-${Date.now()}-seo`,
+          role: "agent",
+          agent: "seo",
+          content: "已为您分析目标关键词（基于您的产品和市场）：",
+          card: {
+            type: "seo-strategy",
+            data: {
+              keywords: MOCK_KEYWORDS,
+              contentPlan: [
+                { week: 1, topic: "2024年露营装备市场趋势", status: "已生成" },
+                { week: 2, topic: "如何选择可靠的户外用品供应商", status: "待生成" },
+                { week: 3, topic: "批发露营帐篷的5个关键考量因素", status: "待生成" },
+                { week: 4, topic: "OEM定制睡袋的生产流程详解", status: "待生成" },
+              ],
+              expectations: {
+                ranking: "3个月内目标关键词进入前20页",
+                traffic: "月均自然流量：500-800访客",
+                leads: "月均转化线索：5-8条",
+              },
+            },
+            actions: [
+              { label: "调整策略", id: "adjust-seo", variant: "secondary" },
+              { label: "📝 查看首篇文章", id: "view-article", variant: "primary" },
+            ],
+          },
+          timestamp: new Date(),
+        },
+      ]);
+      setIsTyping(false);
     }, 1200);
   };
 
-  const handleEmailCommand = (text: string) => {
+  const handleSEOArticle = () => {
     setTimeout(() => {
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: `agent-${Date.now()}-seo-article`,
+          role: "agent",
+          agent: "seo",
+          content: "已为您生成首篇SEO文章：",
+          card: {
+            type: "seo-article",
+            data: MOCK_ARTICLE,
+            actions: [
+              { label: "✏️ 编辑", id: "edit-article", variant: "secondary" },
+              { label: "👁️ 预览", id: "preview-article", variant: "secondary" },
+              { label: "🚀 发布", id: "publish-article", variant: "primary" },
+            ],
+          },
+          timestamp: new Date(),
+        },
+      ]);
+      setAgentStatuses((prev) =>
+        prev.map((a) =>
+          a.agent === "seo" ? { ...a, status: "working" as const, task: "生成SEO文章", progress: 65 } : a
+        )
+      );
       setIsTyping(false);
-      
-      if (text.includes("客户") || text.includes("列表") || text.includes("customer")) {
-        setMessages((prev) => [
-          ...prev,
-          {
-            id: `agent-${Date.now()}-email-customers`,
-            role: "agent",
-            agent: "email",
-            content: "已为您筛选目标客户并生成开发信：",
-            card: {
-              type: "customer-list",
-              data: {
-                total: 856,
-                conditions: {
-                  region: "美国",
-                  industry: "户外用品批发",
-                  size: "50-200人",
-                  purchase: "100万-500万美元",
-                },
-                customers: MOCK_CUSTOMERS,
-                strategy: {
-                  targetCount: 800,
-                  dailySend: 30,
-                  duration: 27,
-                  time: "美国时间周二-周四 9:00-11:00",
-                  channel: "平台代发（送达率95%+）",
-                },
-              },
-              actions: [
-                { label: "调整筛选", id: "adjust-filter", variant: "secondary" },
-                { label: "预览邮件", id: "preview-email", variant: "secondary" },
-                { label: "🚀 启动发送", id: "start-sending", variant: "primary" },
-              ],
-            },
-            timestamp: new Date(),
-          },
-        ]);
-      } else if (text.includes("邮件") || text.includes("预览") || text.includes("preview")) {
-        setMessages((prev) => [
-          ...prev,
-          {
-            id: `agent-${Date.now()}-email-preview`,
-            role: "agent",
-            agent: "email",
-            content: "这是给 Outdoor Gear Co. 的个性化开发信预览：",
-            card: {
-              type: "email-preview",
-              data: {
-                template: MOCK_EMAIL_TEMPLATE,
-                customer: MOCK_CUSTOMERS[0],
-                highlights: [
-                  "提及客户公司最新动态（新店开业）",
-                  "引用客户主营产品类别",
-                  "匹配客户所在地区（加州）",
-                ],
-                score: 92,
-              },
-              actions: [
-                { label: "✏️ 编辑", id: "edit-email", variant: "secondary" },
-                { label: "🔄 换一版", id: "regenerate-email", variant: "secondary" },
-                { label: "👍 确认", id: "confirm-email", variant: "primary" },
-              ],
-            },
-            timestamp: new Date(),
-          },
-        ]);
-      } else {
-        setMessages((prev) => [
-          ...prev,
-          {
-            id: `agent-${Date.now()}-email-help`,
-            role: "agent",
-            agent: "email",
-            content: "我是 Email Agent，可以帮助您：\n• 筛选目标客户列表\n• 生成个性化开发信\n• 预览邮件效果\n• 设置发送策略\n\n请告诉我您需要什么帮助？",
-            timestamp: new Date(),
-          },
-        ]);
-      }
     }, 1200);
   };
 
+  const handleSEOPublish = () => {
+    setMessages((prev) => [
+      ...prev,
+      {
+        id: `agent-${Date.now()}`,
+        role: "agent",
+        agent: "seo",
+        content: "✅ 文章已发布！\n\n• 已发布到您的独立站\n• 已提交搜索引擎收录\n• 预计3-7天被收录并开始获得流量\n\n我会持续监控这篇文章的排名表现。",
+        timestamp: new Date(),
+      },
+    ]);
+    setAgentStatuses((prev) =>
+      prev.map((a) =>
+        a.agent === "seo" ? { ...a, status: "done" as const, task: "文章已发布", progress: 100 } : a
+      )
+    );
+    setIsTyping(false);
+  };
+
+  const handleEmailCustomers = () => {
+    setTimeout(() => {
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: `agent-${Date.now()}-email-customers`,
+          role: "agent",
+          agent: "email",
+          content: "已为您筛选目标客户并生成开发信：",
+          card: {
+            type: "customer-list",
+            data: {
+              total: 856,
+              conditions: {
+                region: "美国",
+                industry: "户外用品批发",
+                size: "50-200人",
+                purchase: "100万-500万美元",
+              },
+              customers: MOCK_CUSTOMERS,
+              strategy: {
+                targetCount: 800,
+                dailySend: 30,
+                duration: 27,
+                time: "美国时间周二-周四 9:00-11:00",
+                channel: "平台代发（送达率95%+）",
+              },
+            },
+            actions: [
+              { label: "调整筛选", id: "adjust-filter", variant: "secondary" },
+              { label: "预览邮件", id: "preview-email", variant: "secondary" },
+              { label: "🚀 启动发送", id: "start-sending", variant: "primary" },
+            ],
+          },
+          timestamp: new Date(),
+        },
+      ]);
+      setIsTyping(false);
+    }, 1200);
+  };
+
+  const handleEmailPreview = () => {
+    setTimeout(() => {
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: `agent-${Date.now()}-email-preview`,
+          role: "agent",
+          agent: "email",
+          content: "这是给 Outdoor Gear Co. 的个性化开发信预览：",
+          card: {
+            type: "email-preview",
+            data: {
+              template: MOCK_EMAIL_TEMPLATE,
+              customer: MOCK_CUSTOMERS[0],
+              highlights: [
+                "提及客户公司最新动态（新店开业）",
+                "引用客户主营产品类别",
+                "匹配客户所在地区（加州）",
+              ],
+              score: 92,
+            },
+            actions: [
+              { label: "✏️ 编辑", id: "edit-email", variant: "secondary" },
+              { label: "🔄 换一版", id: "regenerate-email", variant: "secondary" },
+              { label: "👍 确认", id: "confirm-email", variant: "primary" },
+            ],
+          },
+          timestamp: new Date(),
+        },
+      ]);
+      setIsTyping(false);
+    }, 1200);
+  };
+
+  const handleEmailSend = () => {
+    setMessages((prev) => [
+      ...prev,
+      {
+        id: `agent-${Date.now()}`,
+        role: "agent",
+        agent: "email",
+        content: "✅ 邮件发送已启动！\n\n• 首日发送10封（冷启动期）\n• 发送时间：美国时间周二-周四 9:00-11:00\n• 目标客户：Outdoor Gear Co. 等800家企业\n\n我会实时监控送达率和回复情况。",
+        timestamp: new Date(),
+      },
+    ]);
+    setAgentStatuses((prev) =>
+      prev.map((a) =>
+        a.agent === "email" ? { ...a, status: "working" as const, task: "邮件发送中", progress: 15 } : a
+      )
+    );
+    setIsTyping(false);
+  };
+
+  const handleHelp = () => {
+    setTimeout(() => {
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: `agent-${Date.now()}`,
+          role: "agent",
+          agent: "supervisor",
+          content: "我可以帮您完成以下任务：\n\n📋 **获客任务**\n• 「帮我找美国户外用品批发商」创建获客任务\n• 「任务进展如何」查看实时状态\n• 「查看线索」查看已获得的线索\n• 「本周效果如何」查看数据看板\n\n🔍 **SEO Agent**\n• 「@SEO Agent 关键词」查看关键词策略\n• 「@SEO Agent 生成文章」生成SEO文章\n\n✉️ **Email Agent**\n• 「@Email Agent 客户」筛选目标客户\n• 「@Email Agent 预览邮件」预览开发信\n\n有什么可以帮您的吗？",
+          timestamp: new Date(),
+        },
+      ]);
+      setIsTyping(false);
+    }, 1000);
+  };
+
+  const handleDefaultResponse = () => {
+    setTimeout(() => {
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: `agent-${Date.now()}`,
+          role: "agent",
+          agent: "supervisor",
+          content: "收到您的消息。您可以尝试以下指令：\n• 「任务进展如何」查看实时状态\n• 「查看线索」查看已获得的线索\n• 「本周效果如何」查看数据看板\n• 「@SEO Agent 生成文章」操作SEO任务\n• 「@Email Agent 查看客户」操作邮件任务\n\n或者输入「帮助」查看所有可用指令。",
+          timestamp: new Date(),
+        },
+      ]);
+      setIsTyping(false);
+    }, 1000);
+  };
+
+  // Handle file upload with parsing simulation
+  const handleFileUpload = useCallback((files: { name: string; size: string; type: string }[]) => {
+    setIsTyping(true);
+    
+    // First message: acknowledge upload
+    setMessages((prev) => [
+      ...prev,
+      {
+        id: `user-${Date.now()}`,
+        role: "user",
+        content: `上传了文件: ${files.map(f => `[${f.name}]`).join(" ")}`,
+        timestamp: new Date(),
+      },
+    ]);
+    
+    // Simulate parsing delay
+    setTimeout(() => {
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: `agent-${Date.now()}`,
+          role: "agent",
+          agent: "supervisor",
+          content: `已接收文件，正在解析文档内容...\n\n📄 ${files.map(f => f.name).join(', ')}`,
+          timestamp: new Date(),
+        },
+      ]);
+    }, 500);
+    
+    // Simulate parsing result
+    setTimeout(() => {
+      const parsedProfile: CompanyProfile = {
+        category: "户外用品（帐篷/睡袋/登山装备）",
+        advantage: "自有工厂、OEM定制、通过ISO认证",
+        market: "北美、欧洲",
+        targetCustomer: "批发商、品牌商",
+        priceRange: "中高端",
+      };
+      
+      setCompanyProfile(parsedProfile);
+      
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: `agent-${Date.now() + 1}`,
+          role: "agent",
+          agent: "supervisor",
+          content: "✅ 文档解析完成！基于您上传的产品目录，我提取了以下信息：",
+          card: {
+            type: "company-profile",
+            data: parsedProfile,
+            actions: [
+              { label: "编辑修改", id: "edit-profile", variant: "secondary" },
+              { label: "✓ 确认无误", id: "confirm-profile", variant: "primary" },
+            ],
+          },
+          timestamp: new Date(),
+        },
+      ]);
+      setIsTyping(false);
+    }, 2500);
+  }, []);
+
+  // Handle card actions with full editing support
   const handleCardAction = useCallback(
-    (actionId: string) => {
-      // Check flow actions
-      const currentFlow = DEMO_FLOW[flowIndex.current];
-      if (currentFlow && actionId === currentFlow.trigger) {
-        flowIndex.current++;
-        setIsTyping(true);
-        addMessages(currentFlow.responses);
-        return;
-      }
-
-      // Handle specific card actions
+    (actionId: string, cardData?: Record<string, any>) => {
       switch (actionId) {
-        case "view-article":
+        // Edit actions
+        case "edit-profile": {
+          const currentProfile = companyProfile || {
+            category: "户外用品（帐篷/睡袋/登山装备）",
+            advantage: "自有工厂、OEM定制、通过ISO认证",
+            market: "北美、欧洲",
+            targetCustomer: "批发商、品牌商",
+            priceRange: "中高端",
+          };
+          setEditingCard({ type: "company-profile", data: currentProfile });
           setMessages((prev) => [
             ...prev,
             {
               id: `agent-${Date.now()}`,
               role: "agent",
-              agent: "seo",
-              content: "已为您生成首篇SEO文章：",
+              agent: "supervisor",
+              content: "请编辑企业画像信息：",
               card: {
-                type: "seo-article",
-                data: MOCK_ARTICLE,
+                type: "company-profile-edit",
+                data: currentProfile,
                 actions: [
-                  { label: "✏️ 编辑", id: "edit-article", variant: "secondary" },
-                  { label: "👁️ 预览", id: "preview-article", variant: "secondary" },
-                  { label: "🚀 发布", id: "publish-article", variant: "primary" },
+                  { label: "取消", id: "cancel-edit", variant: "secondary" },
+                  { label: "保存", id: "save-profile", variant: "primary" },
                 ],
               },
               timestamp: new Date(),
             },
           ]);
           break;
-        
-        case "preview-email":
+        }
+
+        case "edit-persona": {
+          const currentPersona = customerPersona || {
+            region: "美国",
+            industry: "户外用品批发",
+            scale: "中型（50-200人）",
+            purchaseVolume: "100万-500万美元/年",
+            decisionMaker: "采购经理/采购总监",
+            timeline: "3个月内",
+          };
+          setEditingCard({ type: "customer-persona", data: currentPersona });
           setMessages((prev) => [
             ...prev,
             {
               id: `agent-${Date.now()}`,
               role: "agent",
-              agent: "email",
-              content: "这是给 Outdoor Gear Co. 的个性化开发信预览：",
+              agent: "supervisor",
+              content: "请编辑客户画像信息：",
               card: {
-                type: "email-preview",
-                data: {
-                  template: MOCK_EMAIL_TEMPLATE,
-                  customer: MOCK_CUSTOMERS[0],
-                  highlights: [
-                    "提及客户公司最新动态（新店开业）",
-                    "引用客户主营产品类别",
-                    "匹配客户所在地区（加州）",
-                  ],
-                  score: 92,
-                },
+                type: "customer-persona-edit",
+                data: currentPersona,
                 actions: [
-                  { label: "✏️ 编辑", id: "edit-email", variant: "secondary" },
-                  { label: "🔄 换一版", id: "regenerate-email", variant: "secondary" },
-                  { label: "👍 确认", id: "confirm-email", variant: "primary" },
+                  { label: "取消", id: "cancel-edit", variant: "secondary" },
+                  { label: "保存", id: "save-persona", variant: "primary" },
                 ],
               },
               timestamp: new Date(),
             },
           ]);
+          break;
+        }
+
+        // Save actions
+        case "save-profile": {
+          if (editingCard && cardData) {
+            setCompanyProfile(cardData as CompanyProfile);
+            setEditingCard(null);
+            setMessages((prev) => [
+              ...prev,
+              {
+                id: `agent-${Date.now()}`,
+                role: "agent",
+                agent: "supervisor",
+                content: "✅ 企业画像已更新！",
+                card: {
+                  type: "company-profile",
+                  data: cardData,
+                  actions: [
+                    { label: "编辑修改", id: "edit-profile", variant: "secondary" },
+                    { label: "✓ 确认无误", id: "confirm-profile", variant: "primary" },
+                  ],
+                },
+                timestamp: new Date(),
+              },
+            ]);
+          }
+          break;
+        }
+
+        case "save-persona": {
+          if (editingCard && cardData) {
+            setCustomerPersona(cardData as CustomerPersona);
+            setEditingCard(null);
+            setMessages((prev) => [
+              ...prev,
+              {
+                id: `agent-${Date.now()}`,
+                role: "agent",
+                agent: "supervisor",
+                content: "✅ 客户画像已更新！",
+                card: {
+                  type: "customer-persona",
+                  data: cardData,
+                  actions: [
+                    { label: "编辑", id: "edit-persona", variant: "secondary" },
+                    { label: "✓ 确认无误", id: "confirm-persona", variant: "primary" },
+                  ],
+                },
+                timestamp: new Date(),
+              },
+            ]);
+          }
+          break;
+        }
+
+        case "cancel-edit": {
+          setEditingCard(null);
+          setMessages((prev) => [
+            ...prev,
+            {
+              id: `agent-${Date.now()}`,
+              role: "agent",
+              agent: "supervisor",
+              content: "已取消编辑。",
+              timestamp: new Date(),
+            },
+          ]);
+          break;
+        }
+
+        // Confirmation actions
+        case "confirm-profile":
+          handleConfirmProfile();
+          break;
+
+        case "confirm-persona":
+          handleConfirmPersona();
+          break;
+
+        case "confirm-plan":
+          handleConfirmPlan();
+          break;
+
+        // SEO actions
+        case "view-article":
+          handleSEOArticle();
           break;
 
         case "publish-article":
-          setMessages((prev) => [
-            ...prev,
-            {
-              id: `agent-${Date.now()}`,
-              role: "agent",
-              agent: "seo",
-              content: "✅ 文章已发布！\n\n• 已发布到您的独立站\n• 已提交搜索引擎收录\n• 预计3-7天被收录并开始获得流量\n\n我会持续监控这篇文章的排名表现。",
-              timestamp: new Date(),
-            },
-          ]);
-          setAgentStatuses((prev) =>
-            prev.map((a) =>
-              a.agent === "seo" ? { ...a, status: "done", task: "文章已发布", progress: 100 } : a
-            )
-          );
+          handleSEOPublish();
+          break;
+
+        // Email actions
+        case "preview-email":
+          handleEmailPreview();
           break;
 
         case "start-sending":
-          setMessages((prev) => [
-            ...prev,
-            {
-              id: `agent-${Date.now()}`,
-              role: "agent",
-              agent: "email",
-              content: "✅ 邮件发送已启动！\n\n• 首日发送10封（冷启动期）\n• 发送时间：美国时间周二-周四 9:00-11:00\n• 目标客户：Outdoor Gear Co. 等800家企业\n\n我会实时监控送达率和回复情况。",
-              timestamp: new Date(),
-            },
-          ]);
-          setAgentStatuses((prev) =>
-            prev.map((a) =>
-              a.agent === "email" ? { ...a, status: "working", task: "邮件发送中", progress: 15 } : a
-            )
-          );
+          handleEmailSend();
           break;
 
-        case "view-all-leads":
+        // Lead actions
+        case "view-all-leads": {
+          const highIntentLeads = leads.filter(l => l.score >= 80);
           setMessages((prev) => [
             ...prev,
             {
               id: `agent-${Date.now()}`,
               role: "agent",
               agent: "lead",
-              content: `📋 线索收件箱 - 共 ${leads.length} 条线索\n\n🔥 高意向线索（评分80+）：${leads.filter(l => l.score >= 80).length} 条\n📧 Email渠道：${leads.filter(l => l.source === "email").length} 条\n🔍 SEO渠道：${leads.filter(l => l.source === "seo").length} 条`,
+              content: `📋 线索收件箱 - 共 ${leads.length} 条线索\n\n🔥 高意向线索（评分80+）：${highIntentLeads.length} 条\n📧 Email渠道：${leads.filter(l => l.source === "email").length} 条\n🔍 SEO渠道：${leads.filter(l => l.source === "seo").length} 条\n\n点击线索卡片中的"查看详情"可以查看更多信息并生成回复。`,
               timestamp: new Date(),
             },
           ]);
           break;
+        }
 
+        case "view-lead-detail": {
+          const leadId = cardData?.leadId;
+          const lead = leads.find(l => l.id === leadId);
+          if (lead) {
+            setMessages((prev) => [
+              ...prev,
+              {
+                id: `agent-${Date.now()}`,
+                role: "agent",
+                agent: "lead",
+                content: `查看线索详情：${lead.company}`,
+                card: {
+                  type: "lead-detail",
+                  data: { lead, notes: "" },
+                },
+                timestamp: new Date(),
+              },
+            ]);
+          }
+          break;
+        }
+
+        case "back-to-leads": {
+          // 返回线索列表
+          handleQueryLeads();
+          break;
+        }
+
+        case "generate-reply": {
+          const lead = cardData?.lead as Lead;
+          if (lead) {
+            // 生成回复建议
+            const suggestion = generateReplySuggestion(lead);
+            setMessages((prev) => [
+              ...prev,
+              {
+                id: `agent-${Date.now()}`,
+                role: "agent",
+                agent: "lead",
+                content: `已为 ${lead.company} 生成回复建议：`,
+                card: {
+                  type: "reply-suggestion",
+                  data: { lead, suggestion },
+                },
+                timestamp: new Date(),
+              },
+            ]);
+          }
+          break;
+        }
+
+        case "send-reply": {
+          const { lead, subject, content } = cardData || {};
+          setMessages((prev) => [
+            ...prev,
+            {
+              id: `agent-${Date.now()}`,
+              role: "agent",
+              agent: "email",
+              content: `✅ 邮件已发送给 ${lead?.company}！\n\n主题：${subject}\n\n我会持续跟进对方的回复情况。`,
+              timestamp: new Date(),
+            },
+          ]);
+          // 更新线索状态
+          setLeads(prev => prev.map(l => 
+            l.id === lead?.id 
+              ? { ...l, status: "contacted" as const, lastContact: "刚刚" }
+              : l
+          ));
+          break;
+        }
+
+        case "regenerate-content": {
+          const lead = cardData?.lead as Lead;
+          if (lead) {
+            const suggestion = generateReplySuggestion(lead, true);
+            setMessages((prev) => [
+              ...prev,
+              {
+                id: `agent-${Date.now()}`,
+                role: "agent",
+                agent: "lead",
+                content: `已重新生成回复建议：`,
+                card: {
+                  type: "reply-suggestion",
+                  data: { lead, suggestion },
+                },
+                timestamp: new Date(),
+              },
+            ]);
+          }
+          break;
+        }
+
+        case "save-draft": {
+          setMessages((prev) => [
+            ...prev,
+            {
+              id: `agent-${Date.now()}`,
+              role: "agent",
+              agent: "supervisor",
+              content: `✅ 草稿已保存！`,
+              timestamp: new Date(),
+            },
+          ]);
+          break;
+        }
+
+        case "schedule-followup": {
+          setMessages((prev) => [
+            ...prev,
+            {
+              id: `agent-${Date.now()}`,
+              role: "agent",
+              agent: "supervisor",
+              content: `已设置跟进提醒！我会在24小时后提醒您跟进此线索。`,
+              timestamp: new Date(),
+            },
+          ]);
+          break;
+        }
+
+        case "assign-lead": {
+          setMessages((prev) => [
+            ...prev,
+            {
+              id: `agent-${Date.now()}`,
+              role: "agent",
+              agent: "supervisor",
+              content: `功能开发中：团队线索分配功能即将上线，届时您可以将线索分配给团队成员协作跟进。`,
+              timestamp: new Date(),
+            },
+          ]);
+          break;
+        }
+
+        case "save-notes": {
+          setMessages((prev) => [
+            ...prev,
+            {
+              id: `agent-${Date.now()}`,
+              role: "agent",
+              agent: "supervisor",
+              content: `✅ 备注已保存！`,
+              timestamp: new Date(),
+            },
+          ]);
+          break;
+        }
+
+        case "add-tag": {
+          setMessages((prev) => [
+            ...prev,
+            {
+              id: `agent-${Date.now()}`,
+              role: "agent",
+              agent: "supervisor",
+              content: `功能开发中：标签管理功能即将上线。`,
+              timestamp: new Date(),
+            },
+          ]);
+          break;
+        }
+
+        // Default
         default:
-          // Generic acknowledgment
           setMessages((prev) => [
             ...prev,
             {
@@ -861,17 +1448,94 @@ export function useChatState() {
           ]);
       }
     },
-    [addMessages, leads]
+    [editingCard, companyProfile, customerPersona, leads]
   );
+
+  // Helper function to generate reply suggestions
+  const generateReplySuggestion = (lead: Lead, isRegenerate = false): {
+    subject: string;
+    content: string;
+    highlights: string[];
+    tips: string;
+  } => {
+    const hasInteraction = lead.interactions && lead.interactions.length > 0;
+    const lastInteraction = hasInteraction ? lead.interactions![lead.interactions!.length - 1] : null;
+    
+    // 根据线索特征生成个性化主题行
+    const subjects = [
+      `Re: ${lead.company} - 户外装备合作机会`,
+      `${lead.company} 的露营装备定制方案`,
+      `关于 ${lead.company} 的批发询价回复`,
+    ];
+    
+    const subject = isRegenerate 
+      ? `Re: 跟进 - ${lead.company} 户外装备供应`
+      : subjects[Math.floor(Math.random() * subjects.length)];
+
+    // 根据互动历史生成个性化内容
+    let greeting = lead.contactName ? `Hi ${lead.contactName.split(' ')[0]},` : `Hi there,`;
+    
+    let content = `${greeting}
+
+Thanks for your interest in our outdoor gear products.
+
+Based on ${lead.company}'s profile as a ${lead.industry} in ${lead.location}, I believe we can be a great supplier partner for you.
+
+Here's what we can offer:
+• Premium camping tents with custom branding (MOQ: 100 units)
+• Competitive wholesale pricing (20-30% below market average)
+• Fast production turnaround (30 days)
+• Full quality inspection & warranty
+
+Would you be interested in receiving our catalog with pricing? I'd be happy to schedule a call to discuss your specific requirements.
+
+Best regards,
+Sarah Chen
+Export Manager
+
+P.S. We're currently offering 5% off first orders for new wholesale partners.`;
+
+    // 如果有互动历史，个性化内容
+    if (lastInteraction) {
+      if (lastInteraction.type === "email_opened") {
+        content = content.replace(
+          "Thanks for your interest",
+          "I noticed you opened my previous email - thanks for your interest"
+        );
+      } else if (lastInteraction.type === "site_visit") {
+        content = content.replace(
+          "Thanks for your interest",
+          "I saw you visited our product catalog - thanks for your interest"
+        );
+      }
+    }
+
+    const highlights = [
+      `针对${lead.industry}的个性化内容`,
+      "提及具体产品优势和MOQ",
+      "包含明确的行动召唤（CTA）",
+      lead.score >= 80 ? "高意向线索专用跟进话术" : "标准培育话术",
+    ];
+
+    const tips = lead.score >= 80
+      ? "高意向线索！建议在24小时内发送，并准备详细产品资料以备回复。"
+      : "建议发送后3天内观察是否打开邮件，再决定是否二次跟进。";
+
+    return { subject, content, highlights, tips };
+  };
 
   return {
     messages,
     isTyping,
     sendMessage,
     handleCardAction,
+    handleFileUpload,
     activeTask,
     setActiveTask,
     agentStatuses,
     leads,
+    companyProfile,
+    customerPersona,
+    editingCard,
   };
 }

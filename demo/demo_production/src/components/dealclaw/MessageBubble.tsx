@@ -1,18 +1,22 @@
 import type { ChatMessage } from "@/hooks/useChatState";
 import { CompanyProfileCard } from "./cards/CompanyProfileCard";
+import { CompanyProfileEditCard } from "./cards/CompanyProfileEditCard";
 import { CustomerPersonaCard } from "./cards/CustomerPersonaCard";
+import { CustomerPersonaEditCard } from "./cards/CustomerPersonaEditCard";
 import { AcquisitionPlanCard } from "./cards/AcquisitionPlanCard";
 import { SEOStrategyCard } from "./cards/SEOStrategyCard";
 import { SEOArticleCard } from "./cards/SEOArticleCard";
 import { CustomerListCard } from "./cards/CustomerListCard";
 import { EmailPreviewCard } from "./cards/EmailPreviewCard";
 import { LeadSummaryCard } from "./cards/LeadSummaryCard";
+import { LeadDetailCard } from "./cards/LeadDetailCard";
+import { ReplySuggestionCard } from "./cards/ReplySuggestionCard";
 import { DataDashboardCard } from "./cards/DataDashboardCard";
 import { TaskProgressCard } from "./cards/TaskProgressCard";
 
 interface MessageBubbleProps {
   message: ChatMessage;
-  onCardAction: (actionId: string) => void;
+  onCardAction: (actionId: string, data?: Record<string, any>) => void;
 }
 
 const AGENT_LABELS: Record<string, { label: string; emoji: string; color: string }> = {
@@ -64,8 +68,14 @@ export function MessageBubble({ message, onCardAction }: MessageBubbleProps) {
             {message.card.type === "company-profile" && (
               <CompanyProfileCard card={message.card} onAction={onCardAction} />
             )}
+            {message.card.type === "company-profile-edit" && (
+              <CompanyProfileEditCard card={message.card} onAction={onCardAction} />
+            )}
             {message.card.type === "customer-persona" && (
               <CustomerPersonaCard card={message.card} onAction={onCardAction} />
+            )}
+            {message.card.type === "customer-persona-edit" && (
+              <CustomerPersonaEditCard card={message.card} onAction={onCardAction} />
             )}
             {message.card.type === "acquisition-plan" && (
               <AcquisitionPlanCard card={message.card} onAction={onCardAction} />
@@ -84,6 +94,12 @@ export function MessageBubble({ message, onCardAction }: MessageBubbleProps) {
             )}
             {message.card.type === "lead-summary" && (
               <LeadSummaryCard card={message.card} onAction={onCardAction} />
+            )}
+            {message.card.type === "lead-detail" && (
+              <LeadDetailCard card={message.card} onAction={onCardAction} />
+            )}
+            {message.card.type === "reply-suggestion" && (
+              <ReplySuggestionCard card={message.card} onAction={onCardAction} />
             )}
             {message.card.type === "data-dashboard" && (
               <DataDashboardCard card={message.card} onAction={onCardAction} />
