@@ -352,8 +352,13 @@ const recognizeIntent = (text: string, context: {
   
   // SEO Agent commands
   if (lowerText.includes('@seo') || lowerText.includes('seo agent')) {
+    // 注意：更具体的匹配条件要放在前面，避免被更宽泛的条件拦截
     if (lowerText.includes('关键词') || lowerText.includes('keyword') || lowerText.includes('策略')) {
       return { type: 'SEO_KEYWORDS', confidence: 0.9 };
+    }
+    // 生成站点要放在生成文章之前检查，因为"生成站点"包含"生成"关键词
+    if (lowerText.includes('建站') || lowerText.includes('生成站点') || lowerText.includes('site generator')) {
+      return { type: 'SEO_GENERATE_SITE', confidence: 0.9 };
     }
     if (lowerText.includes('文章') || lowerText.includes('article') || lowerText.includes('生成') || lowerText.includes('内容')) {
       return { type: 'SEO_ARTICLE', confidence: 0.9 };
@@ -370,8 +375,9 @@ const recognizeIntent = (text: string, context: {
     if (lowerText.includes('竞品') || lowerText.includes('竞争') || lowerText.includes('competitor')) {
       return { type: 'SEO_COMPETITOR', confidence: 0.9 };
     }
-    if (lowerText.includes('建站') || lowerText.includes('网站') || lowerText.includes('生成站点') || lowerText.includes('site')) {
-      return { type: 'SEO_GENERATE_SITE', confidence: 0.9 };
+    // 单独检查"网站"关键词（不包含"生成站点"的情况）
+    if (lowerText.includes('网站') && !lowerText.includes('生成站点')) {
+      return { type: 'SEO_GENERATE_SITE', confidence: 0.85 };
     }
     if (lowerText.includes('健康') || lowerText.includes('监控') || lowerText.includes('health') || lowerText.includes('check')) {
       return { type: 'SEO_HEALTH', confidence: 0.9 };
