@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from "react";
-import { Send, Paperclip, Mic, FileText, X, Upload, HelpCircle } from "lucide-react";
+import { Send, Paperclip, Mic, FileText, X, Upload, HelpCircle, Bot } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import type { ChatMessage } from "@/hooks/useChatState";
 import { MessageBubble } from "./MessageBubble";
@@ -17,6 +17,20 @@ interface UploadedFile {
   size: string;
   type: string;
 }
+
+interface AgentMention {
+  id: string;
+  name: string;
+  emoji: string;
+  description: string;
+  command: string;
+}
+
+const AGENT_MENTIONS: AgentMention[] = [
+  { id: "seo", name: "SEO Agent", emoji: "🔍", description: "关键词、文章、站点优化", command: "@SEO Agent " },
+  { id: "email", name: "Email Agent", emoji: "✉️", description: "客户筛选、邮件发送", command: "@Email Agent " },
+  { id: "whatsapp", name: "WhatsApp Agent", emoji: "💬", description: "消息管理、对话跟进", command: "@WhatsApp Agent " },
+];
 
 // Debounce hook for preventing rapid submissions
 function useDebounce<T extends (...args: any[]) => void>(
@@ -50,8 +64,14 @@ export function ChatPanel({
   const [isRecording, setIsRecording] = useState(false);
   const [showUploadZone, setShowUploadZone] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showMentionPopup, setShowMentionPopup] = useState(false);
+  const [mentionQuery, setMentionQuery] = useState("");
+  const [selectedMentionIndex, setSelectedMentionIndex] = useState(0);
   const scrollRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const mentionStartRef = useRef<number>(-1);
+  const mentionPopupRef = useRef<HTMLDivElement>(null);
 
   // Auto scroll to bottom
   useEffect(() => {
@@ -59,6 +79,23 @@ export function ChatPanel({
       scrollRef.current.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
     }
   }, [messages, isTyping]);
+
+  // Close mention popup when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        mentionPopupRef.current &&
+        !mentionPopupRef.current.contains(event.target as Node) &&
+        !inputRef.current?.contains(event.target as Node)
+      ) {
+        setShowMentionPopup(false);
+        mentionStartRef.current = -1;
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   // Debounced submit handler (BUG FIX-007: Debounce rapid submissions)
   const debouncedSubmit = useDebounce((text: string) => {
@@ -141,6 +178,108 @@ export function ChatPanel({
   const handleHelpClick = () => {
     onSendMessage("帮助");
   };
+
+  // Handle input change with @mention detection
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    const cursorPosition = e.target.selectionStart || 0;
+    setInput(value);
+
+    // Check for @mention
+    const lastAtIndex = value.lastIndexOf("@", cursorPosition - 1);
+    
+    if (lastAtIndex !== -1 && lastAtIndex === mentionStartRef.current) {
+      // User is typing after @
+      const query = value.substring(lastAtIndex + 1, cursorPosition);
+      setMentionQuery(query);
+      setShowMentionPopup(true);
+      
+      // Filter mentions based on query
+      const filtered = AGENT_MENTIONS.filter(agent => 
+        agent.name.toLowerCase().includes(query.toLowerCase()) ||
+        agent.id.toLowerCase().includes(query.toLowerCase())
+      );
+      
+      // Reset selection if out of bounds
+      if (selectedMentionIndex >= filtered.length) {
+        setSelectedMentionIndex(0);
+      }
+    } else if (lastAtIndex !== -1) {
+      // New @ detected
+      const query = value.substring(lastAtIndex + 1, cursorPosition);
+      // Only show if no space in query (still typing agent name)
+      if (!query.includes(" ")) {
+        mentionStartRef.current = lastAtIndex;
+        setMentionQuery(query);
+        setShowMentionPopup(true);
+        setSelectedMentionIndex(0);
+      } else {
+        setShowMentionPopup(false);
+        mentionStartRef.current = -1;
+      }
+    } else {
+      // No @ detected
+      setShowMentionPopup(false);
+      mentionStartRef.current = -1;
+    }
+  };
+
+  // Handle mention selection
+  const handleMentionSelect = (agent: AgentMention) => {
+    if (mentionStartRef.current !== -1) {
+      const beforeMention = input.substring(0, mentionStartRef.current);
+      const afterMention = input.substring(mentionStartRef.current + mentionQuery.length + 1);
+      const newInput = beforeMention + agent.command + afterMention;
+      setInput(newInput);
+      setShowMentionPopup(false);
+      setMentionQuery("");
+      mentionStartRef.current = -1;
+      
+      // Focus input after selection
+      setTimeout(() => {
+        inputRef.current?.focus();
+      }, 0);
+    }
+  };
+
+  // Handle keyboard navigation for mentions
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (!showMentionPopup) return;
+
+    const filteredMentions = AGENT_MENTIONS.filter(agent => 
+      agent.name.toLowerCase().includes(mentionQuery.toLowerCase()) ||
+      agent.id.toLowerCase().includes(mentionQuery.toLowerCase())
+    );
+
+    switch (e.key) {
+      case "ArrowDown":
+        e.preventDefault();
+        setSelectedMentionIndex(prev => 
+          prev < filteredMentions.length - 1 ? prev + 1 : prev
+        );
+        break;
+      case "ArrowUp":
+        e.preventDefault();
+        setSelectedMentionIndex(prev => prev > 0 ? prev - 1 : 0);
+        break;
+      case "Enter":
+        e.preventDefault();
+        if (filteredMentions.length > 0) {
+          handleMentionSelect(filteredMentions[selectedMentionIndex]);
+        }
+        break;
+      case "Escape":
+        setShowMentionPopup(false);
+        mentionStartRef.current = -1;
+        break;
+    }
+  };
+
+  // Get filtered mentions
+  const filteredMentions = AGENT_MENTIONS.filter(agent => 
+    agent.name.toLowerCase().includes(mentionQuery.toLowerCase()) ||
+    agent.id.toLowerCase().includes(mentionQuery.toLowerCase())
+  );
 
   const quickCommands = [
     { label: "查看线索", icon: "🎯", command: "查看线索" },
@@ -294,7 +433,56 @@ export function ChatPanel({
       )}
 
       {/* Input */}
-      <div className="px-6 pb-6">
+      <div className="px-6 pb-6 relative">
+        {/* @mention Popup */}
+        <AnimatePresence>
+          {showMentionPopup && filteredMentions.length > 0 && (
+            <motion.div
+              ref={mentionPopupRef}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 10 }}
+              className="absolute bottom-full left-0 right-0 mb-2 max-w-2xl mx-auto z-50"
+            >
+              <div className="bg-card border border-border rounded-xl shadow-lg overflow-hidden">
+                <div className="px-3 py-2 bg-muted/50 border-b border-border">
+                  <span className="text-xs text-muted-foreground flex items-center gap-1">
+                    <Bot className="w-3 h-3" />
+                    选择 Agent（↑↓ 选择，Enter 确认，Esc 关闭）
+                  </span>
+                </div>
+                <div className="max-h-[180px] overflow-y-auto py-1">
+                  {filteredMentions.map((agent, index) => (
+                    <button
+                      key={agent.id}
+                      type="button"
+                      onClick={() => handleMentionSelect(agent)}
+                      className={`w-full px-3 py-2.5 flex items-center gap-3 text-left transition-colors ${
+                        index === selectedMentionIndex
+                          ? "bg-primary/10"
+                          : "hover:bg-muted/50"
+                      }`}
+                    >
+                      <span className="text-lg">{agent.emoji}</span>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-foreground">
+                          {agent.name}
+                        </p>
+                        <p className="text-xs text-muted-foreground truncate">
+                          {agent.description}
+                        </p>
+                      </div>
+                      {index === selectedMentionIndex && (
+                        <span className="text-xs text-primary">↵</span>
+                      )}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
         <form onSubmit={handleSubmit} className="max-w-2xl mx-auto">
           <div className="flex items-center gap-2 bg-card border border-border rounded-xl px-4 py-3 focus-within:border-primary/50 focus-within:shadow-[var(--shadow-glow)] transition-all">
             <button 
@@ -306,9 +494,11 @@ export function ChatPanel({
               <Paperclip className="w-4 h-4" />
             </button>
             <input
+              ref={inputRef}
               value={input}
-              onChange={(e) => setInput(e.target.value)}
-              placeholder="有什么可以帮你的？"
+              onChange={handleInputChange}
+              onKeyDown={handleKeyDown}
+              placeholder="有什么可以帮你的？（输入 @ 召唤 Agent）"
               disabled={isSubmitting}
               className="flex-1 bg-transparent text-sm text-foreground placeholder:text-muted-foreground outline-none disabled:opacity-50"
             />

@@ -20,6 +20,11 @@ import { LeadDetailCard } from "./cards/LeadDetailCard";
 import { ReplySuggestionCard } from "./cards/ReplySuggestionCard";
 import { DataDashboardCard } from "./cards/DataDashboardCard";
 import { TaskProgressCard } from "./cards/TaskProgressCard";
+import { WhatsAppConfigCard } from "./cards/WhatsAppConfigCard";
+import { WhatsAppInboxCard } from "./cards/WhatsAppInboxCard";
+import { LeadAssignmentCard } from "./cards/LeadAssignmentCard";
+import { LeadTagsCard } from "./cards/LeadTagsCard";
+import { ConversionFunnelCard } from "./cards/ConversionFunnelCard";
 
 interface MessageBubbleProps {
   message: ChatMessage;
@@ -134,6 +139,21 @@ export function MessageBubble({ message, onCardAction }: MessageBubbleProps) {
             )}
             {message.card.type === "task-progress" && (
               <TaskProgressCard card={message.card} onAction={onCardAction} />
+            )}
+            {message.card.type === "whatsapp-config" && (
+              <WhatsAppConfigCard data={message.card.data} onAction={onCardAction} />
+            )}
+            {message.card.type === "whatsapp-inbox" && (
+              <WhatsAppInboxCard data={message.card.data} onAction={onCardAction} />
+            )}
+            {message.card.type === "lead-assignment" && (
+              <LeadAssignmentCard data={message.card.data} onAction={onCardAction} />
+            )}
+            {message.card.type === "lead-tags" && (
+              <LeadTagsCard data={message.card.data} onAction={onCardAction} />
+            )}
+            {message.card.type === "conversion-funnel" && (
+              <ConversionFunnelCard data={message.card.data} onAction={onCardAction} />
             )}
           </div>
         )}

@@ -26,7 +26,11 @@ export type CardType =
   | "data-dashboard"
   | "task-progress"
   | "file-upload"
-  | "whatsapp-config";
+  | "whatsapp-config"
+  | "whatsapp-inbox"
+  | "lead-assignment"
+  | "lead-tags"
+  | "conversion-funnel";
 
 export interface RichCard {
   type: CardType;
@@ -115,6 +119,11 @@ type IntentType =
   | 'EMAIL_CUSTOMERS'
   | 'EMAIL_PREVIEW'
   | 'EMAIL_SEND'
+  | 'WHATSAPP_CONFIG'
+  | 'WHATSAPP_INBOX'
+  | 'ASSIGN_LEAD'
+  | 'MANAGE_TAGS'
+  | 'VIEW_FUNNEL'
   | 'HELP'
   | 'UNKNOWN';
 
@@ -405,6 +414,29 @@ const recognizeIntent = (text: string, context: {
     }
   }
   
+  // WhatsApp Agent commands
+  if (lowerText.includes('@whatsapp') || lowerText.includes('whatsapp agent') || lowerText.includes('whatsapp配置')) {
+    if (lowerText.includes('配置') || lowerText.includes('config') || lowerText.includes('设置')) {
+      return { type: 'WHATSAPP_CONFIG', confidence: 0.9 };
+    }
+    if (lowerText.includes('收件箱') || lowerText.includes('inbox') || lowerText.includes('对话') || lowerText.includes('消息')) {
+      return { type: 'WHATSAPP_INBOX', confidence: 0.9 };
+    }
+  }
+  
+  // Team collaboration commands
+  if (lowerText.includes('分配') || lowerText.includes('assign') || lowerText.includes('指派')) {
+    return { type: 'ASSIGN_LEAD', confidence: 0.9 };
+  }
+  
+  if (lowerText.includes('标签') || lowerText.includes('tag') || lowerText.includes('标记')) {
+    return { type: 'MANAGE_TAGS', confidence: 0.9 };
+  }
+  
+  if (lowerText.includes('漏斗') || lowerText.includes('funnel') || lowerText.includes('转化') || lowerText.includes('转化分析')) {
+    return { type: 'VIEW_FUNNEL', confidence: 0.9 };
+  }
+  
   // Help
   if (lowerText.includes('帮助') || lowerText.includes('help') || lowerText.includes('怎么用') || 
       lowerText.includes('指令') || lowerText.includes('功能')) {
@@ -559,6 +591,21 @@ export function useChatState() {
         break;
       case 'EMAIL_SEND':
         handleEmailSend();
+        break;
+      case 'WHATSAPP_CONFIG':
+        handleWhatsAppConfig();
+        break;
+      case 'WHATSAPP_INBOX':
+        handleWhatsAppInbox();
+        break;
+      case 'ASSIGN_LEAD':
+        handleAssignLead();
+        break;
+      case 'MANAGE_TAGS':
+        handleManageTags();
+        break;
+      case 'VIEW_FUNNEL':
+        handleViewFunnel();
         break;
       case 'HELP':
         handleHelp();
@@ -1396,6 +1443,171 @@ export function useChatState() {
     setIsTyping(false);
   };
 
+  // NEW: WhatsApp Agent handlers
+  const handleWhatsAppConfig = () => {
+    setTimeout(() => {
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: `agent-${Date.now()}`,
+          role: "agent",
+          agent: "whatsapp",
+          content: "💬 配置 WhatsApp Business 账号：",
+          card: {
+            type: "whatsapp-config",
+            data: {
+              config: {
+                apiKey: '',
+                phoneNumber: '',
+                businessName: companyProfile?.category || '',
+              }
+            },
+          },
+          timestamp: new Date(),
+        },
+      ]);
+      setIsTyping(false);
+    }, 800);
+  };
+
+  const handleWhatsAppInbox = () => {
+    setTimeout(() => {
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: `agent-${Date.now()}`,
+          role: "agent",
+          agent: "whatsapp",
+          content: "📱 WhatsApp 统一收件箱：",
+          card: {
+            type: "whatsapp-inbox",
+            data: {
+              conversations: [
+                {
+                  id: 'conv-1',
+                  customerName: 'John Smith',
+                  customerPhone: '+1234567890',
+                  lastMessage: 'Can you send me the price list?',
+                  lastMessageTime: new Date().toISOString(),
+                  unreadCount: 2,
+                  status: 'active',
+                  leadScore: 85,
+                },
+                {
+                  id: 'conv-2',
+                  customerName: 'Sarah Johnson',
+                  customerPhone: '+9876543210',
+                  lastMessage: 'Thanks for the information',
+                  lastMessageTime: new Date(Date.now() - 3600000).toISOString(),
+                  unreadCount: 0,
+                  status: 'pending',
+                  leadScore: 72,
+                },
+              ],
+            },
+          },
+          timestamp: new Date(),
+        },
+      ]);
+      setIsTyping(false);
+    }, 1000);
+  };
+
+  // NEW: Team collaboration handlers
+  const handleAssignLead = () => {
+    const highIntentLead = leads.find(l => l.score >= 80);
+    setTimeout(() => {
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: `agent-${Date.now()}`,
+          role: "agent",
+          agent: "lead",
+          content: "👥 将线索分配给团队成员：",
+          card: {
+            type: "lead-assignment",
+            data: {
+              lead: highIntentLead || leads[0],
+              teamMembers: [
+                { id: 'user-1', name: '张三', email: 'zhangsan@company.com', role: '销售经理', currentLeads: 15 },
+                { id: 'user-2', name: '李四', email: 'lisi@company.com', role: '销售专员', currentLeads: 8 },
+                { id: 'user-3', name: '王五', email: 'wangwu@company.com', role: '销售专员', currentLeads: 12 },
+              ],
+            },
+          },
+          timestamp: new Date(),
+        },
+      ]);
+      setIsTyping(false);
+    }, 800);
+  };
+
+  const handleManageTags = () => {
+    const selectedLead = leads[0];
+    setTimeout(() => {
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: `agent-${Date.now()}`,
+          role: "agent",
+          agent: "lead",
+          content: "🏷️ 管理线索标签：",
+          card: {
+            type: "lead-tags",
+            data: {
+              lead: {
+                id: selectedLead.id,
+                company: selectedLead.company,
+                tags: ['高意向'],
+              },
+              availableTags: [
+                { id: 'tag-1', name: '高意向', color: 'bg-red-100 text-red-800' },
+                { id: 'tag-2', name: '已联系', color: 'bg-blue-100 text-blue-800' },
+                { id: 'tag-3', name: '美国', color: 'bg-green-100 text-green-800' },
+                { id: 'tag-4', name: '欧洲', color: 'bg-purple-100 text-purple-800' },
+                { id: 'tag-5', name: '紧急', color: 'bg-orange-100 text-orange-800' },
+              ],
+            },
+          },
+          timestamp: new Date(),
+        },
+      ]);
+      setIsTyping(false);
+    }, 800);
+  };
+
+  // NEW: Analytics handlers
+  const handleViewFunnel = () => {
+    setTimeout(() => {
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: `agent-${Date.now()}`,
+          role: "agent",
+          agent: "supervisor",
+          content: "📊 转化漏斗分析：",
+          card: {
+            type: "conversion-funnel",
+            data: {
+              stages: [
+                { name: '曝光', count: 10000, conversionRate: 100 },
+                { name: '访问', count: 2500, conversionRate: 25 },
+                { name: '线索', count: 500, conversionRate: 20 },
+                { name: '商机', count: 100, conversionRate: 20 },
+                { name: '成交', count: 25, conversionRate: 25 },
+              ],
+              period: '2026-03-01 至 2026-03-31',
+              totalRevenue: 125000,
+              averageDealSize: 5000,
+            },
+          },
+          timestamp: new Date(),
+        },
+      ]);
+      setIsTyping(false);
+    }, 1000);
+  };
+
   const handleHelp = () => {
     setTimeout(() => {
       setMessages((prev) => [
@@ -1404,7 +1616,7 @@ export function useChatState() {
           id: `agent-${Date.now()}`,
           role: "agent",
           agent: "supervisor",
-          content: "我可以帮您完成以下任务：\n\n📋 **获客任务**\n• 「帮我找美国户外用品批发商」创建获客任务\n• 「任务进展如何」查看实时状态\n• 「查看线索」查看已获得的线索\n• 「本周效果如何」查看数据看板\n\n🔍 **SEO Agent**\n• 「@SEO Agent 关键词」查看关键词策略\n• 「@SEO Agent 生成文章」生成SEO文章\n• 「@SEO Agent 编辑文章」编辑SEO文章\n• 「@SEO Agent 绑定站点」连接WordPress/Shopify\n• 「@SEO Agent 文章数据」查看文章效果\n• 「@SEO Agent 竞品分析」分析竞争对手\n• 「@SEO Agent 生成站点」一键建站\n• 「@SEO Agent 健康检查」SEO健康监控\n• 「@SEO Agent 推荐关键词」获取关键词推荐\n\n✉️ **Email Agent**\n• 「@Email Agent 客户」筛选目标客户\n• 「@Email Agent 预览邮件」预览开发信\n\n有什么可以帮您的吗？",
+          content: "我可以帮您完成以下任务：\n\n📋 **获客任务**\n• 「帮我找美国户外用品批发商」创建获客任务\n• 「任务进展如何」查看实时状态\n• 「查看线索」查看已获得的线索\n• 「本周效果如何」查看数据看板\n• 「转化漏斗」查看转化分析\n\n🔍 **SEO Agent**\n• 「@SEO Agent 关键词」查看关键词策略\n• 「@SEO Agent 生成文章」生成SEO文章\n• 「@SEO Agent 编辑文章」编辑SEO文章\n• 「@SEO Agent 绑定站点」连接WordPress/Shopify\n• 「@SEO Agent 文章数据」查看文章效果\n• 「@SEO Agent 竞品分析」分析竞争对手\n• 「@SEO Agent 生成站点」一键建站\n• 「@SEO Agent 健康检查」SEO健康监控\n• 「@SEO Agent 推荐关键词」获取关键词推荐\n\n✉️ **Email Agent**\n• 「@Email Agent 客户」筛选目标客户\n• 「@Email Agent 预览邮件」预览开发信\n\n💬 **WhatsApp Agent**\n• 「@WhatsApp Agent 配置」设置WhatsApp账号\n• 「@WhatsApp Agent 收件箱」查看消息对话\n\n👥 **团队协作**\n• 「分配线索」将线索分配给团队成员\n• 「标签」管理线索标签\n\n有什么可以帮您的吗？",
           timestamp: new Date(),
         },
       ]);
@@ -1823,6 +2035,109 @@ export function useChatState() {
           handleEmailSend();
           break;
 
+        // WhatsApp actions
+        case "save-whatsapp-config":
+          setMessages((prev) => [
+            ...prev,
+            {
+              id: `agent-${Date.now()}`,
+              role: "agent",
+              agent: "whatsapp",
+              content: "✅ WhatsApp Business 配置已保存！\n\n您的 WhatsApp 账号已成功连接，可以开始接收和发送消息了。",
+              timestamp: new Date(),
+            },
+          ]);
+          setAgentStatuses((prev) =>
+            prev.map((a) =>
+              a.agent === "whatsapp" ? { ...a, status: "idle" as const, task: undefined, progress: 100 } : a
+            )
+          );
+          break;
+
+        case "test-whatsapp-connection":
+          setMessages((prev) => [
+            ...prev,
+            {
+              id: `agent-${Date.now()}`,
+              role: "agent",
+              agent: "whatsapp",
+              content: "🔄 连接测试完成！WhatsApp Business API 连接正常。",
+              timestamp: new Date(),
+            },
+          ]);
+          break;
+
+        case "whatsapp-handover":
+          setMessages((prev) => [
+            ...prev,
+            {
+              id: `agent-${Date.now()}`,
+              role: "agent",
+              agent: "whatsapp",
+              content: "👋 已转人工处理！\n\n此对话已标记为人工接管，AI 将不再自动回复。",
+              timestamp: new Date(),
+            },
+          ]);
+          break;
+
+        // Team collaboration actions
+        case "assign-lead":
+          setMessages((prev) => [
+            ...prev,
+            {
+              id: `agent-${Date.now()}`,
+              role: "agent",
+              agent: "lead",
+              content: `✅ 线索已分配！\n\n团队成员将负责跟进此线索。`,
+              timestamp: new Date(),
+            },
+          ]);
+          setLeads(prev => prev.map(l => 
+            l.id === cardData?.leadId 
+              ? { ...l, status: "following" as const }
+              : l
+          ));
+          break;
+
+        case "cancel-assignment":
+          setMessages((prev) => [
+            ...prev,
+            {
+              id: `agent-${Date.now()}`,
+              role: "agent",
+              agent: "lead",
+              content: "已取消分配。",
+              timestamp: new Date(),
+            },
+          ]);
+          break;
+
+        case "save-tags":
+          setMessages((prev) => [
+            ...prev,
+            {
+              id: `agent-${Date.now()}`,
+              role: "agent",
+              agent: "lead",
+              content: "✅ 标签已保存！",
+              timestamp: new Date(),
+            },
+          ]);
+          break;
+
+        case "cancel-tags":
+          setMessages((prev) => [
+            ...prev,
+            {
+              id: `agent-${Date.now()}`,
+              role: "agent",
+              agent: "lead",
+              content: "已取消标签编辑。",
+              timestamp: new Date(),
+            },
+          ]);
+          break;
+
         // Lead actions
         case "view-all-leads": {
           const highIntentLeads = leads.filter(l => l.score >= 80);
@@ -1955,20 +2270,6 @@ export function useChatState() {
               role: "agent",
               agent: "supervisor",
               content: `已设置跟进提醒！我会在24小时后提醒您跟进此线索。`,
-              timestamp: new Date(),
-            },
-          ]);
-          break;
-        }
-
-        case "assign-lead": {
-          setMessages((prev) => [
-            ...prev,
-            {
-              id: `agent-${Date.now()}`,
-              role: "agent",
-              agent: "supervisor",
-              content: `功能开发中：团队线索分配功能即将上线，届时您可以将线索分配给团队成员协作跟进。`,
               timestamp: new Date(),
             },
           ]);
