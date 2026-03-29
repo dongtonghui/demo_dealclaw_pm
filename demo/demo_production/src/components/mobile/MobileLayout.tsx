@@ -112,8 +112,10 @@ export function MobileLayout({ chatState }: MobileLayoutProps) {
         </AnimatePresence>
       </main>
 
-      {/* Bottom Navigation */}
-      <MobileBottomNav activeTab={nav.activeTab} onTabChange={nav.setActiveTab} />
+      {/* Bottom Navigation - Hidden in chat tab */}
+      {nav.activeTab !== "chat" && (
+        <MobileBottomNav activeTab={nav.activeTab} onTabChange={nav.setActiveTab} />
+      )}
 
       {/* Drawers */}
       <SidebarDrawer
