@@ -230,14 +230,18 @@ const Index = () => {
                       </div>
                       <span className="text-white font-semibold text-sm">🎉 获得新询盘 #{leadIndex + 1}</span>
                     </div>
-                    {isTop && (
-                      <button 
-                        onClick={() => setShowLeadNotification(false)}
-                        className="text-white/80 hover:text-white transition-colors"
-                      >
-                        <X className="w-4 h-4" />
-                      </button>
-                    )}
+                    <button 
+                      onClick={() => {
+                        // Remove this specific notification
+                        setDemoNotifications(prev => prev.filter((_, i) => i !== arrayIndex));
+                        if (demoNotifications.length <= 1) {
+                          setShowLeadNotification(false);
+                        }
+                      }}
+                      className="text-white/80 hover:text-white transition-colors"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
                   </div>
                   
                   {/* Content */}
@@ -266,25 +270,29 @@ const Index = () => {
                       </div>
                     </div>
                     
-                    {isTop && (
-                      <div className="flex gap-2 mt-2">
-                        <button 
-                          onClick={() => {
-                            setCurrentDemoLeadIndex(leadIndex);
-                            setShowLeadDetail(true);
-                          }}
-                          className="flex-1 bg-primary text-white py-1.5 rounded-lg text-xs font-medium hover:bg-primary/90 transition-colors"
-                        >
-                          查看详情
-                        </button>
-                        <button 
-                          onClick={() => setShowLeadNotification(false)}
-                          className="px-3 py-1.5 border border-gray-200 rounded-lg text-xs text-gray-600 hover:bg-gray-50 transition-colors"
-                        >
-                          稍后
-                        </button>
-                      </div>
-                    )}
+                    <div className="flex gap-2 mt-2">
+                      <button 
+                        onClick={() => {
+                          setCurrentDemoLeadIndex(leadIndex);
+                          setShowLeadDetail(true);
+                        }}
+                        className="flex-1 bg-primary text-white py-1.5 rounded-lg text-xs font-medium hover:bg-primary/90 transition-colors"
+                      >
+                        查看详情
+                      </button>
+                      <button 
+                        onClick={() => {
+                          // Remove this specific notification
+                          setDemoNotifications(prev => prev.filter((_, i) => i !== arrayIndex));
+                          if (demoNotifications.length <= 1) {
+                            setShowLeadNotification(false);
+                          }
+                        }}
+                        className="px-3 py-1.5 border border-gray-200 rounded-lg text-xs text-gray-600 hover:bg-gray-50 transition-colors"
+                      >
+                        稍后
+                      </button>
+                    </div>
                   </div>
                 </div>
               </motion.div>
