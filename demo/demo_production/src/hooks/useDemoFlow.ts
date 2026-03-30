@@ -309,14 +309,21 @@ const DEMO_FLOW_CONFIG: Record<DemoStep, {
         timestamp: new Date(),
       },
     ],
-    delay: 2000,
+    delay: 3000, // 给用户3秒时间阅读消息
     autoProceed: true,
   },
   
   new_lead_notification: {
     nextStep: "lead_detail_viewed",
-    getMessages: () => [],
-    delay: 3000,
+    getMessages: () => [
+      {
+        id: "demo-system-2",
+        role: "system",
+        content: "正在执行获客任务，模拟中...",
+        timestamp: new Date(),
+      },
+    ],
+    delay: 2000,
     autoProceed: true,
   },
   
@@ -428,13 +435,20 @@ export function useDemoFlow(
       timeoutRef.current = setTimeout(() => {
         const nextStep = config.nextStep;
         log('Auto-proceeding from', step, 'to', nextStep);
+        
+        // Special handling for new_lead_notification step
+        if (step === "new_lead_notification") {
+          log('Triggering lead notification popup');
+          onLeadNotification?.();
+        }
+        
         isProcessingRef.current = false;
         executeStep(nextStep);
       }, totalDelay);
     } else if (step === "new_lead_notification") {
-      // Special handling for lead notification
+      // Fallback: Special handling for lead notification (when autoProceed is false)
       timeoutRef.current = setTimeout(() => {
-        log('Triggering lead notification');
+        log('Triggering lead notification (fallback)');
         onLeadNotification?.();
         setState(prev => ({ ...prev, currentStep: "lead_detail_viewed", canProceed: true }));
         isProcessingRef.current = false;
