@@ -13,6 +13,9 @@ const Index = () => {
   const [rightPanelOpen, setRightPanelOpen] = useState(true);
   const [showLeadNotification, setShowLeadNotification] = useState(false);
   const [showLeadDetail, setShowLeadDetail] = useState(false);
+  
+  // Demo stacked notifications state
+  const [demoNotifications, setDemoNotifications] = useState<number[]>([]); // Array of visible notification indices
   const chatState = useChatState();
   const { isMobile } = useBreakpoint();
   
@@ -51,6 +54,7 @@ const Index = () => {
   // Handle lead notification during demo
   const handleDemoLeadNotification = useCallback((leadIndex: number) => {
     setCurrentDemoLeadIndex(leadIndex);
+    setDemoNotifications(prev => [...prev, leadIndex]);
     setShowLeadNotification(true);
     // Play notification sound (optional)
     // const audio = new Audio('/notification.mp3');
@@ -72,6 +76,7 @@ const Index = () => {
     setIsDemoRunning(true);
     setShowLeadNotification(false);
     setShowLeadDetail(false);
+    setDemoNotifications([]);
     
     // Start the demo flow
     demoFlow.startDemo();
@@ -84,6 +89,7 @@ const Index = () => {
     setDemoMessages(null);
     setShowLeadNotification(false);
     setShowLeadDetail(false);
+    setDemoNotifications([]);
   }, [demoFlow]);
 
   // Handle card actions during demo
@@ -175,93 +181,117 @@ const Index = () => {
         )}
       </AnimatePresence>
       
-      {/* Lead Notification Popup */}
-      <AnimatePresence>
-        {showLeadNotification && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9, y: 20 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.9, y: 20 }}
-            className="absolute bottom-8 right-8 z-50"
-          >
-            <div className="bg-white rounded-2xl shadow-2xl border border-green-100 overflow-hidden w-80">
-              {/* Header */}
-              <div className="bg-gradient-to-r from-green-500 to-emerald-600 px-4 py-3 flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
-                    <Sparkles className="w-4 h-4 text-white" />
-                  </div>
-                  <span className="text-white font-semibold">🎉 获得新询盘！</span>
-                </div>
-                <button 
-                  onClick={() => setShowLeadNotification(false)}
-                  className="text-white/80 hover:text-white transition-colors"
+      {/* Stacked Lead Notifications */}
+      <div className="absolute bottom-8 right-8 z-50 flex flex-col-reverse gap-2 pointer-events-none">
+        <AnimatePresence>
+          {demoNotifications.map((leadIndex, arrayIndex) => {
+            const lead = DEMO_LEADS[leadIndex];
+            const stackIndex = demoNotifications.length - 1 - arrayIndex; // 0 = bottom, 2 = top
+            const isTop = stackIndex === demoNotifications.length - 1;
+            
+            return (
+              <motion.div
+                key={`${leadIndex}-${arrayIndex}`}
+                initial={{ opacity: 0, scale: 0.8, y: 50, x: 20 }}
+                animate={{ 
+                  opacity: 1 - (stackIndex * 0.15), // Lower opacity for cards behind
+                  scale: 1 - (stackIndex * 0.05),   // Smaller scale for cards behind
+                  y: -stackIndex * 12,               // Stack upward
+                  x: -stackIndex * 8,                // Slight left offset
+                  rotateZ: stackIndex * 2,           // Slight rotation
+                  zIndex: 50 - stackIndex,
+                }}
+                exit={{ opacity: 0, scale: 0.8, y: 20 }}
+                transition={{ 
+                  type: "spring", 
+                  stiffness: 400, 
+                  damping: 25,
+                  delay: arrayIndex * 0.1 
+                }}
+                className="pointer-events-auto"
+                style={{ 
+                  marginBottom: stackIndex > 0 ? -60 : 0,
+                }}
+              >
+                <div 
+                  className={`bg-white rounded-2xl shadow-2xl border-2 overflow-hidden w-80 transition-all duration-300 ${
+                    isTop ? 'border-green-400 shadow-green-200' : 'border-gray-200'
+                  }`}
                 >
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
-              
-              {/* Content */}
-              <div className="p-4">
-                <div className="flex items-start gap-3 mb-3">
-                  <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <Building2 className="w-5 h-5 text-blue-600" />
+                  {/* Header */}
+                  <div className={`px-4 py-2.5 flex items-center justify-between ${
+                    isTop 
+                      ? 'bg-gradient-to-r from-green-500 to-emerald-600' 
+                      : 'bg-gradient-to-r from-green-400/80 to-emerald-500/80'
+                  }`}>
+                    <div className="flex items-center gap-2">
+                      <div className="w-7 h-7 bg-white/20 rounded-full flex items-center justify-center">
+                        <Sparkles className="w-3.5 h-3.5 text-white" />
+                      </div>
+                      <span className="text-white font-semibold text-sm">🎉 获得新询盘 #{leadIndex + 1}</span>
+                    </div>
+                    {isTop && (
+                      <button 
+                        onClick={() => setShowLeadNotification(false)}
+                        className="text-white/80 hover:text-white transition-colors"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    )}
                   </div>
-                  <div>
-                    <h4 className="font-semibold text-gray-900">{currentDemoLead.company}</h4>
-                    <p className="text-sm text-gray-500">{currentDemoLead.location}</p>
+                  
+                  {/* Content */}
+                  <div className="p-3">
+                    <div className="flex items-start gap-2.5 mb-2">
+                      <div className="w-9 h-9 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <Building2 className="w-4 h-4 text-blue-600" />
+                      </div>
+                      <div className="min-w-0">
+                        <h4 className="font-semibold text-gray-900 text-sm truncate">{lead.company}</h4>
+                        <p className="text-xs text-gray-500 truncate">{lead.location}</p>
+                      </div>
+                    </div>
+                    
+                    <div className="space-y-1 mb-2">
+                      <div className="flex items-center gap-1.5 text-xs">
+                        <User className="w-3.5 h-3.5 text-gray-400" />
+                        <span className="text-gray-600 truncate">{lead.contactName}</span>
+                        <span className="text-[10px] bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded-full">采购经理</span>
+                      </div>
+                      <div className="flex items-center gap-1.5 text-xs">
+                        <TrendingUp className="w-3.5 h-3.5 text-gray-400" />
+                        <span className="text-gray-600">AI评分:</span>
+                        <span className="font-semibold text-green-600">{lead.score}/100</span>
+                        <span className="text-[10px] text-green-600">{lead.source === 'email' ? '📧 邮件' : '🔍 SEO'}</span>
+                      </div>
+                    </div>
+                    
+                    {isTop && (
+                      <div className="flex gap-2 mt-2">
+                        <button 
+                          onClick={() => {
+                            setCurrentDemoLeadIndex(leadIndex);
+                            setShowLeadDetail(true);
+                          }}
+                          className="flex-1 bg-primary text-white py-1.5 rounded-lg text-xs font-medium hover:bg-primary/90 transition-colors"
+                        >
+                          查看详情
+                        </button>
+                        <button 
+                          onClick={() => setShowLeadNotification(false)}
+                          className="px-3 py-1.5 border border-gray-200 rounded-lg text-xs text-gray-600 hover:bg-gray-50 transition-colors"
+                        >
+                          稍后
+                        </button>
+                      </div>
+                    )}
                   </div>
                 </div>
-                
-                <div className="space-y-2 mb-4">
-                  <div className="flex items-center gap-2 text-sm">
-                    <User className="w-4 h-4 text-gray-400" />
-                    <span className="text-gray-600">{currentDemoLead.contactName}</span>
-                    <span className="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full">采购经理</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-sm">
-                    <Mail className="w-4 h-4 text-gray-400" />
-                    <span className="text-gray-600">{currentDemoLead.email}</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-sm">
-                    <TrendingUp className="w-4 h-4 text-gray-400" />
-                    <span className="text-gray-600">AI评分:</span>
-                    <span className="font-semibold text-green-600">{currentDemoLead.score}/100</span>
-                    <span className="text-xs text-green-600">高意向</span>
-                  </div>
-                </div>
-                
-                {/* Latest interaction */}
-                <div className="bg-amber-50 rounded-lg p-3 mb-4">
-                  <p className="text-xs text-amber-700 font-medium mb-1">最新互动</p>
-                  <p className="text-sm text-gray-700 line-clamp-2">
-                    "Hi, thanks for reaching out. Can you send me your wholesale price list and MOQ for camping tents? We're looking to expand our product line."
-                  </p>
-                </div>
-                
-                {/* Actions */}
-                <div className="flex gap-2">
-                  <button 
-                    onClick={() => {
-                      setShowLeadNotification(false);
-                      setShowLeadDetail(true);
-                    }}
-                    className="flex-1 bg-primary text-white py-2 rounded-lg text-sm font-medium hover:bg-primary/90 transition-colors"
-                  >
-                    查看详情
-                  </button>
-                  <button 
-                    onClick={() => setShowLeadNotification(false)}
-                    className="px-4 py-2 border border-gray-200 rounded-lg text-sm text-gray-600 hover:bg-gray-50 transition-colors"
-                  >
-                    稍后
-                  </button>
-                </div>
-              </div>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+              </motion.div>
+            );
+          })}
+        </AnimatePresence>
+      </div>
       
       {/* Lead Detail Modal */}
       <AnimatePresence>
