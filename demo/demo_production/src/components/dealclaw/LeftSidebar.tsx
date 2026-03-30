@@ -1,9 +1,12 @@
-import { Search, Plus, MessageSquare, Target, Settings, ChevronDown, Zap, Users, BarChart3, Mail, FileText } from "lucide-react";
+import { Search, Plus, MessageSquare, Target, Settings, ChevronDown, Zap, Users, BarChart3, Mail, FileText, Play, Square } from "lucide-react";
 import { useState } from "react";
 
 interface LeftSidebarProps {
   activeTask: string;
   onSelectTask: (task: string) => void;
+  onStartDemo?: () => void;
+  onStopDemo?: () => void;
+  isDemoRunning?: boolean;
 }
 
 const tasks = [
@@ -32,7 +35,7 @@ const navItems = [
   { id: "content", label: "内容中心", icon: FileText, count: 6 },
 ];
 
-export function LeftSidebar({ activeTask, onSelectTask }: LeftSidebarProps) {
+export function LeftSidebar({ activeTask, onSelectTask, onStartDemo, onStopDemo, isDemoRunning }: LeftSidebarProps) {
   const [expandedSections, setExpandedSections] = useState({
     tasks: true,
     agents: true,
@@ -55,8 +58,29 @@ export function LeftSidebar({ activeTask, onSelectTask }: LeftSidebarProps) {
         <span className="ml-auto text-[10px] font-mono text-muted-foreground bg-muted px-1.5 py-0.5 rounded">BETA</span>
       </div>
 
-      {/* New Task */}
+      {/* Demo Button */}
       <div className="p-3">
+        {isDemoRunning ? (
+          <button 
+            onClick={onStopDemo}
+            className="w-full flex items-center gap-2 px-3 py-2 rounded-lg bg-amber-100 text-amber-700 border border-amber-200 text-sm hover:bg-amber-200 transition-colors"
+          >
+            <Square className="w-4 h-4 fill-current" />
+            停止演示
+          </button>
+        ) : (
+          <button 
+            onClick={onStartDemo}
+            className="w-full flex items-center gap-2 px-3 py-2 rounded-lg bg-gradient-to-r from-violet-500 to-purple-600 text-white text-sm hover:from-violet-600 hover:to-purple-700 transition-all shadow-sm hover:shadow-md"
+          >
+            <Play className="w-4 h-4 fill-current" />
+            功能演示
+          </button>
+        )}
+      </div>
+
+      {/* New Task */}
+      <div className="px-3 pb-3">
         <button className="w-full flex items-center gap-2 px-3 py-2 rounded-lg border border-dashed border-border text-sm text-muted-foreground hover:border-primary hover:text-primary transition-colors">
           <Plus className="w-4 h-4" />
           新建获客任务
