@@ -4,7 +4,7 @@ import { ChatPanel } from "@/components/dealclaw/ChatPanel";
 import { ContextPanel } from "@/components/dealclaw/ContextPanel";
 import { MobileLayout } from "@/components/mobile/MobileLayout";
 import { useChatState, type ChatMessage, type Lead } from "@/hooks/useChatState";
-import { useDemoFlow } from "@/hooks/useDemoFlow";
+import { useDemoFlow, DEMO_LEADS } from "@/hooks/useDemoFlow";
 import { useBreakpoint } from "@/hooks/useBreakpoint";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Sparkles, User, Building2, Mail, TrendingUp } from "lucide-react";
@@ -21,30 +21,14 @@ const Index = () => {
   const [demoAgentStatuses, setDemoAgentStatuses] = useState(chatState.agentStatuses);
   const [isDemoRunning, setIsDemoRunning] = useState(false);
   
+  // Demo lead notification state
+  const [currentDemoLeadIndex, setCurrentDemoLeadIndex] = useState(0);
+  const currentDemoLead = DEMO_LEADS[currentDemoLeadIndex];
+  
   // Use demo messages when in demo mode, otherwise use chatState messages
   const displayMessages = demoMessages || chatState.messages;
   const displayAgentStatuses = isDemoRunning ? demoAgentStatuses : chatState.agentStatuses;
   
-  // Demo leads override
-  const [demoLead, setDemoLead] = useState<Lead>({
-    id: "DEMO-001",
-    company: "Summit Camping Supply",
-    location: "Austin, Texas, USA",
-    industry: "户外用品零售",
-    size: "85人",
-    score: 94,
-    source: "email",
-    status: "new",
-    contactName: "Mike Johnson",
-    email: "mike@summitcamping.com",
-    lastContact: "刚刚",
-    interactions: [
-      { type: "email_sent", timestamp: "2026-03-30 10:30", details: "开发信已送达" },
-      { type: "email_opened", timestamp: "2026-03-30 10:35", details: "打开邮件" },
-      { type: "email_replied", timestamp: "2026-03-30 10:42", details: "回复询问价格表和MOQ" },
-    ],
-  });
-
   // Handle adding messages during demo
   const handleDemoMessagesAdd = useCallback((messages: ChatMessage[]) => {
     setDemoMessages(prev => {
@@ -65,7 +49,8 @@ const Index = () => {
   }, []);
 
   // Handle lead notification during demo
-  const handleDemoLeadNotification = useCallback(() => {
+  const handleDemoLeadNotification = useCallback((leadIndex: number) => {
+    setCurrentDemoLeadIndex(leadIndex);
     setShowLeadNotification(true);
     // Play notification sound (optional)
     // const audio = new Audio('/notification.mp3');
@@ -223,25 +208,25 @@ const Index = () => {
                     <Building2 className="w-5 h-5 text-blue-600" />
                   </div>
                   <div>
-                    <h4 className="font-semibold text-gray-900">{demoLead.company}</h4>
-                    <p className="text-sm text-gray-500">{demoLead.location}</p>
+                    <h4 className="font-semibold text-gray-900">{currentDemoLead.company}</h4>
+                    <p className="text-sm text-gray-500">{currentDemoLead.location}</p>
                   </div>
                 </div>
                 
                 <div className="space-y-2 mb-4">
                   <div className="flex items-center gap-2 text-sm">
                     <User className="w-4 h-4 text-gray-400" />
-                    <span className="text-gray-600">{demoLead.contactName}</span>
+                    <span className="text-gray-600">{currentDemoLead.contactName}</span>
                     <span className="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full">采购经理</span>
                   </div>
                   <div className="flex items-center gap-2 text-sm">
                     <Mail className="w-4 h-4 text-gray-400" />
-                    <span className="text-gray-600">{demoLead.email}</span>
+                    <span className="text-gray-600">{currentDemoLead.email}</span>
                   </div>
                   <div className="flex items-center gap-2 text-sm">
                     <TrendingUp className="w-4 h-4 text-gray-400" />
                     <span className="text-gray-600">AI评分:</span>
-                    <span className="font-semibold text-green-600">{demoLead.score}/100</span>
+                    <span className="font-semibold text-green-600">{currentDemoLead.score}/100</span>
                     <span className="text-xs text-green-600">高意向</span>
                   </div>
                 </div>
@@ -302,8 +287,8 @@ const Index = () => {
                     <Building2 className="w-6 h-6 text-blue-600" />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-lg text-gray-900">{demoLead.company}</h3>
-                    <p className="text-sm text-gray-500">{demoLead.location} · {demoLead.industry}</p>
+                    <h3 className="font-semibold text-lg text-gray-900">{currentDemoLead.company}</h3>
+                    <p className="text-sm text-gray-500">{currentDemoLead.location} · {currentDemoLead.industry}</p>
                   </div>
                 </div>
                 <button 
@@ -319,13 +304,13 @@ const Index = () => {
                 {/* Score Badge */}
                 <div className="flex items-center gap-2 mb-6">
                   <div className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm font-medium">
-                    AI评分 {demoLead.score}/100
+                    AI评分 {currentDemoLead.score}/100
                   </div>
                   <div className="bg-amber-100 text-amber-700 px-3 py-1 rounded-full text-sm font-medium">
                     🔥 高意向
                   </div>
                   <div className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm font-medium">
-                    {demoLead.source === "email" ? "📧 邮件渠道" : "🔍 SEO渠道"}
+                    {currentDemoLead.source === "email" ? "📧 邮件渠道" : "🔍 SEO渠道"}
                   </div>
                 </div>
                 
@@ -333,12 +318,12 @@ const Index = () => {
                 <div className="grid grid-cols-2 gap-4 mb-6">
                   <div className="bg-gray-50 rounded-xl p-4">
                     <p className="text-xs text-gray-500 mb-1">公司规模</p>
-                    <p className="font-medium text-gray-900">{demoLead.size}</p>
+                    <p className="font-medium text-gray-900">{currentDemoLead.size}</p>
                   </div>
                   <div className="bg-gray-50 rounded-xl p-4">
                     <p className="text-xs text-gray-500 mb-1">联系人</p>
-                    <p className="font-medium text-gray-900">{demoLead.contactName}</p>
-                    <p className="text-xs text-gray-500">{demoLead.email}</p>
+                    <p className="font-medium text-gray-900">{currentDemoLead.contactName}</p>
+                    <p className="text-xs text-gray-500">{currentDemoLead.email}</p>
                   </div>
                 </div>
                 
@@ -346,7 +331,7 @@ const Index = () => {
                 <div className="mb-6">
                   <h4 className="font-medium text-gray-900 mb-4">互动时间线</h4>
                   <div className="space-y-3">
-                    {demoLead.interactions?.map((interaction, index) => (
+                    {currentDemoLead.interactions?.map((interaction, index) => (
                       <div key={index} className="flex items-start gap-3">
                         <div className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0" />
                         <div className="flex-1 pb-3 border-b border-gray-100 last:border-0">

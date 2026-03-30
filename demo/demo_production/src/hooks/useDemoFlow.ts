@@ -1,5 +1,5 @@
 import { useState, useCallback, useRef, useEffect } from "react";
-import type { ChatMessage, CompanyProfile, CustomerPersona } from "./useChatState";
+import type { ChatMessage, CompanyProfile, CustomerPersona, Lead } from "./useChatState";
 
 export type DemoStep = 
   | "idle"
@@ -17,10 +17,70 @@ export type DemoStep =
   | "new_lead_notification"
   | "lead_detail_viewed";
 
+// Demo leads data - 3 different leads for sequential notification
+export const DEMO_LEADS: Lead[] = [
+  {
+    id: "DEMO-001",
+    company: "Summit Camping Supply",
+    location: "Austin, Texas, USA",
+    industry: "户外用品零售",
+    size: "85人",
+    score: 94,
+    source: "email",
+    status: "new",
+    contactName: "Mike Johnson",
+    email: "mike@summitcamping.com",
+    lastContact: "刚刚",
+    interactions: [
+      { type: "email_sent", timestamp: "2026-03-30 10:30", details: "开发信已送达" },
+      { type: "email_opened", timestamp: "2026-03-30 10:35", details: "打开邮件" },
+      { type: "email_replied", timestamp: "2026-03-30 10:42", details: "回复询问价格表和MOQ" },
+    ],
+  },
+  {
+    id: "DEMO-002",
+    company: "Outdoor Adventure Co.",
+    location: "Denver, Colorado, USA",
+    industry: "户外品牌",
+    size: "120人",
+    score: 91,
+    source: "seo",
+    status: "new",
+    contactName: "Sarah Williams",
+    email: "sarah@outdooradventure.com",
+    lastContact: "刚刚",
+    interactions: [
+      { type: "site_visit", timestamp: "2026-03-30 10:45", details: "通过Google搜索进入网站" },
+      { type: "site_visit", timestamp: "2026-03-30 10:48", details: "浏览产品目录页面" },
+      { type: "email_sent", timestamp: "2026-03-30 10:50", details: "提交询盘表单" },
+    ],
+  },
+  {
+    id: "DEMO-003",
+    company: "Mountain Gear Wholesale",
+    location: "Seattle, Washington, USA",
+    industry: "装备批发",
+    size: "200人",
+    score: 88,
+    source: "email",
+    status: "new",
+    contactName: "David Chen",
+    email: "david@mountaingear.com",
+    lastContact: "刚刚",
+    interactions: [
+      { type: "email_sent", timestamp: "2026-03-30 10:52", details: "开发信已送达" },
+      { type: "email_opened", timestamp: "2026-03-30 10:55", details: "打开邮件" },
+      { type: "site_visit", timestamp: "2026-03-30 10:58", details: "点击链接访问网站" },
+      { type: "email_replied", timestamp: "2026-03-30 11:00", details: "回复索要样品" },
+    ],
+  },
+];
+
 interface DemoFlowState {
   isRunning: boolean;
   currentStep: DemoStep;
   canProceed: boolean;
+  currentLeadIndex: number;
 }
 
 export interface DemoFlowActions {
@@ -351,16 +411,18 @@ const log = (...args: any[]) => {
 export function useDemoFlow(
   onMessagesAdd: (messages: ChatMessage[]) => void,
   onAgentStatusChange: (agent: string, status: string, task?: string, progress?: number) => void,
-  onLeadNotification?: () => void
+  onLeadNotification?: (leadIndex: number) => void
 ): DemoFlowState & DemoFlowActions {
   // Use a single state object to avoid stale closures
   const [state, setState] = useState<{
     isRunning: boolean;
     currentStep: DemoStep;
+    currentLeadIndex: number;
     canProceed: boolean;
   }>({
     isRunning: false,
     currentStep: "idle",
+    currentLeadIndex: 0,
     canProceed: false,
   });
   
@@ -446,15 +508,32 @@ export function useDemoFlow(
       }, totalDelay);
     } else if (step === "new_lead_notification") {
       // Special handling for lead notification step
-      // Show notification after messages are displayed
-      const notificationDelay = (messages.length * 800) + 500;
-      timeoutRef.current = setTimeout(() => {
-        log('Triggering lead notification popup');
-        onLeadNotification?.();
-      }, notificationDelay);
+      // Trigger 3 lead notifications every 2 seconds
+      const baseDelay = messages.length * 800;
       
-      // Then proceed to next step
-      const totalDelay = config.delay + (messages.length * 800);
+      // First notification at 500ms
+      timeoutRef.current = setTimeout(() => {
+        log('Triggering lead notification 1/3');
+        setState(prev => ({ ...prev, currentLeadIndex: 0 }));
+        onLeadNotification?.(0);
+      }, baseDelay + 500);
+      
+      // Second notification at 2500ms (2 seconds after first)
+      timeoutRef.current = setTimeout(() => {
+        log('Triggering lead notification 2/3');
+        setState(prev => ({ ...prev, currentLeadIndex: 1 }));
+        onLeadNotification?.(1);
+      }, baseDelay + 2500);
+      
+      // Third notification at 4500ms (2 seconds after second)
+      timeoutRef.current = setTimeout(() => {
+        log('Triggering lead notification 3/3');
+        setState(prev => ({ ...prev, currentLeadIndex: 2 }));
+        onLeadNotification?.(2);
+      }, baseDelay + 4500);
+      
+      // Then proceed to next step after all notifications
+      const totalDelay = baseDelay + 7000; // 7 seconds total
       timeoutRef.current = setTimeout(() => {
         log('Auto-proceeding from new_lead_notification to lead_detail_viewed');
         setState(prev => ({ ...prev, currentStep: "lead_detail_viewed", canProceed: true }));
