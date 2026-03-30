@@ -390,6 +390,10 @@ export function useDemoFlow(
   }, []);
 
   const executeStep = useCallback((step: DemoStep) => {
+    // Update current step state and ref
+    setCurrentStep(step);
+    currentStepRef.current = step;
+    
     const config = DEMO_FLOW_CONFIG[step];
     if (!config) return;
     
