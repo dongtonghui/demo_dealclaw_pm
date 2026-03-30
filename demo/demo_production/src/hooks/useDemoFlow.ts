@@ -6,16 +6,13 @@ export type DemoStep =
   | "onboarding_start"
   | "onboarding_user_input"
   | "onboarding_followup"
-  | "onboarding_profile_generated"
   | "onboarding_profile_confirmed"
   | "task_creation_start"
   | "task_user_input"
   | "task_followup"
-  | "task_persona_generated"
   | "task_persona_confirmed"
   | "coordinating_agents"
   | "strategy_generated"
-  | "strategy_editing"
   | "strategy_confirmed"
   | "new_lead_notification"
   | "lead_detail_viewed";
@@ -30,31 +27,27 @@ export interface DemoFlowActions {
   startDemo: () => void;
   stopDemo: () => void;
   proceedToNextStep: () => void;
-  getCurrentStepData: () => {
-    messages: ChatMessage[];
-    delay: number;
-    autoProceed: boolean;
-  } | null;
+  handleAction: (actionId: string) => void;
 }
 
-// Demo flow configuration
+// Demo flow configuration - defined outside component to be stable
 const DEMO_FLOW_CONFIG: Record<DemoStep, {
   nextStep: DemoStep;
-  messages: (data: DemoData) => ChatMessage[];
+  getMessages: (data: DemoData) => ChatMessage[];
   delay: number;
   autoProceed: boolean;
   waitForAction?: string;
 }> = {
   idle: {
     nextStep: "onboarding_start",
-    messages: () => [],
+    getMessages: () => [],
     delay: 0,
     autoProceed: false,
   },
   
   onboarding_start: {
     nextStep: "onboarding_user_input",
-    messages: () => [
+    getMessages: () => [
       {
         id: "demo-1",
         role: "agent",
@@ -69,7 +62,7 @@ const DEMO_FLOW_CONFIG: Record<DemoStep, {
   
   onboarding_user_input: {
     nextStep: "onboarding_followup",
-    messages: () => [
+    getMessages: () => [
       {
         id: "demo-user-1",
         role: "user",
@@ -82,8 +75,8 @@ const DEMO_FLOW_CONFIG: Record<DemoStep, {
   },
   
   onboarding_followup: {
-    nextStep: "onboarding_profile_generated",
-    messages: () => [
+    nextStep: "onboarding_profile_confirmed",
+    getMessages: () => [
       {
         id: "demo-2",
         role: "agent",
@@ -124,16 +117,9 @@ const DEMO_FLOW_CONFIG: Record<DemoStep, {
     waitForAction: "confirm-profile",
   },
   
-  onboarding_profile_generated: {
-    nextStep: "onboarding_profile_confirmed",
-    messages: () => [],
-    delay: 500,
-    autoProceed: false,
-  },
-  
   onboarding_profile_confirmed: {
     nextStep: "task_creation_start",
-    messages: () => [
+    getMessages: () => [
       {
         id: "demo-4",
         role: "agent",
@@ -148,7 +134,7 @@ const DEMO_FLOW_CONFIG: Record<DemoStep, {
   
   task_creation_start: {
     nextStep: "task_user_input",
-    messages: () => [
+    getMessages: () => [
       {
         id: "demo-user-3",
         role: "user",
@@ -161,8 +147,8 @@ const DEMO_FLOW_CONFIG: Record<DemoStep, {
   },
   
   task_user_input: {
-    nextStep: "task_followup",
-    messages: () => [
+    nextStep: "task_persona_confirmed",
+    getMessages: () => [
       {
         id: "demo-5",
         role: "agent",
@@ -204,16 +190,9 @@ const DEMO_FLOW_CONFIG: Record<DemoStep, {
     waitForAction: "confirm-persona",
   },
   
-  task_persona_generated: {
-    nextStep: "task_persona_confirmed",
-    messages: () => [],
-    delay: 500,
-    autoProceed: false,
-  },
-  
   task_persona_confirmed: {
     nextStep: "coordinating_agents",
-    messages: () => [
+    getMessages: () => [
       {
         id: "demo-system-1",
         role: "system",
@@ -227,7 +206,7 @@ const DEMO_FLOW_CONFIG: Record<DemoStep, {
   
   coordinating_agents: {
     nextStep: "strategy_generated",
-    messages: () => [
+    getMessages: () => [
       {
         id: "demo-thinking",
         role: "agent",
@@ -241,8 +220,8 @@ const DEMO_FLOW_CONFIG: Record<DemoStep, {
   },
   
   strategy_generated: {
-    nextStep: "strategy_editing",
-    messages: (data) => [
+    nextStep: "strategy_confirmed",
+    getMessages: (data) => [
       {
         id: "demo-7",
         role: "agent",
@@ -319,16 +298,9 @@ const DEMO_FLOW_CONFIG: Record<DemoStep, {
     waitForAction: "confirm-plan",
   },
   
-  strategy_editing: {
-    nextStep: "strategy_confirmed",
-    messages: () => [],
-    delay: 500,
-    autoProceed: false,
-  },
-  
   strategy_confirmed: {
     nextStep: "new_lead_notification",
-    messages: () => [
+    getMessages: () => [
       {
         id: "demo-9",
         role: "agent",
@@ -343,14 +315,14 @@ const DEMO_FLOW_CONFIG: Record<DemoStep, {
   
   new_lead_notification: {
     nextStep: "lead_detail_viewed",
-    messages: () => [],
+    getMessages: () => [],
     delay: 3000,
     autoProceed: true,
   },
   
   lead_detail_viewed: {
     nextStep: "idle",
-    messages: () => [],
+    getMessages: () => [],
     delay: 0,
     autoProceed: false,
   },
@@ -361,24 +333,32 @@ interface DemoData {
   customerPersona?: CustomerPersona;
 }
 
+// Debug logger
+const DEBUG = true;
+const log = (...args: any[]) => {
+  if (DEBUG) {
+    console.log('[DemoFlow]', ...args);
+  }
+};
+
 export function useDemoFlow(
   onMessagesAdd: (messages: ChatMessage[]) => void,
   onAgentStatusChange: (agent: string, status: string, task?: string, progress?: number) => void,
-  onLeadNotification?: () => void,
-  onShowLeadDetail?: () => void
+  onLeadNotification?: () => void
 ): DemoFlowState & DemoFlowActions {
-  const [isRunning, setIsRunning] = useState(false);
-  const [currentStep, setCurrentStep] = useState<DemoStep>("idle");
-  const [canProceed, setCanProceed] = useState(false);
-  const [demoData, setDemoData] = useState<DemoData>({});
+  // Use a single state object to avoid stale closures
+  const [state, setState] = useState<{
+    isRunning: boolean;
+    currentStep: DemoStep;
+    canProceed: boolean;
+  }>({
+    isRunning: false,
+    currentStep: "idle",
+    canProceed: false,
+  });
   
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const currentStepRef = useRef<DemoStep>("idle");
-  
-  // Keep ref in sync
-  useEffect(() => {
-    currentStepRef.current = currentStep;
-  }, [currentStep]);
+  const isProcessingRef = useRef(false);
   
   // Clear timeout on unmount
   useEffect(() => {
@@ -389,20 +369,35 @@ export function useDemoFlow(
     };
   }, []);
 
+  // Execute a step - using functional updates to avoid stale closures
   const executeStep = useCallback((step: DemoStep) => {
-    // Update current step state and ref
-    setCurrentStep(step);
-    currentStepRef.current = step;
+    if (isProcessingRef.current) {
+      log('Already processing, skipping');
+      return;
+    }
+    
+    isProcessingRef.current = true;
+    log('Executing step:', step);
+    
+    // Update state immediately
+    setState(prev => ({ ...prev, currentStep: step, canProceed: false }));
     
     const config = DEMO_FLOW_CONFIG[step];
-    if (!config) return;
+    if (!config) {
+      log('No config for step:', step);
+      isProcessingRef.current = false;
+      return;
+    }
     
-    // Add messages for this step
-    const messages = config.messages(demoData);
+    // Get messages for this step
+    const messages = config.getMessages({});
+    log('Step messages count:', messages.length);
+    
     if (messages.length > 0) {
       // Stagger message delivery
       messages.forEach((msg, index) => {
         timeoutRef.current = setTimeout(() => {
+          log('Adding message:', msg.id, 'for step:', step);
           onMessagesAdd([msg]);
           
           // Update agent status for certain steps
@@ -415,37 +410,56 @@ export function useDemoFlow(
             onAgentStatusChange("seo", "working", "生成SEO文章", 60);
             onAgentStatusChange("email", "working", "筛选目标客户", 50);
           }
+          
+          // If this is the last message and auto-proceed is false, allow proceeding
+          if (index === messages.length - 1 && !config.autoProceed && step !== "new_lead_notification") {
+            log('Setting canProceed to true for step:', step);
+            setState(prev => ({ ...prev, canProceed: true }));
+            isProcessingRef.current = false;
+          }
         }, index * 800);
       });
     }
     
-    // Handle auto-proceed or wait for action
+    // Handle auto-proceed
     if (config.autoProceed) {
       const totalDelay = config.delay + (messages.length * 800);
+      log('Auto-proceeding in', totalDelay, 'ms');
       timeoutRef.current = setTimeout(() => {
         const nextStep = config.nextStep;
-        setCurrentStep(nextStep);
+        log('Auto-proceeding from', step, 'to', nextStep);
+        isProcessingRef.current = false;
         executeStep(nextStep);
       }, totalDelay);
     } else if (step === "new_lead_notification") {
       // Special handling for lead notification
       timeoutRef.current = setTimeout(() => {
+        log('Triggering lead notification');
         onLeadNotification?.();
-        setCurrentStep("lead_detail_viewed");
-        setCanProceed(true);
+        setState(prev => ({ ...prev, currentStep: "lead_detail_viewed", canProceed: true }));
+        isProcessingRef.current = false;
       }, config.delay);
-    } else {
-      // Wait for user action
-      setCanProceed(true);
+    } else if (messages.length === 0) {
+      // No messages to display, allow proceeding immediately
+      log('No messages, setting canProceed to true');
+      setState(prev => ({ ...prev, canProceed: true }));
+      isProcessingRef.current = false;
     }
-  }, [demoData, onMessagesAdd, onAgentStatusChange, onLeadNotification]);
+    // If there are messages, canProceed will be set after the last message
+  }, [onMessagesAdd, onAgentStatusChange, onLeadNotification]);
 
   const startDemo = useCallback(() => {
-    // Clear existing messages and start fresh
-    setIsRunning(true);
-    setCurrentStep("onboarding_start");
-    setCanProceed(false);
-    setDemoData({});
+    log('Starting demo');
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+    isProcessingRef.current = false;
+    
+    setState({
+      isRunning: true,
+      currentStep: "onboarding_start",
+      canProceed: false,
+    });
     
     // Small delay before starting
     timeoutRef.current = setTimeout(() => {
@@ -454,43 +468,59 @@ export function useDemoFlow(
   }, [executeStep]);
 
   const stopDemo = useCallback(() => {
-    setIsRunning(false);
-    setCurrentStep("idle");
-    setCanProceed(false);
+    log('Stopping demo');
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current);
     }
+    isProcessingRef.current = false;
+    setState({
+      isRunning: false,
+      currentStep: "idle",
+      canProceed: false,
+    });
   }, []);
 
   const proceedToNextStep = useCallback(() => {
-    if (!canProceed) return;
+    log('Proceeding to next step, current:', state.currentStep, 'canProceed:', state.canProceed);
     
-    setCanProceed(false);
-    const config = DEMO_FLOW_CONFIG[currentStepRef.current];
+    if (!state.canProceed) {
+      log('Cannot proceed, canProceed is false');
+      return;
+    }
+    
+    const config = DEMO_FLOW_CONFIG[state.currentStep];
     if (config) {
       const nextStep = config.nextStep;
-      setCurrentStep(nextStep);
+      log('Proceeding from', state.currentStep, 'to', nextStep);
+      setState(prev => ({ ...prev, canProceed: false }));
       executeStep(nextStep);
     }
-  }, [canProceed, executeStep]);
+  }, [state.currentStep, state.canProceed, executeStep]);
 
   const handleAction = useCallback((actionId: string) => {
-    const config = DEMO_FLOW_CONFIG[currentStepRef.current];
+    log('Handling action:', actionId, 'current step:', state.currentStep);
+    
+    const config = DEMO_FLOW_CONFIG[state.currentStep];
+    log('Current step config:', config);
+    log('waitForAction:', config?.waitForAction);
+    
     if (config?.waitForAction === actionId) {
+      log('Action matches waitForAction, proceeding');
       proceedToNextStep();
+    } else {
+      log('Action does not match waitForAction');
     }
     
     // Handle specific actions
     if (actionId === "edit-site") {
-      // Show site editing UI
-      console.log("Opening site editor...");
+      log("Opening site editor...");
     }
-  }, [proceedToNextStep]);
+  }, [state.currentStep, proceedToNextStep]);
 
   return {
-    isRunning,
-    currentStep,
-    canProceed,
+    isRunning: state.isRunning,
+    currentStep: state.currentStep,
+    canProceed: state.canProceed,
     startDemo,
     stopDemo,
     proceedToNextStep,
