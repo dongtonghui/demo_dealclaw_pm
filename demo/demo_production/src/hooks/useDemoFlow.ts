@@ -319,12 +319,12 @@ const DEMO_FLOW_CONFIG: Record<DemoStep, {
       {
         id: "demo-system-2",
         role: "system",
-        content: "正在执行获客任务，模拟中...",
+        content: "🎯 正在执行获客任务，系统运行中...",
         timestamp: new Date(),
       },
     ],
-    delay: 2000,
-    autoProceed: true,
+    delay: 3500, // 3.5秒后显示弹窗
+    autoProceed: false, // 使用自定义处理逻辑
   },
   
   lead_detail_viewed: {
@@ -436,23 +436,30 @@ export function useDemoFlow(
         const nextStep = config.nextStep;
         log('Auto-proceeding from', step, 'to', nextStep);
         
-        // Special handling for new_lead_notification step
-        if (step === "new_lead_notification") {
-          log('Triggering lead notification popup');
-          onLeadNotification?.();
+        // Special handling: when leaving strategy_confirmed, trigger lead notification
+        if (step === "strategy_confirmed") {
+          log('Task started, will show lead notification soon');
         }
         
         isProcessingRef.current = false;
         executeStep(nextStep);
       }, totalDelay);
     } else if (step === "new_lead_notification") {
-      // Fallback: Special handling for lead notification (when autoProceed is false)
+      // Special handling for lead notification step
+      // Show notification after messages are displayed
+      const notificationDelay = (messages.length * 800) + 500;
       timeoutRef.current = setTimeout(() => {
-        log('Triggering lead notification (fallback)');
+        log('Triggering lead notification popup');
         onLeadNotification?.();
+      }, notificationDelay);
+      
+      // Then proceed to next step
+      const totalDelay = config.delay + (messages.length * 800);
+      timeoutRef.current = setTimeout(() => {
+        log('Auto-proceeding from new_lead_notification to lead_detail_viewed');
         setState(prev => ({ ...prev, currentStep: "lead_detail_viewed", canProceed: true }));
         isProcessingRef.current = false;
-      }, config.delay);
+      }, totalDelay);
     } else if (messages.length === 0) {
       // No messages to display, allow proceeding immediately
       log('No messages, setting canProceed to true');
