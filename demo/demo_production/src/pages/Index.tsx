@@ -6,6 +6,7 @@ import { MobileLayout } from "@/components/mobile/MobileLayout";
 import { useChatState, type ChatMessage, type Lead } from "@/hooks/useChatState";
 import { useDemoFlow, DEMO_LEADS } from "@/hooks/useDemoFlow";
 import { useBreakpoint } from "@/hooks/useBreakpoint";
+import { useTheme } from "@/hooks/useTheme";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Sparkles, User, Building2, Mail, TrendingUp } from "lucide-react";
 
@@ -27,6 +28,9 @@ const Index = () => {
   // Demo lead notification state
   const [currentDemoLeadIndex, setCurrentDemoLeadIndex] = useState(0);
   const currentDemoLead = DEMO_LEADS[currentDemoLeadIndex];
+  
+  // Theme management
+  const { theme, toggleTheme } = useTheme();
   
   // Use demo messages when in demo mode, otherwise use chatState messages
   const displayMessages = demoMessages || chatState.messages;
@@ -139,6 +143,8 @@ const Index = () => {
         onStartDemo={handleStartDemo}
         onStopDemo={handleStopDemo}
         isDemoRunning={isDemoRunning}
+        theme={theme}
+        onToggleTheme={toggleTheme}
       />
       <ChatPanel
         messages={displayMessages}

@@ -1,4 +1,4 @@
-import { Search, Plus, MessageSquare, Target, Settings, ChevronDown, Zap, Users, BarChart3, Mail, FileText, Play, Square } from "lucide-react";
+import { Search, Plus, MessageSquare, Target, Settings, ChevronDown, Zap, Users, BarChart3, Mail, FileText, Play, Square, Sun, Moon } from "lucide-react";
 import { useState } from "react";
 
 interface LeftSidebarProps {
@@ -7,6 +7,8 @@ interface LeftSidebarProps {
   onStartDemo?: () => void;
   onStopDemo?: () => void;
   isDemoRunning?: boolean;
+  theme?: 'dark' | 'light';
+  onToggleTheme?: () => void;
 }
 
 const tasks = [
@@ -35,7 +37,7 @@ const navItems = [
   { id: "content", label: "内容中心", icon: FileText, count: 6 },
 ];
 
-export function LeftSidebar({ activeTask, onSelectTask, onStartDemo, onStopDemo, isDemoRunning }: LeftSidebarProps) {
+export function LeftSidebar({ activeTask, onSelectTask, onStartDemo, onStopDemo, isDemoRunning, theme = 'dark', onToggleTheme }: LeftSidebarProps) {
   const [expandedSections, setExpandedSections] = useState({
     tasks: true,
     agents: true,
@@ -214,7 +216,23 @@ export function LeftSidebar({ activeTask, onSelectTask, onStartDemo, onStopDemo,
       )}
 
       {/* Settings */}
-      <div className="p-3 border-t border-border">
+      <div className="p-3 border-t border-border space-y-1">
+        <button 
+          onClick={onToggleTheme}
+          className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-sidebar-foreground hover:bg-sidebar-accent transition-colors"
+        >
+          {theme === 'dark' ? (
+            <>
+              <Sun className="w-4 h-4 text-amber-400" />
+              <span>切换浅色主题</span>
+            </>
+          ) : (
+            <>
+              <Moon className="w-4 h-4 text-indigo-500" />
+              <span>切换深色主题</span>
+            </>
+          )}
+        </button>
         <button className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-sidebar-foreground hover:bg-sidebar-accent transition-colors">
           <Settings className="w-4 h-4" />
           设置
